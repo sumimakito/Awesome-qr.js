@@ -8,7 +8,7 @@ An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
 EFQRCode is a tool to generate QRCode image or recognize QRCode from image, in Swift.
 
-AwesomeQRCode is inspired by [EFQRCode by EyreFree](https://github.com/EyreFree/EFQRCode).
+Awesome-qr.js is inspired by [EFQRCode by EyreFree](https://github.com/EyreFree/EFQRCode).
 
 If your application is in need of generating pretty QR codes in Swift, take a look at EFQRCode.
 
