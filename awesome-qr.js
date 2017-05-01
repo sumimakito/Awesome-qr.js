@@ -1176,6 +1176,34 @@ var AwesomeQRCode;
                     var sRatio = bW / bH;
                     _oContext.drawImage(_htOption.backgroundImage, 0, 0, _htOption.height * sRatio, _htOption.height);
                 }
+
+                if (_htOption.binarize) {
+                    var pixels = _oContext.getImageData(0, 0, _htOption.width, _htOption.height);
+                    var threshold = 128;
+                    if (parseInt(_htOption.binarizeThreshold) > 0 && parseInt(_htOption.binarizeThreshold) < 255) {
+                        threshold = parseInt(_htOption.binarizeThreshold);
+                    }
+                    for (var i = 0; i < pixels.data.length; i += 4) {
+                        var R = pixels.data[i]; //R(0-255)
+                        var G = pixels.data[i + 1]; //G(0-255)
+                        var B = pixels.data[i + 2]; //G(0-255)
+                        var sum = rgb2gray(R, G, B);
+                        if (sum > threshold) {
+                            pixels.data[i] = 255;
+                            pixels.data[i + 1] = 255;
+                            pixels.data[i + 2] = 255;
+                        } else {
+                            pixels.data[i] = 0;
+                            pixels.data[i + 1] = 0;
+                            pixels.data[i + 2] = 0;
+                        }
+                    }
+                    _oContext.putImageData(pixels, 0, 0);
+
+                    _htOption.colorDark = "#000000";
+                    _htOption.colorLight = "#FFFFFF";
+                }
+
             } else {
                 _oContext.rect(0, 0, _htOption.width, _htOption.height);
                 _oContext.fillStyle = "#ffffff";
@@ -1293,6 +1321,9 @@ var AwesomeQRCode;
         return Drawing;
     })();
 
+    function rgb2gray(r, g, b) {
+        return 0.30 * r + 0.59 * b + 0.11 * b;
+    }
 
     function drawAgnProtector(context, centerX, centerY, nWidth, nHeight) {
         context.fillRect((centerX - 2 + 0.5) * nWidth, (centerY - 2 + 0.5) * nHeight, 4 * nWidth, 4 * nHeight);
@@ -1356,7 +1387,9 @@ var AwesomeQRCode;
             colorLight: "#ffffff",
             correctLevel: QRErrorCorrectLevel.H,
             backgroundImage: undefined,
-            autoColor: true
+            autoColor: true,
+            binarize: false,
+            binarizeThreshold: 128
         };
 
         if (typeof vOption === 'string') {
