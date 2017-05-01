@@ -16,11 +16,11 @@ It should help.
 
 ### AwesomeQRCode written for Android, 支持 Android 的 AwesomeQRCode
 
-Redirect to [AwesomeQRCode](https://github.com/SumiMakito/AwesomeQRCode)
+Redirect to [AwesomeQRCode](https://github.com/SumiMakito/AwesomeQRCode).
 
 ### Vue 2.x Component for Awesome-qr.js
 
-Take a look at [Vue-qr by Binaryify](https://github.com/Binaryify/vue-qr)
+Take a look at [Vue-qr by Binaryify](https://github.com/Binaryify/vue-qr).
 
 ### Live demo, 演示网页
 
