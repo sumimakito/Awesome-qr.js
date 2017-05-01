@@ -4,17 +4,6 @@ An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
 一个优雅的<del>(不起眼的)</del> QR 二维码生成器
 
-### Changelog 更新日志
-
-##### Ver. 1.0.1
-
-- Published to NPM.
-- Now background images can be binarized.
-
-##### Ver 1.0.0
-
-- Initial release.
-
 ### Live demo, 演示网页
 
 Take a look at the [live demo](https://www.bitcat.cc/webapp/awesome-qr/index.html).
@@ -28,6 +17,12 @@ Example 1|Example 2|Example 3
 <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-1.png" width="400"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-2.png" width="400"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-3.png" width="400">
 
 ### Quick start, 快速上手
+
+```
+npm install awesome-qr
+```
+
+... or import the .js file manually as you like.
 
 ```java
 new AwesomeQRCode(
@@ -72,6 +67,16 @@ PayPal | Alipay
 ----|----
 [PayPal](https://www.paypal.me/makito) | [Alipay](https://qr.alipay.com/a6x02021re1jk4ftcymlw79)
 
+### Changelog 更新日志
+
+##### Ver. 1.0.1
+
+- Published to NPM.
+- Now background images can be binarized.
+
+##### Ver 1.0.0
+
+- Initial release.
 
 ### Copyright &amp; License, 版权信息与授权协议
 
