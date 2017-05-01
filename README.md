@@ -8,6 +8,10 @@ An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
 Redirect to [AwesomeQRCode](https://github.com/SumiMakito/AwesomeQRCode)
 
+### Vue 2.x Component for Awesome-qr.js
+
+Take a look at [Vue-qr by Binaryify](https://github.com/Binaryify/vue-qr)
+
 ### Live demo, 演示网页
 
 Take a look at the [live demo](https://www.bitcat.cc/webapp/awesome-qr/index.html).
