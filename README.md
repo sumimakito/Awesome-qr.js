@@ -1,4 +1,4 @@
-# Awesome-qr.js
+# Awesome-qr.js [![npm version](https://badge.fury.io/js/awesome-qr.svg)](https://badge.fury.io/js/awesome-qr)
 
 An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
@@ -19,10 +19,13 @@ Example 1|Example 2|Example 3
 ### Quick start, 快速上手
 
 ```
-npm install awesome-qr
+npm install awesome-qr --save
 ```
 
 ... or import the .js file manually as you like.
+
+**ATTENTION PLEASE**
+Parameter list has been changed in Version 1.0.3.
 
 ```java
 new AwesomeQRCode(
@@ -33,13 +36,14 @@ new AwesomeQRCode(
         colorDark: "#000000",               // Color of blocks. Will be OVERRIDE by autoColor. 实点的颜色
         colorLight: "#FFFFFF",              // Color of empty space. Will be OVERRIDE by autoColor. 空白点的颜色
         correctLevel: AwesomeQRCode.CorrectLevel.H, 
-        backgroundImage: backgroundImg,     // The background image to embed in the QR code. If undefined, no background image will be embedded. 欲嵌入的背景图
+        backgroundImage: backgroundImg,     // Optional. The background image to embed in the QR code. If undefined, no background image will be embedded. 欲嵌入的背景图
         autoColor: true                     // If true, colorDark will be set to the dominant color of backgroundImage. Default is true. 若为 true, 则将从背景图取主要颜色作为实点颜色
-        binarize: false,                    // If true, background image will be binarized. Default is false.
-        binarizeThreshold: 128              // Optional threshold for binarizing.
-    }, 
-    function(dataUrl) {
-        $("#qrcode").attr("src", dataUrl);
+        binarize: false,                    // Optional. If true, background image will be binarized. Default is false.
+        binarizeThreshold: 128              // Optional. Threshold for binarizing.
+        callback: function(dataUri){        //
+            ...                             // Optional. You can get the data URI of the generated QR code here. 
+        },                                  //
+        bindElement: 'qrcode'               // Optional. MUST be the ID of the target element. (without "#" prefix used in jQuery). Element type can be <div>, <img>, etc.
     }
 );
 ```
@@ -69,7 +73,11 @@ PayPal | Alipay
 
 ### Changelog 更新日志
 
-##### Ver. 1.0.1
+##### Ver. 1.0.3
+
+- Now generated QR codes can be automatically filled into specified elements.
+
+##### Ver. 1.0.2, 1.0.1
 
 - Published to NPM.
 - Now background images can be binarized.

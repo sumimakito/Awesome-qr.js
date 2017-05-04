@@ -1128,7 +1128,7 @@ var AwesomeQRCode;
             }
         };
 
-        var Drawing = function(htOption, callback) {
+        var Drawing = function(htOption) {
             this._bIsPainted = false;
             this._android = _getAndroid();
 
@@ -1142,7 +1142,8 @@ var AwesomeQRCode;
             this._elImage.alt = "Scan me!";
             this._elImage.style.display = "none";
             this._bSupportDataURI = null;
-            this._callback = callback;
+            this._callback = htOption.callback;
+            this._bindElement = htOption.bindElement;
         };
 
         Drawing.prototype.draw = function(oQRCode) {
@@ -1292,7 +1293,24 @@ var AwesomeQRCode;
             }
 
             this._bIsPainted = true;
-            this._callback(this._elCanvas.toDataURL());
+            if (this._callback != undefined) {
+                this._callback(this._elCanvas.toDataURL());
+            }
+            if (this._bindElement != undefined) {
+                try {
+                    var el = document.getElementById(this._bindElement);
+                    if (el.nodeName == 'IMG') {
+                        el.src = this._elCanvas.toDataURL();
+                    } else {
+                        var elStyle = el.style;
+                        elStyle["background-image"] = 'url(' + this._elCanvas.toDataURL() + ')';
+                        elStyle["background-size"] = 'contain';
+                        elStyle["background-repeat"] = 'no-repeat';
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
         };
 
         Drawing.prototype.makeImage = function() {
@@ -1378,7 +1396,7 @@ var AwesomeQRCode;
         return replacedText.length + (replacedText.length != sText ? 3 : 0);
     }
 
-    AwesomeQRCode = function(vOption, callback) {
+    AwesomeQRCode = function(vOption) {
         this._htOption = {
             width: 800,
             height: 800,
@@ -1389,7 +1407,9 @@ var AwesomeQRCode;
             backgroundImage: undefined,
             autoColor: true,
             binarize: false,
-            binarizeThreshold: 128
+            binarizeThreshold: 128,
+            callback: undefined,
+            bindElement: undefined
         };
 
         if (typeof vOption === 'string') {
@@ -1410,7 +1430,7 @@ var AwesomeQRCode;
 
         this._android = _getAndroid();
         this._oQRCode = null;
-        this._oDrawing = new Drawing(this._htOption, callback);
+        this._oDrawing = new Drawing(this._htOption);
 
         if (this._htOption.text) {
             this.makeCode(this._htOption.text);
