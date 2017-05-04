@@ -24,7 +24,7 @@ npm install awesome-qr --save
 
 ... or import the .js file manually as you like.
 
-**ATTENTION PLEASE**
+**ATTENTION PLEASE:**
 Parameter list has been changed in Version 1.0.3.
 
 ```java
