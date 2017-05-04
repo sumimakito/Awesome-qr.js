@@ -48,6 +48,8 @@ new AwesomeQRCode(
 );
 ```
 
+> If you'd like to try out the new options add in v1.0.3, explore the source code of [this page](https://www.bitcat.cc/webapp/awesome-qr/index2.html).
+
 ### Introducing EFQRCode written in Swift
 
 EFQRCode is a tool to generate QRCode image or recognize QRCode from image, in Swift.
