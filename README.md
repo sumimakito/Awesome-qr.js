@@ -8,7 +8,9 @@ An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
 Take a look at the [live demo](https://www.bitcat.cc/webapp/awesome-qr/index.html).
 
-### Compatibilit, 兼容性
+### Compatibility, 兼容性
+
+> Awesome-qr.js is compatible with following browsers.
 
 - Chrome 4 to 57 (Chrome for Android 53)
 - Firefox 3.6 to 52 (Firefox for Android 49)
@@ -84,6 +86,10 @@ PayPal | Alipay
 [PayPal](https://www.paypal.me/makito) | [Alipay](https://qr.alipay.com/a6x02021re1jk4ftcymlw79)
 
 ### Changelog 更新日志
+
+##### Ver. 1.0.4
+
+- Compatibility improved.
 
 ##### Ver. 1.0.3
 
