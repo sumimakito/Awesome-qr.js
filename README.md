@@ -8,6 +8,16 @@ An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
 Take a look at the [live demo](https://www.bitcat.cc/webapp/awesome-qr/index.html).
 
+### Compatibilit, 兼容性
+
+- Chrome 4 to 57 (Chrome for Android 53)
+- Firefox 3.6 to 52 (Firefox for Android 49)
+- Opera 9 to 43 (Opera Mobile 10 to 37)
+- Safari 4 to TP (iOS Safari 3.2 to 10)
+- Android Browser 3 to 53
+- Edge 12 to 14
+- IE 9 to 11
+
 ### Examples, 样例
 
 > Try to scan these QR codes below with your smart phone.
