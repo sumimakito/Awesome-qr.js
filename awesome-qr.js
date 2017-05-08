@@ -1526,7 +1526,7 @@ var AwesomeQRCode;
 
 (function (window, factory) {
     if (typeof exports === 'object') {
-        module.exports = factory();
+        module.exports = factory;
     } else if (typeof define === 'function' && define.amd) {
         define(factory);
     } else {
