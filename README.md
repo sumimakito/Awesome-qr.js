@@ -28,39 +28,96 @@ Example 1|Example 2|Example 3
 ------------ | ------------- | -------------
 <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-1.png" width="400"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-2.png" width="400"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-3.png" width="400">
 
+Binarized|With a logo|Custom color
+------------ | ------------- | -------------
+<img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-4.png" width="400"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-5.png" width="400"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-6.png" width="400">
+
 ### Quick start, 快速上手
 
 ```
 npm install awesome-qr --save
 ```
 
-... or import the .js file manually as you like.
-
-**ATTENTION PLEASE:**
-Parameter list has been changed in Version 1.0.3.
-
-```java
-new AwesomeQRCode(
-    {
-        text: "Makito loves Kafuu Chino.",  // Contents to encode. 欲编码的内容
-        width: 800,                         // Width, should equal to height. 宽度, 宽高应当一致
-        height: 800,                        // Height, should equal to width. 高度, 宽高应当一致
-        colorDark: "#000000",               // Color of blocks. Will be OVERRIDE by autoColor. 实点的颜色
-        colorLight: "#FFFFFF",              // Color of empty space. Will be OVERRIDE by autoColor. 空白点的颜色
-        correctLevel: AwesomeQRCode.CorrectLevel.H, 
-        backgroundImage: backgroundImg,     // Optional. The background image to embed in the QR code. If undefined, no background image will be embedded. 欲嵌入的背景图
-        autoColor: true                     // If true, colorDark will be set to the dominant color of backgroundImage. Default is true. 若为 true, 则将从背景图取主要颜色作为实点颜色
-        binarize: false,                    // Optional. If true, background image will be binarized. Default is false.
-        binarizeThreshold: 128              // Optional. Threshold for binarizing.
-        callback: function(dataUri){        //
-            ...                             // Optional. You can get the data URI of the generated QR code here. 
-        },                                  //
-        bindElement: 'qrcode'               // Optional. MUST be the ID of the target element. (without "#" prefix used in jQuery). Element type can be <div>, <img>, etc.
-    }
-);
+```javascript
+require(['awesome-qr'], function (awesomeQR) {
+    awesomeQR.create({
+        text: 'Makito loves Kafuu Chino.',
+        size: 800,
+        margin: 20,
+        backgroundImage: backgroundImg,
+        logoImage: logoImg,
+        bindElement: 'qrcode'
+    });
+});
 ```
 
-> If you'd like to try out the new options add in v1.0.3, explore the source code of [this page](https://www.bitcat.cc/webapp/awesome-qr/index2.html).
+... or import the .js file manually as you like, and ...
+
+```javascript
+new AwesomeQRCode().create({
+    text: 'Makito loves Kafuu Chino.',
+    size: 800,
+    margin: 20,
+    backgroundImage: backgroundImg,
+    logoImage: logoImg,
+    callback: function(dataURI){
+        console.log(dataURI);
+    },
+    bindElement: 'qrcode'
+});
+```
+
+### Parameters, 参数
+
+> Here's a full list of all parameters, but some of them are optional.
+
+> (Translation) 以下列出全部参数，但其中部分参数是可选的。
+
+```javascript
+new AwesomeQRCode().create({
+    text: 'Makito loves Kafuu Chino.'
+    size: 800,
+    margin: 20,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    backgroundImage: backgroundImg,
+    backgroundDimming: 'rgba(0,0,0,0)',
+    logoImage: logoImg,
+    logoScale: 0.2,
+    logoMargin: 6,
+    logoCornerRadius: 8,
+    whiteMargin: true,
+    dotScale: 0.35,
+    autoColor: true,
+    binarize: false,
+    binarizeThreshold: 128,
+    callback: function(dataURI){},
+    bindElement: 'qrcode'
+});
+```
+
+Parameter | Explanation
+----|----
+contents | Contents to encode. 欲编码的内容
+size | Width as well as the height of the output QR code, includes margin. 尺寸, 长宽一致, 包含外边距
+margin | Margin to add around the QR code. 二维码图像的外边距, 默认 20px
+colorDark | Color of "true" blocks. Works only when both colorDark and colorLight are set. (BYTE_DTA, BYTE_POS, BYTE_AGN, BYTE_TMG) 实点的颜色
+colorLight | Color of empty space, or "false" blocks. Works only when both colorDark and colorLight are set. (BYTE_EPT) 空白区的颜色
+backgroundImage | Background image to embed in the QR code. Leave null to disable. 欲嵌入的背景图, 设为 null 以禁用
+backgroundDimming | Color mask to add above the background image. Helpful when having problems with decoding. 叠加在背景图上的颜色, 在解码有难度的时有一定帮助
+logoImage | Logo image to embed at the center of generated QR code. Leave `undefined` to disable. 欲嵌入至二维码中心的 LOGO 标识, 设为 `undefined` 以禁用
+logoScale | Value used to scale the logo image. Larger value may result in decode failure. Size of the logo equals to `logoScale*(size-2*margin)`. Default is 0.2f. 用于计算 LOGO 大小的值, 过大将导致解码失败, LOGO 尺寸计算公式 `logoScale*(size-2*margin)`, 默认 0.2f
+logoMargin | White margin that appears around the logo image. Leave 0 to disable. LOGO 标识周围的空白边框, 设为 0 以禁用
+logoCornerRadius | Radius of the logo's corners. Leave 0 to disable. LOGO 标识及其边框的圆角半径, 设为 0 以禁用
+whiteMargin | If set to true, a white border will appear around the background image. Default is true. 若设为 true, 背景图外将绘制白色边框
+dotScale | Value used to scale down the data dots' size. (0 < scale < 1.0f) 数据区域点缩小比例
+autoColor | If set to true, the dominant color of backgroundImage will be used as colorDark. Default is true. 若为 true, 背景图的主要颜色将作为实点的颜色, 即 colorDark
+binarize | If set to true, the whole image will be binarized with the given threshold, or default threshold if not specified. Default is false. 若为 true, 图像将被二值化处理, 未指定阈值则使用默认值
+binarizeThreshold | Threshold used to binarize the whole image. Default is 128. (0 < threshold < 255) 二值化处理的阈值
+callback | Data URI of the generated QR code will be available here. 生成的二维码 Data URI 可以在回调中取得
+bindElement | Element to inject the generated QR code into. MUST be the ID of the target element. (without the "#" prefix). Element type can be <div>, <img>, etc.
+
+> If you'd like to try out the feature `bindElement`, explore the source code of [this page](https://www.bitcat.cc/webapp/awesome-qr/index2.html).
 
 ### Introducing EFQRCode written in Swift
 
@@ -86,6 +143,12 @@ PayPal | Alipay
 [PayPal](https://www.paypal.me/makito) | [Alipay](https://qr.alipay.com/a6x02021re1jk4ftcymlw79)
 
 ### Changelog 更新日志
+
+##### Ver. 1.0.5
+
+- Now you may use Awesome-qr.js with [require.js](http://requirejs.org/).
+- New feature: Embedding a logo image in the QR code.
+- Added some features which previously only available on Android platform.
 
 ##### Ver. 1.0.4
 
