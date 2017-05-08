@@ -1,4 +1,7 @@
-# Awesome-qr.js [![npm version](https://badge.fury.io/js/awesome-qr.svg)](https://badge.fury.io/js/awesome-qr)
+# Awesome-qr.js 
+
+[![npm version](https://badge.fury.io/js/awesome-qr.svg)](https://badge.fury.io/js/awesome-qr)
+[![license](https://img.shields.io/github/license/SumiMakito/Awesome-qr.js.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
