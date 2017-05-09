@@ -972,7 +972,7 @@ var AwesomeQRCode;
                 _oContext.save();
                 prepareRoundedCornerClip(_oContext, x, y, logoSize, logoSize, logoCornerRadius);
                 _oContext.clip();
-                _oContext.drawImage(logoImg, x, y, logoSize, logoSize);
+                _oContext.drawImage(_htOption.logoImage, x, y, logoSize, logoSize);
                 _oContext.restore();
             }
 

@@ -147,6 +147,10 @@ PayPal | Alipay
 
 ### Changelog 更新日志
 
+##### Ver. 1.0.7
+
+- Minor fixes.
+
 ##### Ver. 1.0.6
 
 - Fixed an issue related to the coordinate system.
