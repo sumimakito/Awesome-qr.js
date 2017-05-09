@@ -118,7 +118,7 @@ autoColor | If set to true, the dominant color of backgroundImage will be used a
 binarize | If set to true, the whole image will be binarized with the given threshold, or default threshold if not specified. Default is false. 若为 true, 图像将被二值化处理, 未指定阈值则使用默认值
 binarizeThreshold | Threshold used to binarize the whole image. Default is 128. (0 < threshold < 255) 二值化处理的阈值
 callback | Data URI of the generated QR code will be available here. 生成的二维码 Data URI 可以在回调中取得
-bindElement | Element to inject the generated QR code into. MUST be the ID of the target element. (without the "#" prefix). Element type can be <div>, <img>, etc.
+bindElement | Element to inject the generated QR code into. MUST be the ID of the target element. (without the "#" prefix). Element type can be `<div>`, `<img>`, etc.
 
 > If you'd like to try out the feature `bindElement`, explore the source code of [this page](https://www.bitcat.cc/webapp/awesome-qr/index2.html).
 
