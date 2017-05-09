@@ -147,6 +147,10 @@ PayPal | Alipay
 
 ### Changelog 更新日志
 
+##### Ver. 1.0.6
+
+- Fixed an issue related to the coordinate system.
+
 ##### Ver. 1.0.5
 
 - Now you may use Awesome-qr.js with [require.js](http://requirejs.org/).
