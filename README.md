@@ -101,12 +101,12 @@ new AwesomeQRCode().create({
 
 Parameter | Explanation
 ----|----
-contents | Contents to encode. 欲编码的内容
+text | Contents to encode. 欲编码的内容
 size | Width as well as the height of the output QR code, includes margin. 尺寸, 长宽一致, 包含外边距
 margin | Margin to add around the QR code. 二维码图像的外边距, 默认 20px
 colorDark | Color of "true" blocks. Works only when both colorDark and colorLight are set. (BYTE_DTA, BYTE_POS, BYTE_AGN, BYTE_TMG) 实点的颜色
 colorLight | Color of empty space, or "false" blocks. Works only when both colorDark and colorLight are set. (BYTE_EPT) 空白区的颜色
-backgroundImage | Background image to embed in the QR code. Leave null to disable. 欲嵌入的背景图, 设为 null 以禁用
+backgroundImage | Background image to embed in the QR code. Leave null to disable. 欲嵌入的背景图, 设为 `undefined` 以禁用
 backgroundDimming | Color mask to add above the background image. Helpful when having problems with decoding. 叠加在背景图上的颜色, 在解码有难度的时有一定帮助
 logoImage | Logo image to embed at the center of generated QR code. Leave `undefined` to disable. 欲嵌入至二维码中心的 LOGO 标识, 设为 `undefined` 以禁用
 logoScale | Value used to scale the logo image. Larger value may result in decode failure. Size of the logo equals to `logoScale*(size-2*margin)`. Default is 0.2f. 用于计算 LOGO 大小的值, 过大将导致解码失败, LOGO 尺寸计算公式 `logoScale*(size-2*margin)`, 默认 0.2f
