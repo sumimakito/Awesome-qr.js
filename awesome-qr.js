@@ -801,28 +801,45 @@ var AwesomeQRCode;
 
         Drawing.prototype.draw = function (oQRCode) {
             var _elImage = this._elImage;
-            var _oContext = this._oContext;
+            var _tCanvas = document.createElement("canvas");
+            var _oContext = _tCanvas.getContext("2d");
+            // var _oContext = this._oContext;
             var _htOption = this._htOption;
 
             var nCount = oQRCode.getModuleCount();
-            var size = _htOption.size;
-            var margin = _htOption.margin;
+            var rawSize = _htOption.size;
+            var rawMargin = _htOption.margin;
 
-            if (margin < 0 || margin * 2 >= size) {
-                margin = 20;
+            if (rawMargin < 0 || rawMargin * 2 >= rawSize) {
+                rawMargin = 0;
             }
 
-            var viewportSize = size - 2 * margin;
+            var margin = Math.ceil(rawMargin);
+
+            var rawViewportSize = rawSize - 2 * rawMargin;
+
 
             var whiteMargin = _htOption.whiteMargin;
             var backgroundDimming = _htOption.backgroundDimming;
-            var nWidth = viewportSize / nCount;
-            var nHeight = viewportSize / nCount;
+            var rawWidth = rawViewportSize / nCount;
+            var rawHeight = rawWidth;
+            var nWidth = Math.ceil(rawWidth);
+            var nHeight = nWidth;
+            var viewportSize = nWidth * nCount;
+            var size = viewportSize + 2 * margin;
+
+            _tCanvas.width = size;
+            _tCanvas.height = size;
+
+            console.log("rawSize=" + rawSize + ", drawSize=" + size);
+            console.log("rawViewportSize=" + rawViewportSize + ", drawViewportSize=" + viewportSize);
+            console.log("rawWidth=rawHeight=" + rawWidth + ", drawWidth=drawHeight=" + nWidth);
+
             var dotScale = _htOption.dotScale;
             _elImage.style.display = "none";
             this.clear();
 
-            if (dotScale <= 0 || dotScale >= 1) {
+            if (dotScale <= 0 || dotScale > 1) {
                 dotScale = 0.35;
             }
 
@@ -999,6 +1016,13 @@ var AwesomeQRCode;
                 }
                 _oContext.putImageData(pixels, 0, 0);
             }
+
+            var _fCanvas = document.createElement("canvas");
+            var _fContext = _fCanvas.getContext("2d");
+            _fCanvas.width = rawSize;
+            _fCanvas.height = rawSize;
+            _fContext.drawImage(_tCanvas, 0, 0, rawSize, rawSize);
+            this._elCanvas = _fCanvas;
 
             this._bIsPainted = true;
             if (this._callback !== undefined) {

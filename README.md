@@ -113,7 +113,7 @@ logoScale | Value used to scale the logo image. Larger value may result in decod
 logoMargin | White margin that appears around the logo image. Leave 0 to disable. LOGO 标识周围的空白边框, 设为 0 以禁用
 logoCornerRadius | Radius of the logo's corners. Leave 0 to disable. LOGO 标识及其边框的圆角半径, 设为 0 以禁用
 whiteMargin | If set to true, a white border will appear around the background image. Default is true. 若设为 true, 背景图外将绘制白色边框
-dotScale | Value used to scale down the data dots' size. (0 < scale < 1.0f) 数据区域点缩小比例
+dotScale | Value used to scale down the data dots' size. (0 < scale <= 1.0) 数据区域点缩小比例
 autoColor | If set to true, the dominant color of backgroundImage will be used as colorDark. Default is true. 若为 true, 背景图的主要颜色将作为实点的颜色, 即 colorDark
 binarize | If set to true, the whole image will be binarized with the given threshold, or default threshold if not specified. Default is false. 若为 true, 图像将被二值化处理, 未指定阈值则使用默认值
 binarizeThreshold | Threshold used to binarize the whole image. Default is 128. (0 < threshold < 255) 二值化处理的阈值
@@ -146,6 +146,12 @@ PayPal | Alipay
 [PayPal](https://www.paypal.me/makito) | [Alipay](https://qr.alipay.com/a6x02021re1jk4ftcymlw79)
 
 ### Changelog 更新日志
+
+##### Ver. 1.0.8
+
+- Fixed a bug which would leave white stripes between neighboring blocks while drawing QRCode at scale ```1.0```.
+
+![](art/bug-fix-1.0.8.png)
 
 ##### Ver. 1.0.7
 
