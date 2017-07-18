@@ -831,9 +831,10 @@ var AwesomeQRCode;
             _tCanvas.width = size;
             _tCanvas.height = size;
 
-            console.log("rawSize=" + rawSize + ", drawSize=" + size);
-            console.log("rawViewportSize=" + rawViewportSize + ", drawViewportSize=" + viewportSize);
-            console.log("rawWidth=rawHeight=" + rawWidth + ", drawWidth=drawHeight=" + nWidth);
+            // We've banned these naughty log outputs
+            // console.log("rawSize=" + rawSize + ", drawSize=" + size);
+            // console.log("rawViewportSize=" + rawViewportSize + ", drawViewportSize=" + viewportSize);
+            // console.log("rawWidth=rawHeight=" + rawWidth + ", drawWidth=drawHeight=" + nWidth);
 
             var dotScale = _htOption.dotScale;
             _elImage.style.display = "none";
@@ -890,6 +891,7 @@ var AwesomeQRCode;
                     if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) continue;
                     if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) continue;
                     drawAgnProtector(_oContext, agnX, agnY, nWidth, nHeight);
+                    // console.log("agnX=" + agnX + ", agnY=" + agnX);
                 }
             }
 
@@ -933,8 +935,8 @@ var AwesomeQRCode;
                 for (var col = 0; col < nCount; col++) {
                     var bIsDark = oQRCode.isDark(row, col);
 
-                    var isBlkPosCtr = ((col < 8 && (row < 8 || row >= nCount - 8)) || (col >= nCount - 8 && row < 8) ||
-                    (col < nCount - 4 && col >= nCount - 4 - 5 && row < nCount - 4 && row >= nCount - 4 - 5));
+                    // var isBlkPosCtr = ((col < 8 && (row < 8 || row >= nCount - 8)) || (col >= nCount - 8 && row < 8) || (col < nCount - 4 && col >= nCount - 4 - 5 && row < nCount - 4 && row >= nCount - 4 - 5));
+                    var isBlkPosCtr = ((col < 8 && (row < 8 || row >= nCount - 8)) || (col >= nCount - 8 && row < 8));
                     var isBlkPos = ((col < 7 && (row < 7 || row >= nCount - 7)) || (col >= nCount - 7 && row < 7));
                     var bProtected = (row === 6 || col === 6 || isBlkPosCtr);
 
@@ -947,7 +949,13 @@ var AwesomeQRCode;
                     _oContext.strokeStyle = bIsDark ? _htOption.colorDark : _htOption.colorLight;
                     _oContext.lineWidth = 0.5;
                     _oContext.fillStyle = bIsDark ? _htOption.colorDark : "rgba(255, 255, 255, 0.6)"; //_htOption.colorLight;
-                    if (!bProtected) _oContext.fillRect(nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1.1 : 1) : dotScale) * nWidth, (bProtected ? (isBlkPosCtr ? 1.1 : 1) : dotScale) * nHeight);
+                    if (agnPatternCenter.length === 0) {
+                        // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
+                        if (!bProtected) _oContext.fillRect(nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nWidth, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nHeight);
+                    }else{
+                        var inAgnRange = ((col < nCount - 4 && col >= nCount - 4 - 5 && row < nCount - 4 && row >= nCount - 4 - 5));
+                        if (!bProtected&&!inAgnRange) _oContext.fillRect(nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nWidth, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nHeight);
+                    }
                 }
             }
 

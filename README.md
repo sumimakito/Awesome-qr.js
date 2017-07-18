@@ -147,6 +147,12 @@ PayPal | Alipay
 
 ### Changelog 更新日志
 
+##### Ver. 1.0.9
+
+- Fixed a bug which would leave an empty space on the simple QRCode image which has no alignment patterns.
+
+![](art/bug-fix-1.0.9.png)
+
 ##### Ver. 1.0.8
 
 - Fixed a bug which would leave white stripes between neighboring blocks while drawing QRCode at scale ```1.0```.
