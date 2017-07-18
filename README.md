@@ -145,6 +145,10 @@ PayPal | Alipay
 ----|----
 [PayPal](https://www.paypal.me/makito) | [Alipay](https://qr.alipay.com/a6x02021re1jk4ftcymlw79)
 
+Also, you can try to scan the following QR code with Alipay.
+
+<img src="https://raw.githubusercontent.com/SumiMakito/Misc/master/alipay.png" width="300">
+
 ### Changelog 更新日志
 
 ##### Ver. 1.0.9
