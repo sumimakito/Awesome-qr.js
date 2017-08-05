@@ -70,6 +70,17 @@ new AwesomeQRCode().create({
 });
 ```
 
+```javascript
+var img = new Image();
+img.crossOrigin = "Anonymous";
+img.onload = function() {
+    // Use the img
+};
+img.src = "Some URL";
+```
+
+> Note that the Image loads images asynchronously; that is to say, you will need to set a callback in order to use the image after it has finished loading. For more information, please follow the issue [#8](https://github.com/SumiMakito/Awesome-qr.js/issues/8).
+
 ### Parameters, 参数
 
 > Here's a full list of all parameters, but some of them are optional.
