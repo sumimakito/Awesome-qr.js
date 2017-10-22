@@ -19,7 +19,7 @@
 var AwesomeQRCode;
 
 (function () {
-    //---------------------------------------------------------------------
+//---------------------------------------------------------------------
 // QRCode for JavaScript
 //
 // Copyright (c) 2009 Kazuhiko Arase
@@ -97,6 +97,30 @@ var AwesomeQRCode;
         }, getModuleCount: function () {
             return this.moduleCount
         }, make: function () {
+            /////////////////////////////////////////////
+            if (this.typeNumber < 1) {
+                var typeNumber = 1;
+                for (typeNumber = 1; typeNumber < 40; typeNumber++) {
+                    var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
+
+                    var buffer = new QRBitBuffer();
+                    var totalDataCount = 0;
+                    for (var i = 0; i < rsBlocks.length; i++) {
+                        totalDataCount += rsBlocks[i].dataCount;
+                    }
+
+                    for (var i = 0; i < this.dataList.length; i++) {
+                        var data = this.dataList[i];
+                        buffer.put(data.mode, 4);
+                        buffer.put(data.getLength(), QRUtil.getLengthInBits(data.mode, typeNumber));
+                        data.write(buffer);
+                    }
+                    if (buffer.getLengthInBits() <= totalDataCount * 8)
+                        break;
+                }
+                this.typeNumber = typeNumber;
+            }
+            /////////////////////////////////////////////
             this.makeImpl(!1, this.getBestMaskPattern())
         }, makeImpl: function (test, maskPattern) {
             this.moduleCount = this.typeNumber * 4 + 17;
@@ -847,25 +871,60 @@ var AwesomeQRCode;
             _oContext.save();
             _oContext.translate(margin, margin);
 
-            _oContext.rect(whiteMargin ? 0 : -margin, whiteMargin ? 0 : -margin, size, size);
-            _oContext.fillStyle = "#ffffff";
-            _oContext.fill();
+            //_oContext.rect(whiteMargin ? 0 : -margin, whiteMargin ? 0 : -margin, size, size);
+            //_oContext.fillStyle = "#ffffff";
+            //_oContext.fill();
+
+            var _bkgCanvas = document.createElement("canvas");
+            _bkgCanvas.width = size;
+            _bkgCanvas.height = size;
+            var _bContext = _bkgCanvas.getContext("2d");
+
+            var _maskCanvas = undefined;
+            var _mContext = undefined;
 
             if (_htOption.backgroundImage !== undefined) {
                 if (_htOption.autoColor) {
                     var avgRGB = getAverageRGB(_htOption.backgroundImage);
                     _htOption.colorDark = "rgb(" + avgRGB.r + ", " + avgRGB.g + ", " + avgRGB.b + ")";
                 }
-                _oContext.drawImage(_htOption.backgroundImage,
-                    0, 0, _htOption.backgroundImage.width, _htOption.backgroundImage.height,
-                    whiteMargin ? 0 : -margin, whiteMargin ? 0 : -margin, whiteMargin ? viewportSize : size, whiteMargin ? viewportSize : size);
-                _oContext.rect(whiteMargin ? 0 : -margin, whiteMargin ? 0 : -margin, size, size);
-                _oContext.fillStyle = backgroundDimming;
-                _oContext.fill();
+
+                if (_htOption.maskedDots) {
+                    _maskCanvas = document.createElement("canvas");
+                    _maskCanvas.width = size;
+                    _maskCanvas.height = size;
+                    _mContext = _maskCanvas.getContext("2d");
+                    /*
+                     _mContext.drawImage(_htOption.backgroundImage,
+                     0, 0, _htOption.backgroundImage.width, _htOption.backgroundImage.height,
+                     whiteMargin ? 0 : -margin, whiteMargin ? 0 : -margin, whiteMargin ? viewportSize : size, whiteMargin ? viewportSize : size);
+                     */
+                    _mContext.drawImage(_htOption.backgroundImage,
+                        0, 0, _htOption.backgroundImage.width, _htOption.backgroundImage.height,
+                        0, 0, size, size);
+
+                    _bContext.rect(0, 0, size, size);
+                    _bContext.fillStyle = "#ffffff";
+                    _bContext.fill();
+                } else {
+                    /*
+                     _bContext.drawImage(_htOption.backgroundImage,
+                     0, 0, _htOption.backgroundImage.width, _htOption.backgroundImage.height,
+                     whiteMargin ? 0 : -margin, whiteMargin ? 0 : -margin, whiteMargin ? viewportSize : size, whiteMargin ? viewportSize : size);
+                     */
+                    _bContext.drawImage(_htOption.backgroundImage,
+                        0, 0, _htOption.backgroundImage.width, _htOption.backgroundImage.height,
+                        0, 0, size, size);
+                    _bContext.rect(0, 0, size, size);
+                    _bContext.fillStyle = backgroundDimming;
+                    _bContext.fill();
+                }
+
+
             } else {
-                _oContext.rect(0, 0, size, size);
-                _oContext.fillStyle = "#ffffff";
-                _oContext.fill();
+                _bContext.rect(0, 0, size, size);
+                _bContext.fillStyle = "#ffffff";
+                _bContext.fill();
             }
 
             if (_htOption.binarize) {
@@ -874,61 +933,6 @@ var AwesomeQRCode;
             }
 
             var agnPatternCenter = QRUtil.getPatternPosition(oQRCode.typeNumber);
-
-            _oContext.fillStyle = "rgba(255, 255, 255, 0.6)";
-            _oContext.fillRect(0, 0, 8 * nWidth, 8 * nHeight);
-            _oContext.fillRect(0, (nCount - 8) * nHeight, 8 * nWidth, 8 * nHeight);
-            _oContext.fillRect((nCount - 8) * nWidth, 0, 8 * nWidth, 8 * nHeight);
-            _oContext.fillRect(8 * nWidth, 6 * nHeight, (nCount - 8 - 8) * nWidth, nHeight);
-            _oContext.fillRect(6 * nWidth, 8 * nHeight, nWidth, (nCount - 8 - 8) * nHeight);
-
-            var edgeCenter = agnPatternCenter[agnPatternCenter.length - 1];
-            for (var i = 0; i < agnPatternCenter.length; i++) {
-                for (var j = 0; j < agnPatternCenter.length; j++) {
-                    var agnX = agnPatternCenter[j];
-                    var agnY = agnPatternCenter[i];
-                    if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) continue;
-                    if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) continue;
-                    if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) continue;
-                    drawAgnProtector(_oContext, agnX, agnY, nWidth, nHeight);
-                    // console.log("agnX=" + agnX + ", agnY=" + agnX);
-                }
-            }
-
-            _oContext.fillStyle = _htOption.colorDark;
-
-            _oContext.fillRect(0, 0, 7 * nWidth, nHeight);
-            _oContext.fillRect((nCount - 7) * nWidth, 0, 7 * nWidth, nHeight);
-            _oContext.fillRect(0, 6 * nHeight, 7 * nWidth, nHeight);
-            _oContext.fillRect((nCount - 7) * nWidth, 6 * nHeight, 7 * nWidth, nHeight);
-            _oContext.fillRect(0, (nCount - 7) * nHeight, 7 * nWidth, nHeight);
-            _oContext.fillRect(0, (nCount - 7 + 6) * nHeight, 7 * nWidth, nHeight);
-            _oContext.fillRect(0, 0, nWidth, 7 * nHeight);
-            _oContext.fillRect(6 * nWidth, 0, nWidth, 7 * nHeight);
-            _oContext.fillRect((nCount - 7) * nWidth, 0, nWidth, 7 * nHeight);
-            _oContext.fillRect((nCount - 7 + 6) * nWidth, 0, nWidth, 7 * nHeight);
-            _oContext.fillRect(0, (nCount - 7) * nHeight, nWidth, 7 * nHeight);
-            _oContext.fillRect(6 * nWidth, (nCount - 7) * nHeight, nWidth, 7 * nHeight);
-
-            for (var i = 0; i < agnPatternCenter.length; i++) {
-                for (var j = 0; j < agnPatternCenter.length; j++) {
-                    var agnX = agnPatternCenter[j];
-                    var agnY = agnPatternCenter[i];
-                    if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) continue;
-                    if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) continue;
-                    if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) continue;
-                    drawAgn(_oContext, agnX, agnY, nWidth, nHeight);
-                }
-            }
-
-            _oContext.fillRect(2 * nWidth, 2 * nHeight, 3 * nWidth, 3 * nHeight);
-            _oContext.fillRect((nCount - 7 + 2) * nWidth, 2 * nHeight, 3 * nWidth, 3 * nHeight);
-            _oContext.fillRect(2 * nWidth, (nCount - 7 + 2) * nHeight, 3 * nWidth, 3 * nHeight);
-
-            for (var i = 0; i < nCount - 8; i += 2) {
-                _oContext.fillRect((8 + i) * nWidth, 6 * nHeight, nWidth, nHeight);
-                _oContext.fillRect(6 * nWidth, (8 + i) * nHeight, nWidth, nHeight);
-            }
 
             var xyOffset = (1 - dotScale) * 0.5;
             for (var row = 0; row < nCount; row++) {
@@ -951,16 +955,108 @@ var AwesomeQRCode;
                     _oContext.fillStyle = bIsDark ? _htOption.colorDark : "rgba(255, 255, 255, 0.6)"; //_htOption.colorLight;
                     if (agnPatternCenter.length === 0) {
                         // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
-                        if (!bProtected) _oContext.fillRect(nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nWidth, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nHeight);
-                    }else{
+                        if (!bProtected)
+                            fillRect_(_oContext, nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nWidth, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nHeight, _maskCanvas, bIsDark);
+                    } else {
                         var inAgnRange = ((col < nCount - 4 && col >= nCount - 4 - 5 && row < nCount - 4 && row >= nCount - 4 - 5));
-                        if (!bProtected&&!inAgnRange) _oContext.fillRect(nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nWidth, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nHeight);
+                        if (!bProtected && !inAgnRange)
+                            fillRect_(_oContext, nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nWidth, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nHeight, _maskCanvas, bIsDark);
+                    }
+                }
+            }
+
+            var protectorStyle = "rgba(255, 255, 255, 0.6)";
+            _oContext.fillStyle = protectorStyle;
+            /*
+             fillRect_(_oContext, 0, 0, 8 * nWidth, 8 * nHeight, maskImg);
+             fillRect_(_oContext, 0, (nCount - 8) * nHeight, 8 * nWidth, 8 * nHeight, maskImg);
+             fillRect_(_oContext, (nCount - 8) * nWidth, 0, 8 * nWidth, 8 * nHeight, maskImg);
+             fillRect_(_oContext, 8 * nWidth, 6 * nHeight, (nCount - 8 - 8) * nWidth, nHeight, maskImg);
+             fillRect_(_oContext, 6 * nWidth, 8 * nHeight, nWidth, (nCount - 8 - 8) * nHeight, maskImg);
+             */
+            _oContext.fillRect(0, 0, 8 * nWidth, 8 * nHeight);
+            _oContext.fillRect(0, (nCount - 8) * nHeight, 8 * nWidth, 8 * nHeight);
+            _oContext.fillRect((nCount - 8) * nWidth, 0, 8 * nWidth, 8 * nHeight);
+            _oContext.fillRect(8 * nWidth, 6 * nHeight, (nCount - 8 - 8) * nWidth, nHeight);
+            _oContext.fillRect(6 * nWidth, 8 * nHeight, nWidth, (nCount - 8 - 8) * nHeight);
+
+            var edgeCenter = agnPatternCenter[agnPatternCenter.length - 1];
+            for (var i = 0; i < agnPatternCenter.length; i++) {
+                for (var j = 0; j < agnPatternCenter.length; j++) {
+                    var agnX = agnPatternCenter[j];
+                    var agnY = agnPatternCenter[i];
+                    if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
+                        continue;
+                    } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
+                        continue;
+                    } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
+                        drawAgnProtector(_oContext, agnX, agnY, nWidth, nHeight);
+                    } else {
+                        drawAgnProtector(_oContext, agnX, agnY, nWidth, nHeight);
+                    }
+                    // console.log("agnX=" + agnX + ", agnY=" + agnX);
+                }
+            }
+
+            _oContext.fillStyle = _htOption.colorDark;
+
+            /*
+             fillRect_(_oContext, 0, 0, 7 * nWidth, nHeight, _maskCanvas,true);
+             fillRect_(_oContext, (nCount - 7) * nWidth, 0, 7 * nWidth, nHeight, _maskCanvas,true);
+             fillRect_(_oContext, 0, 6 * nHeight, 7 * nWidth, nHeight, _maskCanvas,true);
+             fillRect_(_oContext, (nCount - 7) * nWidth, 6 * nHeight, 7 * nWidth, nHeight, _maskCanvas,true);
+             fillRect_(_oContext, 0, (nCount - 7) * nHeight, 7 * nWidth, nHeight, _maskCanvas,true);
+             fillRect_(_oContext, 0, (nCount - 7 + 6) * nHeight, 7 * nWidth, nHeight, _maskCanvas,true);
+             fillRect_(_oContext, 0, 0, nWidth, 7 * nHeight, _maskCanvas,true);
+             fillRect_(_oContext, 6 * nWidth, 0, nWidth, 7 * nHeight, _maskCanvas,true);
+             fillRect_(_oContext, (nCount - 7) * nWidth, 0, nWidth, 7 * nHeight, _maskCanvas,true);
+             fillRect_(_oContext, (nCount - 7 + 6) * nWidth, 0, nWidth, 7 * nHeight, _maskCanvas,true);
+             fillRect_(_oContext, 0, (nCount - 7) * nHeight, nWidth, 7 * nHeight, _maskCanvas,true);
+             fillRect_(_oContext, 6 * nWidth, (nCount - 7) * nHeight, nWidth, 7 * nHeight, _maskCanvas,true);
+             */
+
+            _oContext.fillRect(0, 0, 7 * nWidth, nHeight);
+            _oContext.fillRect((nCount - 7) * nWidth, 0, 7 * nWidth, nHeight);
+            _oContext.fillRect(0, 6 * nHeight, 7 * nWidth, nHeight);
+            _oContext.fillRect((nCount - 7) * nWidth, 6 * nHeight, 7 * nWidth, nHeight);
+            _oContext.fillRect(0, (nCount - 7) * nHeight, 7 * nWidth, nHeight);
+            _oContext.fillRect(0, (nCount - 7 + 6) * nHeight, 7 * nWidth, nHeight);
+            _oContext.fillRect(0, 0, nWidth, 7 * nHeight);
+            _oContext.fillRect(6 * nWidth, 0, nWidth, 7 * nHeight);
+            _oContext.fillRect((nCount - 7) * nWidth, 0, nWidth, 7 * nHeight);
+            _oContext.fillRect((nCount - 7 + 6) * nWidth, 0, nWidth, 7 * nHeight);
+            _oContext.fillRect(0, (nCount - 7) * nHeight, nWidth, 7 * nHeight);
+            _oContext.fillRect(6 * nWidth, (nCount - 7) * nHeight, nWidth, 7 * nHeight);
+
+            _oContext.fillRect(2 * nWidth, 2 * nHeight, 3 * nWidth, 3 * nHeight);
+            _oContext.fillRect((nCount - 7 + 2) * nWidth, 2 * nHeight, 3 * nWidth, 3 * nHeight);
+            _oContext.fillRect(2 * nWidth, (nCount - 7 + 2) * nHeight, 3 * nWidth, 3 * nHeight);
+
+            for (var i = 0; i < nCount - 8; i += 2) {
+                _oContext.fillRect((8 + i) * nWidth, 6 * nHeight, nWidth, nHeight);
+                _oContext.fillRect(6 * nWidth, (8 + i) * nHeight, nWidth, nHeight);
+            }
+            for (var i = 0; i < agnPatternCenter.length; i++) {
+                for (var j = 0; j < agnPatternCenter.length; j++) {
+                    var agnX = agnPatternCenter[j];
+                    var agnY = agnPatternCenter[i];
+                    if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
+                        continue;
+                    } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
+                        continue;
+                    } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
+                        _oContext.fillStyle = "rgba(0, 0, 0, .2)";
+                        drawAgn(_oContext, agnX, agnY, nWidth, nHeight);
+                    } else {
+                        _oContext.fillStyle = _htOption.colorDark;
+                        drawAgn(_oContext, agnX, agnY, nWidth, nHeight);
                     }
                 }
             }
 
             if (whiteMargin) {
                 _oContext.fillStyle = '#FFFFFF';
+
                 _oContext.fillRect(-margin, -margin, size, margin);
                 _oContext.fillRect(-margin, viewportSize, size, margin);
                 _oContext.fillRect(viewportSize, -margin, margin, size);
@@ -1000,6 +1096,9 @@ var AwesomeQRCode;
                 _oContext.drawImage(_htOption.logoImage, x, y, logoSize, logoSize);
                 _oContext.restore();
             }
+
+            _bContext.drawImage(_tCanvas, 0, 0, size, size);
+            _oContext.drawImage(_bkgCanvas, -margin, -margin, size, size);
 
             if (_htOption.binarize) {
                 var pixels = _oContext.getImageData(0, 0, size, size);
@@ -1093,15 +1192,38 @@ var AwesomeQRCode;
         return 0.30 * r + 0.59 * b + 0.11 * b;
     }
 
+    function fillRect_(canvas, x, y, w, h, maskSrc) {
+        //console.log("maskSrc=" + maskSrc);
+        if (maskSrc === undefined) {
+            canvas.fillRect(x, y, w, h);
+        } else {
+            canvas.drawImage(maskSrc, x, y, w, h, x, y, w, h);
+        }
+    }
+
+    function fillRect_(canvas, x, y, w, h, maskSrc, bDark) {
+        //console.log("maskSrc=" + maskSrc);
+        if (maskSrc === undefined) {
+            canvas.fillRect(x, y, w, h);
+        } else {
+            canvas.drawImage(maskSrc, x, y, w, h, x, y, w, h);
+            var fill_ = canvas.fillStyle;
+            canvas.fillStyle = bDark ? "rgba(0, 0, 0, .5)" : "rgba(255, 255, 255, .7)";
+            canvas.fillRect(x, y, w, h);
+            canvas.fillStyle = fill_;
+        }
+    }
+
     function drawAgnProtector(context, centerX, centerY, nWidth, nHeight) {
-        context.fillRect((centerX - 2 + 0.5) * nWidth, (centerY - 2 + 0.5) * nHeight, 4 * nWidth, 4 * nHeight);
+        context.clearRect((centerX - 2 ) * nWidth, (centerY - 2 ) * nHeight, 5 * nWidth, 5 * nHeight);
+        context.fillRect((centerX - 2 ) * nWidth, (centerY - 2 ) * nHeight, 5 * nWidth, 5 * nHeight);
     }
 
     function drawAgn(context, centerX, centerY, nWidth, nHeight) {
-        context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, nWidth, 5 * nHeight);
-        context.fillRect((centerX + 2) * nWidth, (centerY - 2) * nHeight, nWidth, 5 * nHeight);
-        context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, nHeight);
-        context.fillRect((centerX - 2) * nWidth, (centerY + 2) * nHeight, 5 * nWidth, nHeight);
+        context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, nWidth, 4 * nHeight);
+        context.fillRect((centerX + 2) * nWidth, (centerY - 2 + 1) * nHeight, nWidth, 4 * nHeight);
+        context.fillRect((centerX - 2 + 1) * nWidth, (centerY - 2) * nHeight, 4 * nWidth, nHeight);
+        context.fillRect((centerX - 2 ) * nWidth, (centerY + 2) * nHeight, 4 * nWidth, nHeight);
         context.fillRect(centerX * nWidth, centerY * nHeight, nWidth, nHeight);
     }
 
@@ -1156,7 +1278,7 @@ var AwesomeQRCode;
             typeNumber: 4,
             colorDark: "#000000",
             colorLight: "#ffffff",
-            correctLevel: QRErrorCorrectLevel.H,
+            correctLevel: QRErrorCorrectLevel.M,
             backgroundImage: undefined,
             backgroundDimming: 'rgba(0,0,0,0)',
             logoImage: undefined,
@@ -1165,6 +1287,7 @@ var AwesomeQRCode;
             logoCornerRadius: 8,
             whiteMargin: true,
             dotScale: 0.35,
+            maskedDots: false,
             autoColor: true,
             binarize: false,
             binarizeThreshold: 128,
@@ -1198,7 +1321,8 @@ var AwesomeQRCode;
     };
 
     AwesomeQRCode.prototype.makeCode = function (sText) {
-        this._oQRCode = new QRCodeModel(_getTypeNumber(sText, this._htOption.correctLevel), this._htOption.correctLevel);
+        //this._oQRCode = new QRCodeModel(_getTypeNumber(sText, this._htOption.correctLevel), this._htOption.correctLevel);
+        this._oQRCode = new QRCodeModel(-1, this._htOption.correctLevel);
         this._oQRCode.addData(sText);
         this._oQRCode.make();
         this._oDrawing.draw(this._oQRCode);

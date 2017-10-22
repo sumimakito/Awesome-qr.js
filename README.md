@@ -7,9 +7,11 @@ An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
 一个优雅的<del>(不起眼的)</del> QR 二维码生成器
 
-### Live demo, 演示网页
+### Live demo 在线演示
 
-Take a look at the [live demo](https://www.bitcat.cc/webapp/awesome-qr/index.html).
+Check out our **brand-new** [live demo](https://www.bitcat.cc/webapp/awesome-qr/index.html).
+
+Or you can also access the live demo by typing ```bitcat.cc/awesome``` in the browser on your smartphone.
 
 ### Compatibility, 兼容性
 
@@ -27,9 +29,13 @@ Take a look at the [live demo](https://www.bitcat.cc/webapp/awesome-qr/index.htm
 
 > Try to scan these QR codes below with your smart phone.
 
+##### Simple
+
 Example 1|Example 2|Example 3
 ------------ | ------------- | -------------
 <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-1.png" width="400"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-2.png" width="400"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-3.png" width="400">
+
+##### <del>Magical</del>
 
 Binarized|With a logo|Custom color
 ------------ | ------------- | -------------
@@ -131,8 +137,6 @@ binarizeThreshold | Threshold used to binarize the whole image. Default is 128. 
 callback | Data URI of the generated QR code will be available here. 生成的二维码 Data URI 可以在回调中取得
 bindElement | Element to inject the generated QR code into. MUST be the ID of the target element. (without the "#" prefix). Element type can be `<div>`, `<img>`, etc.
 
-> If you'd like to try out the feature `bindElement`, explore the source code of [this page](https://www.bitcat.cc/webapp/awesome-qr/index2.html).
-
 ### Introducing EFQRCode written in Swift
 
 EFQRCode is a tool to generate QRCode image or recognize QRCode from image, in Swift.
@@ -152,6 +156,11 @@ Redirect to [AwesomeQRCode](https://github.com/SumiMakito/AwesomeQRCode).
 Take a look at [Vue-qr by Binaryify](https://github.com/Binaryify/vue-qr).
 
 ### Would you like to buy me a cup of cappuccino? 要请我喝一杯卡布奇诺吗？
+
+If you really like Awesome-qr.js, please consider making a donation to support me. Thanks!
+
+Search **"sumimakito"** on Alipay, or click the links below.
+
 PayPal | Alipay
 ----|----
 [PayPal](https://www.paypal.me/makito) | [Alipay](https://qr.alipay.com/a6x02021re1jk4ftcymlw79)
@@ -161,6 +170,10 @@ Also, you can try to scan the following QR code with Alipay.
 <img src="https://raw.githubusercontent.com/SumiMakito/Misc/master/alipay.png" width="300">
 
 ### Changelog 更新日志
+
+##### Ver. 1.0.10
+
+- Fixed a bug in the core library which would cause the too-early overflow.
 
 ##### Ver. 1.0.9
 
