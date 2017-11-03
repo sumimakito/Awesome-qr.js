@@ -44,7 +44,7 @@ Example 1|Example 2|Example 3
 
 Binarized|With a logo|Custom color|With GIF background
 ------------ | ------------- | ------------- | -------------
-<img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-4.png" width="350"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-5.png" width="350"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-6.png" width="350"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-7.png" width="350">
+<img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-4.png" width="350"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-5.png" width="350"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-6.png" width="350"> | <img src="https://raw.githubusercontent.com/SumiMakito/Awesome-qr.js/master/art/awesome-qr-7.gif" width="350">
 
 ### Quick start 快速上手
 
@@ -94,13 +94,13 @@ img.src = "Some URL";
 
 > Note that the Image loads images asynchronously; that is to say, you will need to set a callback in order to use the image after it has finished loading. For more information, please follow the issue [#8](https://github.com/SumiMakito/Awesome-qr.js/issues/8).
 
-> When using an animated GIF image as the background, please follow these steps in order to use this new feature correctly.
+> When using an animated GIF image as the background, please follow [these steps](#steps-for-applying-a-gif-background-設置-gif-動圖為背景的步驟) in order to use this new feature correctly.
 
 > 請將 `gif.js` 及 `gif.worker.js` 與 `awesome-qr(.min).js` 放在一起。
 
 > 圖像為異步方式載入，因此請留意設置回調函數來取得載入完成的圖像數據。參見 [#8](https://github.com/SumiMakito/Awesome-qr.js/issues/8)。
 
-> 當使用 GIF 動圖作為背景時，請參考這些步驟以便正確使用這個新功能。
+> 當使用 GIF 動圖作為背景時，請參考[這些步驟](#steps-for-applying-a-gif-background-設置-gif-動圖為背景的步驟)以便正確使用這個新功能。
 
 ### Parameters 参数介紹
 
