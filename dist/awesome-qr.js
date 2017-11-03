@@ -1,11 +1,25 @@
 /**
- * @fileoverview
- * Awesome-qr.js
+ *  Awesome-qr.js
+ *      https://github.com/SumiMakito/Awesome-qr.js
  *
- * @author Makito <sumimakito@hotmail.com>
- * @see <a href="https://www.keep.moe/" target="_blank">https://www.keep.moe/</a>
- * @see <a href="https://github.com/SumiMakito/Awesome-qr.js" target="_blank">https://github.com/SumiMakito/Awesome-qr.js</a>
+ *  Copyright © 2017 Makito <master@keep.moe>, https://www.keep.moe/
+ *
+ *  Licensed under Apache License 2.0 License.
+ *  Copyright (c) 2017 Makito, https://www.keep.moe
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
+
 /**
  * @fileoverview
  * - Using the 'QRCode for Javascript library'
@@ -17,9 +31,718 @@
  * @see <a href="http://jeromeetienne.github.com/jquery-qrcode/" target="_blank">http://jeromeetienne.github.com/jquery-qrcode/</a>
  */
 var AwesomeQRCode;
+var GIFE;
 
+require(['gif'], function (encoder) {
+    GIFE = encoder;
+});
+
+// gifuct-js.js
+// https://raw.githubusercontent.com/matt-way/gifuct-js/master/dist/gifuct-js.js
 (function () {
-//---------------------------------------------------------------------
+    (function e(t, n, r) {
+        function s(o, u) {
+            if (!n[o]) {
+                if (!t[o]) {
+                    var a = typeof require == "function" && require;
+                    if (!u && a)return a(o, !0);
+                    if (i)return i(o, !0);
+                    var f = new Error("Cannot find module '" + o + "'");
+                    throw f.code = "MODULE_NOT_FOUND", f
+                }
+                var l = n[o] = {exports: {}};
+                t[o][0].call(l.exports, function (e) {
+                    var n = t[o][1][e];
+                    return s(n ? n : e)
+                }, l, l.exports, e, t, n, r)
+            }
+            return n[o].exports
+        }
+
+        var i = typeof require == "function" && require;
+        for (var o = 0; o < r.length; o++)s(r[o]);
+        return s
+    })({
+        1: [function (require, module, exports) {
+
+// Stream object for reading off bytes from a byte array
+
+            function ByteStream(data) {
+                this.data = data;
+                this.pos = 0;
+            }
+
+// read the next byte off the stream
+            ByteStream.prototype.readByte = function () {
+                return this.data[this.pos++];
+            };
+
+// look at the next byte in the stream without updating the stream position
+            ByteStream.prototype.peekByte = function () {
+                return this.data[this.pos];
+            };
+
+// read an array of bytes
+            ByteStream.prototype.readBytes = function (n) {
+                var bytes = new Array(n);
+                for (var i = 0; i < n; i++) {
+                    bytes[i] = this.readByte();
+                }
+                return bytes;
+            };
+
+// peek at an array of bytes without updating the stream position
+            ByteStream.prototype.peekBytes = function (n) {
+                var bytes = new Array(n);
+                for (var i = 0; i < n; i++) {
+                    bytes[i] = this.data[this.pos + i];
+                }
+                return bytes;
+            };
+
+// read a string from a byte set
+            ByteStream.prototype.readString = function (len) {
+                var str = '';
+                for (var i = 0; i < len; i++) {
+                    str += String.fromCharCode(this.readByte());
+                }
+                return str;
+            };
+
+// read a single byte and return an array of bit booleans
+            ByteStream.prototype.readBitArray = function () {
+                var arr = [];
+                var bite = this.readByte();
+                for (var i = 7; i >= 0; i--) {
+                    arr.push(!!(bite & (1 << i)));
+                }
+                return arr;
+            };
+
+// read an unsigned int with endian option
+            ByteStream.prototype.readUnsigned = function (littleEndian) {
+                var a = this.readBytes(2);
+                if (littleEndian) {
+                    return (a[1] << 8) + a[0];
+                } else {
+                    return (a[0] << 8) + a[1];
+                }
+            };
+
+            module.exports = ByteStream;
+        }, {}],
+        2: [function (require, module, exports) {
+
+// Primary data parsing object used to parse byte arrays
+
+            var ByteStream = require('./bytestream');
+
+            function DataParser(data) {
+                this.stream = new ByteStream(data);
+                // the final parsed object from the data
+                this.output = {};
+            }
+
+            DataParser.prototype.parse = function (schema) {
+                // the top level schema is just the top level parts array
+                this.parseParts(this.output, schema);
+                return this.output;
+            };
+
+// parse a set of hierarchy parts providing the parent object, and the subschema
+            DataParser.prototype.parseParts = function (obj, schema) {
+                for (var i = 0; i < schema.length; i++) {
+                    var part = schema[i];
+                    this.parsePart(obj, part);
+                }
+            };
+
+            DataParser.prototype.parsePart = function (obj, part) {
+                var name = part.label;
+                var value;
+
+                // make sure the part meets any parse requirements
+                if (part.requires && !part.requires(this.stream, this.output, obj)) {
+                    return;
+                }
+
+                if (part.loop) {
+                    // create a parse loop over the parts
+                    var items = [];
+                    while (part.loop(this.stream)) {
+                        var item = {};
+                        this.parseParts(item, part.parts);
+                        items.push(item);
+                    }
+                    obj[name] = items;
+                } else if (part.parts) {
+                    // process any child parts
+                    value = {};
+                    this.parseParts(value, part.parts);
+                    obj[name] = value;
+                } else if (part.parser) {
+                    // parse the value using a parser
+                    value = part.parser(this.stream, this.output, obj);
+                    if (!part.skip) {
+                        obj[name] = value;
+                    }
+                } else if (part.bits) {
+                    // convert the next byte to a set of bit fields
+                    obj[name] = this.parseBits(part.bits);
+                }
+            };
+
+// combine bits to calculate value
+            function bitsToNum(bitArray) {
+                return bitArray.reduce(function (s, n) {
+                    return s * 2 + n;
+                }, 0);
+            }
+
+// parse a byte as a bit set (flags and values)
+            DataParser.prototype.parseBits = function (details) {
+                var out = {};
+                var bits = this.stream.readBitArray();
+                for (var key in details) {
+                    var item = details[key];
+                    if (item.length) {
+                        // convert the bit set to value
+                        out[key] = bitsToNum(bits.slice(item.index, item.index + item.length));
+                    } else {
+                        out[key] = bits[item.index];
+                    }
+                }
+                return out;
+            };
+
+            module.exports = DataParser;
+        }, {"./bytestream": 1}],
+        3: [function (require, module, exports) {
+
+// a set of common parsers used with DataParser
+
+            var Parsers = {
+                // read a byte
+                readByte: function () {
+                    return function (stream) {
+                        return stream.readByte();
+                    };
+                },
+                // read an array of bytes
+                readBytes: function (length) {
+                    return function (stream) {
+                        return stream.readBytes(length);
+                    };
+                },
+                // read a string from bytes
+                readString: function (length) {
+                    return function (stream) {
+                        return stream.readString(length);
+                    };
+                },
+                // read an unsigned int (with endian)
+                readUnsigned: function (littleEndian) {
+                    return function (stream) {
+                        return stream.readUnsigned(littleEndian);
+                    };
+                },
+                // read an array of byte sets
+                readArray: function (size, countFunc) {
+                    return function (stream, obj, parent) {
+                        var count = countFunc(stream, obj, parent);
+                        var arr = new Array(count);
+                        for (var i = 0; i < count; i++) {
+                            arr[i] = stream.readBytes(size);
+                        }
+                        return arr;
+                    };
+                }
+            };
+
+            module.exports = Parsers;
+        }, {}],
+        4: [function (require, module, exports) {
+// export wrapper for exposing library
+
+            var GIF = window.GIF || {};
+
+            GIF = require('./gif');
+
+            window.GIF = GIF;
+        }, {"./gif": 5}],
+        5: [function (require, module, exports) {
+
+// object used to represent array buffer data for a gif file
+
+            var DataParser = require('../bower_components/js-binary-schema-parser/src/dataparser');
+            var gifSchema = require('./schema');
+
+            function GIF(arrayBuffer) {
+                // convert to byte array
+                var byteData = new Uint8Array(arrayBuffer);
+                var parser = new DataParser(byteData);
+                // parse the data
+                this.raw = parser.parse(gifSchema);
+
+                // set a flag to make sure the gif contains at least one image
+                this.raw.hasImages = false;
+                for (var f = 0; f < this.raw.frames.length; f++) {
+                    if (this.raw.frames[f].image) {
+                        this.raw.hasImages = true;
+                        break;
+                    }
+                }
+            }
+
+// process a single gif image frames data, decompressing it using LZW
+// if buildPatch is true, the returned image will be a clamped 8 bit image patch
+// for use directly with a canvas.
+            GIF.prototype.decompressFrame = function (index, buildPatch) {
+
+                // make sure a valid frame is requested
+                if (index >= this.raw.frames.length) {
+                    return null;
+                }
+
+                var frame = this.raw.frames[index];
+                if (frame.image) {
+                    // get the number of pixels
+                    var totalPixels = frame.image.descriptor.width * frame.image.descriptor.height;
+
+                    // do lzw decompression
+                    var pixels = lzw(frame.image.data.minCodeSize, frame.image.data.blocks, totalPixels);
+
+                    // deal with interlacing if necessary
+                    if (frame.image.descriptor.lct.interlaced) {
+                        pixels = deinterlace(pixels, frame.image.descriptor.width);
+                    }
+
+                    // setup usable image object
+                    var image = {
+                        pixels: pixels,
+                        dims: {
+                            top: frame.image.descriptor.top,
+                            left: frame.image.descriptor.left,
+                            width: frame.image.descriptor.width,
+                            height: frame.image.descriptor.height
+                        }
+                    };
+
+                    // color table
+                    if (frame.image.descriptor.lct && frame.image.descriptor.lct.exists) {
+                        image.colorTable = frame.image.lct;
+                    } else {
+                        image.colorTable = this.raw.gct;
+                    }
+
+                    // add per frame relevant gce information
+                    if (frame.gce) {
+                        image.delay = (frame.gce.delay || 10) * 10; // convert to ms
+                        image.disposalType = frame.gce.extras.disposal;
+                        // transparency
+                        if (frame.gce.extras.transparentColorGiven) {
+                            image.transparentIndex = frame.gce.transparentColorIndex;
+                        }
+                    }
+
+                    // create canvas usable imagedata if desired
+                    if (buildPatch) {
+                        image.patch = generatePatch(image);
+                    }
+
+                    return image;
+                }
+
+                // frame does not contains image
+                return null;
+
+
+                /**
+                 * javascript port of java LZW decompression
+                 * Original java author url: https://gist.github.com/devunwired/4479231
+                 */
+                function lzw(minCodeSize, data, pixelCount) {
+
+                    var MAX_STACK_SIZE = 4096;
+                    var nullCode = -1;
+
+                    var npix = pixelCount;
+                    var available, clear, code_mask, code_size, end_of_information, in_code, old_code, bits, code, i,
+                        datum, data_size, first, top, bi, pi;
+
+                    var dstPixels = new Array(pixelCount);
+                    var prefix = new Array(MAX_STACK_SIZE);
+                    var suffix = new Array(MAX_STACK_SIZE);
+                    var pixelStack = new Array(MAX_STACK_SIZE + 1);
+
+                    // Initialize GIF data stream decoder.
+                    data_size = minCodeSize;
+                    clear = 1 << data_size;
+                    end_of_information = clear + 1;
+                    available = clear + 2;
+                    old_code = nullCode;
+                    code_size = data_size + 1;
+                    code_mask = (1 << code_size) - 1;
+                    for (code = 0; code < clear; code++) {
+                        prefix[code] = 0;
+                        suffix[code] = code;
+                    }
+
+                    // Decode GIF pixel stream.
+                    datum = bits = count = first = top = pi = bi = 0;
+                    for (i = 0; i < npix;) {
+                        if (top === 0) {
+                            if (bits < code_size) {
+
+                                // get the next byte
+                                datum += data[bi] << bits;
+
+                                bits += 8;
+                                bi++;
+                                continue;
+                            }
+                            // Get the next code.
+                            code = datum & code_mask;
+                            datum >>= code_size;
+                            bits -= code_size;
+                            // Interpret the code
+                            if ((code > available) || (code == end_of_information)) {
+                                break;
+                            }
+                            if (code == clear) {
+                                // Reset decoder.
+                                code_size = data_size + 1;
+                                code_mask = (1 << code_size) - 1;
+                                available = clear + 2;
+                                old_code = nullCode;
+                                continue;
+                            }
+                            if (old_code == nullCode) {
+                                pixelStack[top++] = suffix[code];
+                                old_code = code;
+                                first = code;
+                                continue;
+                            }
+                            in_code = code;
+                            if (code == available) {
+                                pixelStack[top++] = first;
+                                code = old_code;
+                            }
+                            while (code > clear) {
+                                pixelStack[top++] = suffix[code];
+                                code = prefix[code];
+                            }
+
+                            first = suffix[code] & 0xff;
+                            pixelStack[top++] = first;
+
+                            // add a new string to the table, but only if space is available
+                            // if not, just continue with current table until a clear code is found
+                            // (deferred clear code implementation as per GIF spec)
+                            if (available < MAX_STACK_SIZE) {
+                                prefix[available] = old_code;
+                                suffix[available] = first;
+                                available++;
+                                if (((available & code_mask) === 0) && (available < MAX_STACK_SIZE)) {
+                                    code_size++;
+                                    code_mask += available;
+                                }
+                            }
+                            old_code = in_code;
+                        }
+                        // Pop a pixel off the pixel stack.
+                        top--;
+                        dstPixels[pi++] = pixelStack[top];
+                        i++;
+                    }
+
+                    for (i = pi; i < npix; i++) {
+                        dstPixels[i] = 0; // clear missing pixels
+                    }
+
+                    return dstPixels;
+                }
+
+                // deinterlace function from https://github.com/shachaf/jsgif
+                function deinterlace(pixels, width) {
+
+                    var newPixels = new Array(pixels.length);
+                    var rows = pixels.length / width;
+                    var cpRow = function (toRow, fromRow) {
+                        var fromPixels = pixels.slice(fromRow * width, (fromRow + 1) * width);
+                        newPixels.splice.apply(newPixels, [toRow * width, width].concat(fromPixels));
+                    };
+
+                    // See appendix E.
+                    var offsets = [0, 4, 2, 1];
+                    var steps = [8, 8, 4, 2];
+
+                    var fromRow = 0;
+                    for (var pass = 0; pass < 4; pass++) {
+                        for (var toRow = offsets[pass]; toRow < rows; toRow += steps[pass]) {
+                            cpRow(toRow, fromRow);
+                            fromRow++;
+                        }
+                    }
+
+                    return newPixels;
+                }
+
+                // create a clamped byte array patch for the frame image to be used directly with a canvas
+                // TODO: could potentially squeeze some performance by doing a direct 32bit write per iteration
+                function generatePatch(image) {
+
+                    var totalPixels = image.pixels.length;
+                    var patchData = new Uint8ClampedArray(totalPixels * 4);
+                    for (var i = 0; i < totalPixels; i++) {
+                        var pos = i * 4;
+                        var colorIndex = image.pixels[i];
+                        var color = image.colorTable[colorIndex];
+                        patchData[pos] = color[0];
+                        patchData[pos + 1] = color[1];
+                        patchData[pos + 2] = color[2];
+                        patchData[pos + 3] = colorIndex !== image.transparentIndex ? 255 : 0;
+                    }
+
+                    return patchData;
+                }
+            };
+
+// returns all frames decompressed
+            GIF.prototype.decompressFrames = function (buildPatch) {
+                var frames = [];
+                for (var i = 0; i < this.raw.frames.length; i++) {
+                    var frame = this.raw.frames[i];
+                    if (frame.image) {
+                        frames.push(this.decompressFrame(i, buildPatch));
+                    }
+                }
+                return frames;
+            };
+
+            module.exports = GIF;
+        }, {"../bower_components/js-binary-schema-parser/src/dataparser": 2, "./schema": 6}],
+        6: [function (require, module, exports) {
+
+// Schema for the js file parser to use to parse gif files
+// For js object convenience (re-use), the schema objects are approximately reverse ordered
+
+// common parsers available
+            var Parsers = require('../bower_components/js-binary-schema-parser/src/parsers');
+
+// a set of 0x00 terminated subblocks
+            var subBlocks = {
+                label: 'blocks',
+                parser: function (stream) {
+                    var out = [];
+                    var terminator = 0x00;
+                    for (var size = stream.readByte(); size !== terminator; size = stream.readByte()) {
+                        out = out.concat(stream.readBytes(size));
+                    }
+                    return out;
+                }
+            };
+
+// global control extension
+            var gce = {
+                label: 'gce',
+                requires: function (stream) {
+                    // just peek at the top two bytes, and if true do this
+                    var codes = stream.peekBytes(2);
+                    return codes[0] === 0x21 && codes[1] === 0xF9;
+                },
+                parts: [
+                    {label: 'codes', parser: Parsers.readBytes(2), skip: true},
+                    {label: 'byteSize', parser: Parsers.readByte()},
+                    {
+                        label: 'extras', bits: {
+                        future: {index: 0, length: 3},
+                        disposal: {index: 3, length: 3},
+                        userInput: {index: 6},
+                        transparentColorGiven: {index: 7}
+                    }
+                    },
+                    {label: 'delay', parser: Parsers.readUnsigned(true)},
+                    {label: 'transparentColorIndex', parser: Parsers.readByte()},
+                    {label: 'terminator', parser: Parsers.readByte(), skip: true}
+                ]
+            };
+
+// image pipeline block
+            var image = {
+                label: 'image',
+                requires: function (stream) {
+                    // peek at the next byte
+                    var code = stream.peekByte();
+                    return code === 0x2C;
+                },
+                parts: [
+                    {label: 'code', parser: Parsers.readByte(), skip: true},
+                    {
+                        label: 'descriptor', // image descriptor
+                        parts: [
+                            {label: 'left', parser: Parsers.readUnsigned(true)},
+                            {label: 'top', parser: Parsers.readUnsigned(true)},
+                            {label: 'width', parser: Parsers.readUnsigned(true)},
+                            {label: 'height', parser: Parsers.readUnsigned(true)},
+                            {
+                                label: 'lct', bits: {
+                                exists: {index: 0},
+                                interlaced: {index: 1},
+                                sort: {index: 2},
+                                future: {index: 3, length: 2},
+                                size: {index: 5, length: 3}
+                            }
+                            }
+                        ]
+                    }, {
+                        label: 'lct', // optional local color table
+                        requires: function (stream, obj, parent) {
+                            return parent.descriptor.lct.exists;
+                        },
+                        parser: Parsers.readArray(3, function (stream, obj, parent) {
+                            return Math.pow(2, parent.descriptor.lct.size + 1);
+                        })
+                    }, {
+                        label: 'data', // the image data blocks
+                        parts: [
+                            {label: 'minCodeSize', parser: Parsers.readByte()},
+                            subBlocks
+                        ]
+                    }
+                ]
+            };
+
+// plain text block
+            var text = {
+                label: 'text',
+                requires: function (stream) {
+                    // just peek at the top two bytes, and if true do this
+                    var codes = stream.peekBytes(2);
+                    return codes[0] === 0x21 && codes[1] === 0x01;
+                },
+                parts: [
+                    {label: 'codes', parser: Parsers.readBytes(2), skip: true},
+                    {label: 'blockSize', parser: Parsers.readByte()},
+                    {
+                        label: 'preData',
+                        parser: function (stream, obj, parent) {
+                            return stream.readBytes(parent.text.blockSize);
+                        }
+                    },
+                    subBlocks
+                ]
+            };
+
+// application block
+            var application = {
+                label: 'application',
+                requires: function (stream, obj, parent) {
+                    // make sure this frame doesn't already have a gce, text, comment, or image
+                    // as that means this block should be attached to the next frame
+                    //if(parent.gce || parent.text || parent.image || parent.comment){ return false; }
+
+                    // peek at the top two bytes
+                    var codes = stream.peekBytes(2);
+                    return codes[0] === 0x21 && codes[1] === 0xFF;
+                },
+                parts: [
+                    {label: 'codes', parser: Parsers.readBytes(2), skip: true},
+                    {label: 'blockSize', parser: Parsers.readByte()},
+                    {
+                        label: 'id',
+                        parser: function (stream, obj, parent) {
+                            return stream.readString(parent.blockSize);
+                        }
+                    },
+                    subBlocks
+                ]
+            };
+
+// comment block
+            var comment = {
+                label: 'comment',
+                requires: function (stream, obj, parent) {
+                    // make sure this frame doesn't already have a gce, text, comment, or image
+                    // as that means this block should be attached to the next frame
+                    //if(parent.gce || parent.text || parent.image || parent.comment){ return false; }
+
+                    // peek at the top two bytes
+                    var codes = stream.peekBytes(2);
+                    return codes[0] === 0x21 && codes[1] === 0xFE;
+                },
+                parts: [
+                    {label: 'codes', parser: Parsers.readBytes(2), skip: true},
+                    subBlocks
+                ]
+            };
+
+// frames of ext and image data
+            var frames = {
+                label: 'frames',
+                parts: [
+                    gce,
+                    application,
+                    comment,
+                    image,
+                    text
+                ],
+                loop: function (stream) {
+                    var nextCode = stream.peekByte();
+                    // rather than check for a terminator, we should check for the existence
+                    // of an ext or image block to avoid infinite loops
+                    //var terminator = 0x3B;
+                    //return nextCode !== terminator;
+                    return nextCode === 0x21 || nextCode === 0x2C;
+                }
+            };
+
+// main GIF schema
+            var schemaGIF = [
+                {
+                    label: 'header', // gif header
+                    parts: [
+                        {label: 'signature', parser: Parsers.readString(3)},
+                        {label: 'version', parser: Parsers.readString(3)}
+                    ]
+                }, {
+                    label: 'lsd', // local screen descriptor
+                    parts: [
+                        {label: 'width', parser: Parsers.readUnsigned(true)},
+                        {label: 'height', parser: Parsers.readUnsigned(true)},
+                        {
+                            label: 'gct', bits: {
+                            exists: {index: 0},
+                            resolution: {index: 1, length: 3},
+                            sort: {index: 4},
+                            size: {index: 5, length: 3}
+                        }
+                        },
+                        {label: 'backgroundColorIndex', parser: Parsers.readByte()},
+                        {label: 'pixelAspectRatio', parser: Parsers.readByte()}
+                    ]
+                }, {
+                    label: 'gct', // global color table
+                    requires: function (stream, obj) {
+                        return obj.lsd.gct.exists;
+                    },
+                    parser: Parsers.readArray(3, function (stream, obj) {
+                        return Math.pow(2, obj.lsd.gct.size + 1);
+                    })
+                },
+                frames // content frames
+            ];
+
+            module.exports = schemaGIF;
+        }, {"../bower_components/js-binary-schema-parser/src/parsers": 3}]
+    }, {}, [4])
+})();
+
+// QR CODE CORE LIBRARY DEFINITION
+(function () {
+// QR CODE CORE LIBRARY DEFINITION START
+// SHOULD NOT BE MODIFIED
+//
 // QRCode for JavaScript
 //
 // Copyright (c) 2009 Kazuhiko Arase
@@ -29,11 +752,10 @@ var AwesomeQRCode;
 // Licensed under the MIT license:
 //   http://www.opensource.org/licenses/mit-license.php
 //
-// The word "QR Code" is registered trademark of
-// DENSO WAVE INCORPORATED
+// The word "QR Code" is registered trademark of DENSO WAVE INCORPORATED
 //   http://www.denso-wave.com/qrcode/faqpatent-e.html
 //
-//---------------------------------------------------------------------
+
     function QR8bitByte(data) {
         this.mode = QRMode.MODE_8BIT_BYTE;
         this.data = data;
@@ -688,86 +1410,13 @@ var AwesomeQRCode;
     };
     var QRCodeLimitLength = [[17, 14, 11, 7], [32, 26, 20, 14], [53, 42, 32, 24], [78, 62, 46, 34], [106, 84, 60, 44], [134, 106, 74, 58], [154, 122, 86, 64], [192, 152, 108, 84], [230, 180, 130, 98], [271, 213, 151, 119], [321, 251, 177, 137], [367, 287, 203, 155], [425, 331, 241, 177], [458, 362, 258, 194], [520, 412, 292, 220], [586, 450, 322, 250], [644, 504, 364, 280], [718, 560, 394, 310], [792, 624, 442, 338], [858, 666, 482, 382], [929, 711, 509, 403], [1003, 779, 565, 439], [1091, 857, 611, 461], [1171, 911, 661, 511], [1273, 997, 715, 535], [1367, 1059, 751, 593], [1465, 1125, 805, 625], [1528, 1190, 868, 658], [1628, 1264, 908, 698], [1732, 1370, 982, 742], [1840, 1452, 1030, 790], [1952, 1538, 1112, 842], [2068, 1628, 1168, 898], [2188, 1722, 1228, 958], [2303, 1809, 1283, 983], [2431, 1911, 1351, 1051], [2563, 1989, 1423, 1093], [2699, 2099, 1499, 1139], [2809, 2213, 1579, 1219], [2953, 2331, 1663, 1273]]
 
-    function _isSupportCanvas() {
-        return typeof CanvasRenderingContext2D != "undefined";
-    }
+    // END OF QR CODE CORE LIBRARY DEFINITION
 
-    function _getAndroid() {
-        var android = false;
-        var sAgent = navigator.userAgent;
-
-        if (/android/i.test(sAgent)) { // android
-            android = true;
-            var aMat = sAgent.toString().match(/android ([0-9]\.[0-9])/i);
-
-            if (aMat && aMat[1]) {
-                android = parseFloat(aMat[1]);
-            }
-        }
-
-        return android;
-    }
-
-    var Drawing = !_isSupportCanvas() ? (function () {
-        var Drawing = function (htOption) {
-            this._htOption = htOption;
-        };
-
-        Drawing.prototype.draw = function (oQRCode) {
-            var _htOption = this._htOption;
-            var nCount = oQRCode.getModuleCount();
-            var nWidth = Math.floor(_htOption.size / nCount);
-            var nHeight = Math.floor(_htOption.size / nCount);
-            var aHTML = ['<table style="border:0;border-collapse:collapse;">'];
-
-            for (var row = 0; row < nCount; row++) {
-                aHTML.push('<tr>');
-
-                for (var col = 0; col < nCount; col++) {
-                    aHTML.push('<td style="border:0;border-collapse:collapse;padding:0;margin:0;width:' + nWidth + 'px;height:' + nHeight + 'px;background-color:' + (oQRCode.isDark(row, col) ? _htOption.colorDark : _htOption.colorLight) + ';"></td>');
-                }
-
-                aHTML.push('</tr>');
-            }
-
-            aHTML.push('</table>');
-
-            var nLeftMarginTable = (_htOption.size - elTable.offsetWidth) / 2;
-            var nTopMarginTable = (_htOption.size - elTable.offsetHeight) / 2;
-
-            if (nLeftMarginTable > 0 && nTopMarginTable > 0) {
-                elTable.style.margin = nTopMarginTable + "px " + nLeftMarginTable + "px";
-            }
-        };
-
-        Drawing.prototype.clear = function () {
-        };
-
-        return Drawing;
-    })() : (function () { // Drawing in Canvas
+    var Drawing = (function () { // Drawing in Canvas
         function _onMakeImage() {
             this._elImage.src = this._elCanvas.toDataURL("image/png");
             this._elImage.style.display = "block";
             this._elCanvas.style.display = "none";
-        }
-
-        if (this._android && this._android <= 2.1) {
-            var factor = 1 / window.devicePixelRatio;
-            var drawImage = CanvasRenderingContext2D.prototype.drawImage;
-            CanvasRenderingContext2D.prototype.drawImage = function (image, sx, sy, sw, sh, dx, dy, dw, dh) {
-                if (("nodeName" in image) && /img/i.test(image.nodeName)) {
-                    for (var i = arguments.length - 1; i >= 1; i--) {
-                        arguments[i] = arguments[i] * factor;
-                    }
-                } else if (typeof dw == "undefined") {
-                    arguments[1] *= factor;
-                    arguments[2] *= factor;
-                    arguments[3] *= factor;
-                    arguments[4] *= factor;
-                }
-
-                drawImage.apply(this, arguments);
-            };
         }
 
         function _safeSetDataURI(fSuccess, fFail) {
@@ -803,11 +1452,10 @@ var AwesomeQRCode;
             } else if (self._bSupportDataURI === false && self._fFail) {
                 self._fFail.call(self);
             }
-        };
+        }
 
         var Drawing = function (htOption) {
             this._bIsPainted = false;
-            this._android = _getAndroid();
 
             this._htOption = htOption;
             this._elCanvas = document.createElement("canvas");
@@ -842,38 +1490,29 @@ var AwesomeQRCode;
 
             var rawViewportSize = rawSize - 2 * rawMargin;
 
-
             var whiteMargin = _htOption.whiteMargin;
             var backgroundDimming = _htOption.backgroundDimming;
-            var rawWidth = rawViewportSize / nCount;
-            var rawHeight = rawWidth;
-            var nWidth = Math.ceil(rawWidth);
-            var nHeight = nWidth;
-            var viewportSize = nWidth * nCount;
+            var nSize = Math.ceil(rawViewportSize / nCount);
+            var viewportSize = nSize * nCount;
             var size = viewportSize + 2 * margin;
+
+            var gifBackground = undefined;
+            var gifFrames = undefined;
 
             _tCanvas.width = size;
             _tCanvas.height = size;
-
-            // We've banned these naughty log outputs
-            // console.log("rawSize=" + rawSize + ", drawSize=" + size);
-            // console.log("rawViewportSize=" + rawViewportSize + ", drawViewportSize=" + viewportSize);
-            // console.log("rawWidth=rawHeight=" + rawWidth + ", drawWidth=drawHeight=" + nWidth);
 
             var dotScale = _htOption.dotScale;
             _elImage.style.display = "none";
             this.clear();
 
             if (dotScale <= 0 || dotScale > 1) {
-                dotScale = 0.35;
+                throw new Error("Scale should be in range (0, 1).")
             }
 
+            // Leave room for margin
             _oContext.save();
             _oContext.translate(margin, margin);
-
-            //_oContext.rect(whiteMargin ? 0 : -margin, whiteMargin ? 0 : -margin, size, size);
-            //_oContext.fillStyle = "#ffffff";
-            //_oContext.fill();
 
             var _bkgCanvas = document.createElement("canvas");
             _bkgCanvas.width = size;
@@ -883,7 +1522,37 @@ var AwesomeQRCode;
             var _maskCanvas = undefined;
             var _mContext = undefined;
 
-            if (_htOption.backgroundImage !== undefined) {
+            if (_htOption.gifBackground !== undefined) {
+                var gif = new GIF(_htOption.gifBackground);
+                // console.log(_htOption.gifBackground);
+                // console.log(gif);
+                if (!gif.raw.hasImages) {
+                    throw new Error("An invalid gif has been selected as the background.")
+                }
+                gifBackground = gif;
+                gifFrames = gif.decompressFrames(true);
+                // console.log(gifFrames);
+                if (_htOption.autoColor) {
+                    var r = 0, g = 0, b = 0;
+                    var count = 0;
+                    for (var i = 0; i < gifFrames[0].colorTable.length; i++) {
+                        var c = gifFrames[0].colorTable[i];
+                        if (c[0] > 200 || c[1] > 200 || c[2] > 200) continue;
+                        if (c[0] === 0 && c[1] === 0 && c[2] === 0) continue;
+                        count++;
+                        r += c[0];
+                        g += c[1];
+                        b += c[2];
+                    }
+
+                    r = ~~(r / count);
+                    g = ~~(g / count);
+                    b = ~~(b / count);
+                    // console.log("rgb(" + r + ", " + g + ", " + b + ")");
+                    _htOption.colorDark = "rgb(" + r + ", " + g + ", " + b + ")";
+                }
+            }
+            else if (_htOption.backgroundImage !== undefined) {
                 if (_htOption.autoColor) {
                     var avgRGB = getAverageRGB(_htOption.backgroundImage);
                     _htOption.colorDark = "rgb(" + avgRGB.r + ", " + avgRGB.g + ", " + avgRGB.b + ")";
@@ -919,9 +1588,8 @@ var AwesomeQRCode;
                     _bContext.fillStyle = backgroundDimming;
                     _bContext.fill();
                 }
-
-
-            } else {
+            }
+            else {
                 _bContext.rect(0, 0, size, size);
                 _bContext.fillStyle = "#ffffff";
                 _bContext.fill();
@@ -948,38 +1616,33 @@ var AwesomeQRCode;
                         bProtected = bProtected || (row >= agnPatternCenter[i] - 2 && row <= agnPatternCenter[i] + 2 && col >= agnPatternCenter[i] - 2 && col <= agnPatternCenter[i] + 2);
                     }
 
-                    var nLeft = col * nWidth + (bProtected ? 0 : (xyOffset * nWidth));
-                    var nTop = row * nHeight + (bProtected ? 0 : (xyOffset * nHeight));
+                    var nLeft = col * nSize + (bProtected ? 0 : (xyOffset * nSize));
+                    var nTop = row * nSize + (bProtected ? 0 : (xyOffset * nSize));
                     _oContext.strokeStyle = bIsDark ? _htOption.colorDark : _htOption.colorLight;
                     _oContext.lineWidth = 0.5;
                     _oContext.fillStyle = bIsDark ? _htOption.colorDark : "rgba(255, 255, 255, 0.6)"; //_htOption.colorLight;
                     if (agnPatternCenter.length === 0) {
                         // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
                         if (!bProtected)
-                            fillRect_(_oContext, nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nWidth, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nHeight, _maskCanvas, bIsDark);
+                            _fillRectWithMask(_oContext, nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nSize, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nSize, _maskCanvas, bIsDark);
                     } else {
                         var inAgnRange = ((col < nCount - 4 && col >= nCount - 4 - 5 && row < nCount - 4 && row >= nCount - 4 - 5));
                         if (!bProtected && !inAgnRange)
-                            fillRect_(_oContext, nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nWidth, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nHeight, _maskCanvas, bIsDark);
+                            _fillRectWithMask(_oContext, nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nSize, (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nSize, _maskCanvas, bIsDark);
                     }
                 }
             }
 
+            // Draw POSITION protectors
             var protectorStyle = "rgba(255, 255, 255, 0.6)";
             _oContext.fillStyle = protectorStyle;
-            /*
-             fillRect_(_oContext, 0, 0, 8 * nWidth, 8 * nHeight, maskImg);
-             fillRect_(_oContext, 0, (nCount - 8) * nHeight, 8 * nWidth, 8 * nHeight, maskImg);
-             fillRect_(_oContext, (nCount - 8) * nWidth, 0, 8 * nWidth, 8 * nHeight, maskImg);
-             fillRect_(_oContext, 8 * nWidth, 6 * nHeight, (nCount - 8 - 8) * nWidth, nHeight, maskImg);
-             fillRect_(_oContext, 6 * nWidth, 8 * nHeight, nWidth, (nCount - 8 - 8) * nHeight, maskImg);
-             */
-            _oContext.fillRect(0, 0, 8 * nWidth, 8 * nHeight);
-            _oContext.fillRect(0, (nCount - 8) * nHeight, 8 * nWidth, 8 * nHeight);
-            _oContext.fillRect((nCount - 8) * nWidth, 0, 8 * nWidth, 8 * nHeight);
-            _oContext.fillRect(8 * nWidth, 6 * nHeight, (nCount - 8 - 8) * nWidth, nHeight);
-            _oContext.fillRect(6 * nWidth, 8 * nHeight, nWidth, (nCount - 8 - 8) * nHeight);
+            _oContext.fillRect(0, 0, 8 * nSize, 8 * nSize);
+            _oContext.fillRect(0, (nCount - 8) * nSize, 8 * nSize, 8 * nSize);
+            _oContext.fillRect((nCount - 8) * nSize, 0, 8 * nSize, 8 * nSize);
+            _oContext.fillRect(8 * nSize, 6 * nSize, (nCount - 8 - 8) * nSize, nSize);
+            _oContext.fillRect(6 * nSize, 8 * nSize, nSize, (nCount - 8 - 8) * nSize);
 
+            // Draw ALIGN protectors
             var edgeCenter = agnPatternCenter[agnPatternCenter.length - 1];
             for (var i = 0; i < agnPatternCenter.length; i++) {
                 for (var j = 0; j < agnPatternCenter.length; j++) {
@@ -990,51 +1653,36 @@ var AwesomeQRCode;
                     } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                         continue;
                     } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-                        drawAgnProtector(_oContext, agnX, agnY, nWidth, nHeight);
+                        _drawAlignProtector(_oContext, agnX, agnY, nSize, nSize);
                     } else {
-                        drawAgnProtector(_oContext, agnX, agnY, nWidth, nHeight);
+                        _drawAlignProtector(_oContext, agnX, agnY, nSize, nSize);
                     }
                     // console.log("agnX=" + agnX + ", agnY=" + agnX);
                 }
             }
 
+            // Draw POSITION patterns
             _oContext.fillStyle = _htOption.colorDark;
+            _oContext.fillRect(0, 0, 7 * nSize, nSize);
+            _oContext.fillRect((nCount - 7) * nSize, 0, 7 * nSize, nSize);
+            _oContext.fillRect(0, 6 * nSize, 7 * nSize, nSize);
+            _oContext.fillRect((nCount - 7) * nSize, 6 * nSize, 7 * nSize, nSize);
+            _oContext.fillRect(0, (nCount - 7) * nSize, 7 * nSize, nSize);
+            _oContext.fillRect(0, (nCount - 7 + 6) * nSize, 7 * nSize, nSize);
+            _oContext.fillRect(0, 0, nSize, 7 * nSize);
+            _oContext.fillRect(6 * nSize, 0, nSize, 7 * nSize);
+            _oContext.fillRect((nCount - 7) * nSize, 0, nSize, 7 * nSize);
+            _oContext.fillRect((nCount - 7 + 6) * nSize, 0, nSize, 7 * nSize);
+            _oContext.fillRect(0, (nCount - 7) * nSize, nSize, 7 * nSize);
+            _oContext.fillRect(6 * nSize, (nCount - 7) * nSize, nSize, 7 * nSize);
 
-            /*
-             fillRect_(_oContext, 0, 0, 7 * nWidth, nHeight, _maskCanvas,true);
-             fillRect_(_oContext, (nCount - 7) * nWidth, 0, 7 * nWidth, nHeight, _maskCanvas,true);
-             fillRect_(_oContext, 0, 6 * nHeight, 7 * nWidth, nHeight, _maskCanvas,true);
-             fillRect_(_oContext, (nCount - 7) * nWidth, 6 * nHeight, 7 * nWidth, nHeight, _maskCanvas,true);
-             fillRect_(_oContext, 0, (nCount - 7) * nHeight, 7 * nWidth, nHeight, _maskCanvas,true);
-             fillRect_(_oContext, 0, (nCount - 7 + 6) * nHeight, 7 * nWidth, nHeight, _maskCanvas,true);
-             fillRect_(_oContext, 0, 0, nWidth, 7 * nHeight, _maskCanvas,true);
-             fillRect_(_oContext, 6 * nWidth, 0, nWidth, 7 * nHeight, _maskCanvas,true);
-             fillRect_(_oContext, (nCount - 7) * nWidth, 0, nWidth, 7 * nHeight, _maskCanvas,true);
-             fillRect_(_oContext, (nCount - 7 + 6) * nWidth, 0, nWidth, 7 * nHeight, _maskCanvas,true);
-             fillRect_(_oContext, 0, (nCount - 7) * nHeight, nWidth, 7 * nHeight, _maskCanvas,true);
-             fillRect_(_oContext, 6 * nWidth, (nCount - 7) * nHeight, nWidth, 7 * nHeight, _maskCanvas,true);
-             */
-
-            _oContext.fillRect(0, 0, 7 * nWidth, nHeight);
-            _oContext.fillRect((nCount - 7) * nWidth, 0, 7 * nWidth, nHeight);
-            _oContext.fillRect(0, 6 * nHeight, 7 * nWidth, nHeight);
-            _oContext.fillRect((nCount - 7) * nWidth, 6 * nHeight, 7 * nWidth, nHeight);
-            _oContext.fillRect(0, (nCount - 7) * nHeight, 7 * nWidth, nHeight);
-            _oContext.fillRect(0, (nCount - 7 + 6) * nHeight, 7 * nWidth, nHeight);
-            _oContext.fillRect(0, 0, nWidth, 7 * nHeight);
-            _oContext.fillRect(6 * nWidth, 0, nWidth, 7 * nHeight);
-            _oContext.fillRect((nCount - 7) * nWidth, 0, nWidth, 7 * nHeight);
-            _oContext.fillRect((nCount - 7 + 6) * nWidth, 0, nWidth, 7 * nHeight);
-            _oContext.fillRect(0, (nCount - 7) * nHeight, nWidth, 7 * nHeight);
-            _oContext.fillRect(6 * nWidth, (nCount - 7) * nHeight, nWidth, 7 * nHeight);
-
-            _oContext.fillRect(2 * nWidth, 2 * nHeight, 3 * nWidth, 3 * nHeight);
-            _oContext.fillRect((nCount - 7 + 2) * nWidth, 2 * nHeight, 3 * nWidth, 3 * nHeight);
-            _oContext.fillRect(2 * nWidth, (nCount - 7 + 2) * nHeight, 3 * nWidth, 3 * nHeight);
+            _oContext.fillRect(2 * nSize, 2 * nSize, 3 * nSize, 3 * nSize);
+            _oContext.fillRect((nCount - 7 + 2) * nSize, 2 * nSize, 3 * nSize, 3 * nSize);
+            _oContext.fillRect(2 * nSize, (nCount - 7 + 2) * nSize, 3 * nSize, 3 * nSize);
 
             for (var i = 0; i < nCount - 8; i += 2) {
-                _oContext.fillRect((8 + i) * nWidth, 6 * nHeight, nWidth, nHeight);
-                _oContext.fillRect(6 * nWidth, (8 + i) * nHeight, nWidth, nHeight);
+                _oContext.fillRect((8 + i) * nSize, 6 * nSize, nSize, nSize);
+                _oContext.fillRect(6 * nSize, (8 + i) * nSize, nSize, nSize);
             }
             for (var i = 0; i < agnPatternCenter.length; i++) {
                 for (var j = 0; j < agnPatternCenter.length; j++) {
@@ -1046,17 +1694,17 @@ var AwesomeQRCode;
                         continue;
                     } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
                         _oContext.fillStyle = "rgba(0, 0, 0, .2)";
-                        drawAgn(_oContext, agnX, agnY, nWidth, nHeight);
+                        _drawAlign(_oContext, agnX, agnY, nSize, nSize);
                     } else {
                         _oContext.fillStyle = _htOption.colorDark;
-                        drawAgn(_oContext, agnX, agnY, nWidth, nHeight);
+                        _drawAlign(_oContext, agnX, agnY, nSize, nSize);
                     }
                 }
             }
 
+            // Fill the margin
             if (whiteMargin) {
                 _oContext.fillStyle = '#FFFFFF';
-
                 _oContext.fillRect(-margin, -margin, size, margin);
                 _oContext.fillRect(-margin, viewportSize, size, margin);
                 _oContext.fillRect(viewportSize, -margin, margin, size);
@@ -1085,71 +1733,175 @@ var AwesomeQRCode;
 
                 _oContext.fillStyle = '#FFFFFF';
                 _oContext.save();
-                prepareRoundedCornerClip(_oContext, x - logoMargin, y - logoMargin, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
+                _prepareRoundedCornerClip(_oContext, x - logoMargin, y - logoMargin, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
                 _oContext.clip();
                 _oContext.fill();
                 _oContext.restore();
 
                 _oContext.save();
-                prepareRoundedCornerClip(_oContext, x, y, logoSize, logoSize, logoCornerRadius);
+                _prepareRoundedCornerClip(_oContext, x, y, logoSize, logoSize, logoCornerRadius);
                 _oContext.clip();
                 _oContext.drawImage(_htOption.logoImage, x, y, logoSize, logoSize);
                 _oContext.restore();
             }
 
-            _bContext.drawImage(_tCanvas, 0, 0, size, size);
-            _oContext.drawImage(_bkgCanvas, -margin, -margin, size, size);
+            if (gifBackground === undefined) {
+                // Swap and merge the foreground and the background
+                _bContext.drawImage(_tCanvas, 0, 0, size, size);
+                _oContext.drawImage(_bkgCanvas, -margin, -margin, size, size);
 
-            if (_htOption.binarize) {
-                var pixels = _oContext.getImageData(0, 0, size, size);
-                var threshold = 128;
-                if (parseInt(_htOption.binarizeThreshold) > 0 && parseInt(_htOption.binarizeThreshold) < 255) {
-                    threshold = parseInt(_htOption.binarizeThreshold);
+                // Binarize the final image
+                if (_htOption.binarize) {
+                    var pixels = _oContext.getImageData(0, 0, size, size);
+                    var threshold = 128;
+                    if (parseInt(_htOption.binarizeThreshold) > 0 && parseInt(_htOption.binarizeThreshold) < 255) {
+                        threshold = parseInt(_htOption.binarizeThreshold);
+                    }
+                    for (var i = 0; i < pixels.data.length; i += 4) {
+                        // rgb in [0, 255]
+                        var R = pixels.data[i];
+                        var G = pixels.data[i + 1];
+                        var B = pixels.data[i + 2];
+                        var sum = _greyscale(R, G, B);
+                        if (sum > threshold) {
+                            pixels.data[i] = 255;
+                            pixels.data[i + 1] = 255;
+                            pixels.data[i + 2] = 255;
+                        } else {
+                            pixels.data[i] = 0;
+                            pixels.data[i + 1] = 0;
+                            pixels.data[i + 2] = 0;
+                        }
+                    }
+                    _oContext.putImageData(pixels, 0, 0);
                 }
-                for (var i = 0; i < pixels.data.length; i += 4) {
-                    var R = pixels.data[i]; //R(0-255)
-                    var G = pixels.data[i + 1]; //G(0-255)
-                    var B = pixels.data[i + 2]; //G(0-255)
-                    var sum = rgb2gray(R, G, B);
-                    if (sum > threshold) {
-                        pixels.data[i] = 255;
-                        pixels.data[i + 1] = 255;
-                        pixels.data[i + 2] = 255;
-                    } else {
-                        pixels.data[i] = 0;
-                        pixels.data[i + 1] = 0;
-                        pixels.data[i + 2] = 0;
+
+                // Scale the final image
+                var _fCanvas = document.createElement("canvas");
+                var _fContext = _fCanvas.getContext("2d");
+                _fCanvas.width = rawSize;
+                _fCanvas.height = rawSize;
+                _fContext.drawImage(_tCanvas, 0, 0, rawSize, rawSize);
+                this._elCanvas = _fCanvas;
+
+                // Painting work completed
+                this._bIsPainted = true;
+                if (this._callback !== undefined) {
+                    this._callback(this._elCanvas.toDataURL());
+                }
+                if (this._bindElement !== undefined) {
+                    try {
+                        var el = document.getElementById(this._bindElement);
+                        if (el.nodeName === 'IMG') {
+                            el.src = this._elCanvas.toDataURL();
+                        } else {
+                            var elStyle = el.style;
+                            elStyle["background-image"] = 'url(' + this._elCanvas.toDataURL() + ')';
+                            elStyle["background-size"] = 'contain';
+                            elStyle["background-repeat"] = 'no-repeat';
+                        }
+                    } catch (e) {
+                        console.error(e);
                     }
                 }
-                _oContext.putImageData(pixels, 0, 0);
-            }
+            } else {
+                var gifOutput;
 
-            var _fCanvas = document.createElement("canvas");
-            var _fContext = _fCanvas.getContext("2d");
-            _fCanvas.width = rawSize;
-            _fCanvas.height = rawSize;
-            _fContext.drawImage(_tCanvas, 0, 0, rawSize, rawSize);
-            this._elCanvas = _fCanvas;
+                // Reuse in order to apply the patch
+                var rawBkg;
+                var hRawBkg;
 
-            this._bIsPainted = true;
-            if (this._callback !== undefined) {
-                this._callback(this._elCanvas.toDataURL());
-            }
-            if (this._bindElement !== undefined) {
-                try {
-                    var el = document.getElementById(this._bindElement);
-                    if (el.nodeName === 'IMG') {
-                        el.src = this._elCanvas.toDataURL();
-                    } else {
-                        var elStyle = el.style;
-                        elStyle["background-image"] = 'url(' + this._elCanvas.toDataURL() + ')';
-                        elStyle["background-size"] = 'contain';
-                        elStyle["background-repeat"] = 'no-repeat';
+                var patchCanvas = document.createElement("canvas");
+                var hPatchCanvas = patchCanvas.getContext("2d");
+                var patchData;
+
+                gifFrames.forEach(function (frame) {
+                    // console.log(frame);
+                    if (gifOutput === undefined) {
+                        gifOutput = new GIFE({
+                            workers: 4,
+                            quality: 10,
+                            width: rawSize,
+                            height: rawSize
+                        });
                     }
-                } catch (e) {
-                    console.error(e);
+
+                    if (rawBkg === undefined) {
+                        rawBkg = document.createElement("canvas");
+                        hRawBkg = rawBkg.getContext("2d");
+                        rawBkg.width = frame.dims.width;
+                        rawBkg.height = frame.dims.height;
+                        hRawBkg.rect(0, 0, rawBkg.width, rawBkg.height);
+                        hRawBkg.fillStyle = "#ffffff";
+                        hRawBkg.fill();
+                        // console.log(rawBkg);
+                    }
+
+                    if (!patchData || frame.dims.width !== patchCanvas.width || frame.dims.height !== patchCanvas.height) {
+                        patchCanvas.width = frame.dims.width;
+                        patchCanvas.height = frame.dims.height;
+                        patchData = hPatchCanvas.createImageData(frame.dims.width, frame.dims.height);
+                    }
+
+                    patchData.data.set(frame.patch);
+                    hPatchCanvas.putImageData(patchData, 0, 0);
+
+                    hRawBkg.drawImage(patchCanvas, frame.dims.left, frame.dims.top);
+
+                    var stdCanvas = document.createElement("canvas");
+                    stdCanvas.width = size;
+                    stdCanvas.height = size;
+                    var hStdCanvas = stdCanvas.getContext("2d");
+
+                    hStdCanvas.drawImage(rawBkg, 0, 0, size, size);
+                    hStdCanvas.drawImage(_tCanvas, 0, 0, size, size);
+
+                    // Scale the final image
+                    var _fCanvas = document.createElement("canvas");
+                    var _fContext = _fCanvas.getContext("2d");
+                    _fCanvas.width = rawSize;
+                    _fCanvas.height = rawSize;
+                    _fContext.drawImage(stdCanvas, 0, 0, rawSize, rawSize);
+                    // console.log(_fContext);
+                    gifOutput.addFrame(_fContext, {copy: true, delay: frame.delay});
+                });
+
+                if (gifOutput === undefined) {
+                    throw new Error("No frames.")
                 }
+                var ref = this;
+                gifOutput.on('finished', function (blob) {
+                    // Painting work completed
+                    var r = new FileReader();
+                    r.onload = function (e) {
+                        var data = e.target.result;
+                        ref._bIsPainted = true;
+                        if (ref._callback !== undefined) {
+                            ref._callback(data);
+                        }
+                        if (ref._bindElement !== undefined) {
+                            try {
+                                var el = document.getElementById(ref._bindElement);
+                                if (el.nodeName === 'IMG') {
+                                    el.src = data;
+                                } else {
+                                    var elStyle = el.style;
+                                    elStyle["background-image"] = 'url(' + data + ')';
+                                    elStyle["background-size"] = 'contain';
+                                    elStyle["background-repeat"] = 'no-repeat';
+                                }
+                            } catch (e) {
+                                console.error(e);
+                            }
+                        }
+                    };
+                    r.readAsDataURL(blob);
+                });
+
+                gifOutput.render();
             }
+
+
         };
 
         Drawing.prototype.makeImage = function () {
@@ -1178,7 +1930,14 @@ var AwesomeQRCode;
         return Drawing;
     })();
 
-    function prepareRoundedCornerClip(ctx, x, y, w, h, r) {
+// Utilities and useful helpers
+
+    function _getUTF8Length(sText) {
+        var replacedText = encodeURI(sText).toString().replace(/\%[0-9a-fA-F]{2}/g, 'a');
+        return replacedText.length + (replacedText.length != sText ? 3 : 0);
+    }
+
+    function _prepareRoundedCornerClip(ctx, x, y, w, h, r) {
         ctx.beginPath();
         ctx.moveTo(x, y);
         ctx.arcTo(x + w, y, x + w, y + h, r);
@@ -1188,20 +1947,19 @@ var AwesomeQRCode;
         ctx.closePath();
     }
 
-    function rgb2gray(r, g, b) {
+    function _setPixel(imageData, p, r, g, b, a) {
+        index = p * 4;
+        imageData.data[index + 0] = r;
+        imageData.data[index + 1] = g;
+        imageData.data[index + 2] = b;
+        imageData.data[index + 3] = a;
+    }
+
+    function _greyscale(r, g, b) {
         return 0.30 * r + 0.59 * b + 0.11 * b;
     }
 
-    function fillRect_(canvas, x, y, w, h, maskSrc) {
-        //console.log("maskSrc=" + maskSrc);
-        if (maskSrc === undefined) {
-            canvas.fillRect(x, y, w, h);
-        } else {
-            canvas.drawImage(maskSrc, x, y, w, h, x, y, w, h);
-        }
-    }
-
-    function fillRect_(canvas, x, y, w, h, maskSrc, bDark) {
+    function _fillRectWithMask(canvas, x, y, w, h, maskSrc, bDark) {
         //console.log("maskSrc=" + maskSrc);
         if (maskSrc === undefined) {
             canvas.fillRect(x, y, w, h);
@@ -1214,18 +1972,66 @@ var AwesomeQRCode;
         }
     }
 
-    function drawAgnProtector(context, centerX, centerY, nWidth, nHeight) {
+    function _drawAlignProtector(context, centerX, centerY, nWidth, nHeight) {
         context.clearRect((centerX - 2 ) * nWidth, (centerY - 2 ) * nHeight, 5 * nWidth, 5 * nHeight);
         context.fillRect((centerX - 2 ) * nWidth, (centerY - 2 ) * nHeight, 5 * nWidth, 5 * nHeight);
     }
 
-    function drawAgn(context, centerX, centerY, nWidth, nHeight) {
+    function _drawAlign(context, centerX, centerY, nWidth, nHeight) {
         context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, nWidth, 4 * nHeight);
         context.fillRect((centerX + 2) * nWidth, (centerY - 2 + 1) * nHeight, nWidth, 4 * nHeight);
         context.fillRect((centerX - 2 + 1) * nWidth, (centerY - 2) * nHeight, 4 * nWidth, nHeight);
         context.fillRect((centerX - 2 ) * nWidth, (centerY + 2) * nHeight, 4 * nWidth, nHeight);
         context.fillRect(centerX * nWidth, centerY * nHeight, nWidth, nHeight);
     }
+
+    AwesomeQRCode = function () {
+    };
+
+    AwesomeQRCode.prototype.create = function (vOption) {
+        this._htOption = {
+            size: 800,
+            margin: 20,
+            typeNumber: 4,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRErrorCorrectLevel.M,
+            backgroundImage: undefined,
+            backgroundDimming: 'rgba(0,0,0,0)',
+            logoImage: undefined,
+            logoScale: 0.2,
+            logoMargin: 6,
+            logoCornerRadius: 8,
+            whiteMargin: true,
+            dotScale: 0.35,
+            maskedDots: false,
+            autoColor: true,
+            binarize: false,
+            binarizeThreshold: 128,
+            gifBackground: undefined,
+            callback: undefined,
+            bindElement: undefined
+        };
+
+        if (typeof vOption === 'string') {
+            vOption = {
+                text: vOption
+            };
+        }
+
+        if (vOption) {
+            for (var i in vOption) {
+                this._htOption[i] = vOption[i];
+            }
+        }
+
+        this._oQRCode = null;
+        this._oDrawing = new Drawing(this._htOption);
+
+        if (this._htOption.text) {
+            this.makeCode(this._htOption.text);
+        }
+    };
 
     function _getTypeNumber(sText, nCorrectLevel) {
         var nType = 1;
@@ -1263,63 +2069,6 @@ var AwesomeQRCode;
         return nType;
     }
 
-    function _getUTF8Length(sText) {
-        var replacedText = encodeURI(sText).toString().replace(/\%[0-9a-fA-F]{2}/g, 'a');
-        return replacedText.length + (replacedText.length != sText ? 3 : 0);
-    }
-
-    AwesomeQRCode = function () {
-    };
-
-    AwesomeQRCode.prototype.create = function (vOption) {
-        this._htOption = {
-            size: 800,
-            margin: 20,
-            typeNumber: 4,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRErrorCorrectLevel.M,
-            backgroundImage: undefined,
-            backgroundDimming: 'rgba(0,0,0,0)',
-            logoImage: undefined,
-            logoScale: 0.2,
-            logoMargin: 6,
-            logoCornerRadius: 8,
-            whiteMargin: true,
-            dotScale: 0.35,
-            maskedDots: false,
-            autoColor: true,
-            binarize: false,
-            binarizeThreshold: 128,
-            callback: undefined,
-            bindElement: undefined
-        };
-
-        if (typeof vOption === 'string') {
-            vOption = {
-                text: vOption
-            };
-        }
-
-        if (vOption) {
-            for (var i in vOption) {
-                this._htOption[i] = vOption[i];
-            }
-        }
-
-        if (this._htOption.useSVG) {
-            Drawing = svgDrawer;
-        }
-
-        this._android = _getAndroid();
-        this._oQRCode = null;
-        this._oDrawing = new Drawing(this._htOption);
-
-        if (this._htOption.text) {
-            this.makeCode(this._htOption.text);
-        }
-    };
-
     AwesomeQRCode.prototype.makeCode = function (sText) {
         //this._oQRCode = new QRCodeModel(_getTypeNumber(sText, this._htOption.correctLevel), this._htOption.correctLevel);
         this._oQRCode = new QRCodeModel(-1, this._htOption.correctLevel);
@@ -1330,7 +2079,7 @@ var AwesomeQRCode;
     };
 
     AwesomeQRCode.prototype.makeImage = function () {
-        if (typeof this._oDrawing.makeImage == "function" && (!this._android || this._android >= 3)) {
+        if (typeof this._oDrawing.makeImage == "function") {
             this._oDrawing.makeImage();
         }
     };
