@@ -7,9 +7,27 @@ An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
 一个优雅的<del>(不起眼的)</del> QR 二维码生成器
 
+### Preface 前言
+
+Awesome-qr.js is inspired by [EFQRCode by EyreFree](https://github.com/EyreFree/EFQRCode).
+
+EFQRCode is a tool to generate QRCode image or recognize QRCode from image, in Swift.
+
+Awesome QR code 系列項目受 [EFQRCode](https://github.com/EyreFree/EFQRCode) 的啟發而誕生，EFQRCode 是一個使用 Swift 寫成的藝術二維碼生成器。
+
+If your application is in need of generating pretty QR codes in Swift, take a look at EFQRCode. It should help.
+
+如果你的 iOS/Mac 項目也需要生成此種二維碼，可以嘗試使用 EFQRCode。
+
+Also, if you are developing Android apps, you can take a look at [AwesomeQRCode](https://github.com/SumiMakito/AwesomeQRCode), which is designed for Android projects.
+
+如果你正在開發 Android 應用程式，或許為 Android 設計的 [AwesomeQRCode](https://github.com/SumiMakito/AwesomeQRCode) 可以幫到你。
+
+Vue 2.x component: [Vue-qr](https://github.com/Binaryify/vue-qr)
+
 ### Live demo 在线演示
 
-Check out our **brand-new** [live demo](https://www.bitcat.cc/webapp/awesome-qr/index.html).
+Check out our [**brand-new** live demo](https://www.bitcat.cc/webapp/awesome-qr/index.html).
 
 來訪問 [最新的演示頁面](https://www.bitcat.cc/webapp/awesome-qr/index.html) 吧！
 
@@ -277,24 +295,6 @@ Also, you can try to scan the following QR code with Alipay.
 ##### Ver 1.0.0
 
 - Initial release.
-
-### Introducing EFQRCode written in Swift
-
-EFQRCode is a tool to generate QRCode image or recognize QRCode from image, in Swift.
-
-Awesome-qr.js is inspired by [EFQRCode by EyreFree](https://github.com/EyreFree/EFQRCode).
-
-If your application is in need of generating pretty QR codes in Swift, take a look at EFQRCode.
-
-It should help.
-
-### AwesomeQRCode written for Android 支持 Android 的 AwesomeQRCode
-
-Redirect to [AwesomeQRCode](https://github.com/SumiMakito/AwesomeQRCode).
-
-### Vue 2.x Component for Awesome-qr.js
-
-[Vue-qr](https://github.com/Binaryify/vue-qr).
 
 ### Copyright &amp; License 版权信息与授权协议
 
