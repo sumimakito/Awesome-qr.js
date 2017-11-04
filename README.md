@@ -192,6 +192,18 @@ It usually takes a longer time to decode and encode the GIF, and generate an ani
 
 通常解碼編碼 GIF 以及生成二維碼會花費更多時間，取決於輸入文件的大小。
 
+### Sponsors 贊助者們
+
+It is those generous sponsors who supports this project makes the Awesome-qr.js more awesome!
+
+I'd like to express my sincere appreciation to all the generous sponsors.
+
+Sponsors' names will not show up here without their permissions. If you wish to have your name shown up here, please feel free to contact me.
+
+在一些慷慨的贊助者的贊助下，這個項目得以發展的更好。對於他們的慷慨支持，我向他們願表達我最真誠的感謝之情。
+
+默認情況下，未經贊助者許可，他們的名字不會出現在這裡。如果您希望自己的名字出現在這裡，請聯繫我就好啦。
+                        
 ### Support me 支持開發者
 
 If you really like Awesome-qr.js, please consider making a donation to support me. Thanks!
@@ -274,7 +286,7 @@ If your application is in need of generating pretty QR codes in Swift, take a lo
 
 It should help.
 
-### AwesomeQRCode written for Android, 支持 Android 的 AwesomeQRCode
+### AwesomeQRCode written for Android 支持 Android 的 AwesomeQRCode
 
 Redirect to [AwesomeQRCode](https://github.com/SumiMakito/AwesomeQRCode).
 
@@ -282,7 +294,7 @@ Redirect to [AwesomeQRCode](https://github.com/SumiMakito/AwesomeQRCode).
 
 [Vue-qr](https://github.com/Binaryify/vue-qr).
 
-### Copyright &amp; License, 版权信息与授权协议
+### Copyright &amp; License 版权信息与授权协议
 
 Copyright &copy; 2017 Sumi Makito
 
