@@ -198,11 +198,13 @@ It is those generous sponsors who supports this project makes the Awesome-qr.js 
 
 I'd like to express my sincere appreciation to all the generous sponsors.
 
-Sponsors' names will not show up here without their permissions. If you wish to have your name shown up here, please feel free to contact me.
-
 在一些慷慨的贊助者的贊助下，這個項目得以發展的更好。對於他們的慷慨支持，我願向他們表達我最真誠的感謝之情。
 
-默認情況下，未經贊助者許可，他們的名字不會出現在這裡。如果您希望自己的名字出現在這裡，請聯繫我就好啦。
+- [Coxxs](https://coxxs.me/)       
+
+Since sponsors' names will not show up here without their permissions, the list above only shows a part of all the sponsors. If you wish to have your name shown up here, please feel free to contact me.
+
+默認情況下，未經贊助者許可的情況下，他們的名字不會出現在這裡，因此此處只展示部分贊助者。如果您希望自己的名字出現在這裡，請聯繫我就好啦。
                         
 ### Support me 支持開發者
 
