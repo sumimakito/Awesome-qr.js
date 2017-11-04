@@ -200,7 +200,7 @@ I'd like to express my sincere appreciation to all the generous sponsors.
 
 Sponsors' names will not show up here without their permissions. If you wish to have your name shown up here, please feel free to contact me.
 
-在一些慷慨的贊助者的贊助下，這個項目得以發展的更好。對於他們的慷慨支持，我向他們願表達我最真誠的感謝之情。
+在一些慷慨的贊助者的贊助下，這個項目得以發展的更好。對於他們的慷慨支持，我向他們願表達我最真誠的感謝之情。
 
 默認情況下，未經贊助者許可，他們的名字不會出現在這裡。如果您希望自己的名字出現在這裡，請聯繫我就好啦。
                         
