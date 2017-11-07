@@ -33,7 +33,7 @@
 var AwesomeQRCode;
 var GIFE;
 
-require(['gif'], function (encoder) {
+require(['./gif'], function (encoder) {
     GIFE = encoder;
 });
 
