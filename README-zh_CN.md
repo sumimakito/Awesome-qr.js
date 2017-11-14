@@ -132,15 +132,15 @@ request.get(options, (error, response, body) => {
 		backgroundImage.src = body;
 		
 		new AwesomeQR().create({
-		    text: 'Makito loves Kafuu Chino.',
-		    size: 500,
-		    backgroundImage: backgroundImage,
-		    autoColor: true,
-		    callback: (data) => {
-		    	if (data === undefined) {
+			text: 'Makito loves Kafuu Chino.',
+			size: 500,
+			backgroundImage: backgroundImage,
+			autoColor: true,
+			callback: (data) => {
+				if (data === undefined) {
 		    		console.log('生成二维码失败');
 				} else {
-				    // 得到 PNG 的二进制数据
+					// 得到 PNG 的二进制数据
 				}
 			}
 		});
