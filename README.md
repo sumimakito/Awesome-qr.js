@@ -133,15 +133,15 @@ request.get(options, (error, response, body) => {
 		backgroundImage.src = body;
 		
 		new AwesomeQR().create({
-		    text: 'Makito loves Kafuu Chino.',
-		    size: 500,
-		    backgroundImage: backgroundImage,
-		    autoColor: true,
-		    callback: (data) => {
+			text: 'Makito loves Kafuu Chino.',
+			size: 500,
+			backgroundImage: backgroundImage,
+			autoColor: true,
+			callback: (data) => {
 		    	if (data === undefined) {
 		    		console.log('failed to generate the QR code');
 				} else {
-				    // play with binary PNG data
+					// play with binary PNG data
 				}
 			}
 		});
