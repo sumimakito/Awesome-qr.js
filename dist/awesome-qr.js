@@ -30,28 +30,29 @@
  * @see <a href="http://www.d-project.com/" target="_blank">http://www.d-project.com/</a>
  * @see <a href="http://jeromeetienne.github.com/jquery-qrcode/" target="_blank">http://jeromeetienne.github.com/jquery-qrcode/</a>
  */
+
 var AwesomeQRCode;
 var GIFE;
 
-require(['./gif'], function (encoder) {
-    GIFE = encoder;
+require([__awesome_qr_base_path+'/gif'], function (gifEncoder) {
+    GIFE = gifEncoder;
 });
 
 // gifuct-js.js
 // https://raw.githubusercontent.com/matt-way/gifuct-js/master/dist/gifuct-js.js
-(function () {
+(function() {
     (function e(t, n, r) {
         function s(o, u) {
             if (!n[o]) {
                 if (!t[o]) {
                     var a = typeof require == "function" && require;
-                    if (!u && a)return a(o, !0);
-                    if (i)return i(o, !0);
+                    if (!u && a) return a(o, !0);
+                    if (i) return i(o, !0);
                     var f = new Error("Cannot find module '" + o + "'");
                     throw f.code = "MODULE_NOT_FOUND", f
                 }
-                var l = n[o] = {exports: {}};
-                t[o][0].call(l.exports, function (e) {
+                var l = n[o] = { exports: {} };
+                t[o][0].call(l.exports, function(e) {
                     var n = t[o][1][e];
                     return s(n ? n : e)
                 }, l, l.exports, e, t, n, r)
@@ -60,30 +61,30 @@ require(['./gif'], function (encoder) {
         }
 
         var i = typeof require == "function" && require;
-        for (var o = 0; o < r.length; o++)s(r[o]);
+        for (var o = 0; o < r.length; o++) s(r[o]);
         return s
     })({
-        1: [function (require, module, exports) {
+        1: [function(require, module, exports) {
 
-// Stream object for reading off bytes from a byte array
+            // Stream object for reading off bytes from a byte array
 
             function ByteStream(data) {
                 this.data = data;
                 this.pos = 0;
             }
 
-// read the next byte off the stream
-            ByteStream.prototype.readByte = function () {
+            // read the next byte off the stream
+            ByteStream.prototype.readByte = function() {
                 return this.data[this.pos++];
             };
 
-// look at the next byte in the stream without updating the stream position
-            ByteStream.prototype.peekByte = function () {
+            // look at the next byte in the stream without updating the stream position
+            ByteStream.prototype.peekByte = function() {
                 return this.data[this.pos];
             };
 
-// read an array of bytes
-            ByteStream.prototype.readBytes = function (n) {
+            // read an array of bytes
+            ByteStream.prototype.readBytes = function(n) {
                 var bytes = new Array(n);
                 for (var i = 0; i < n; i++) {
                     bytes[i] = this.readByte();
@@ -91,8 +92,8 @@ require(['./gif'], function (encoder) {
                 return bytes;
             };
 
-// peek at an array of bytes without updating the stream position
-            ByteStream.prototype.peekBytes = function (n) {
+            // peek at an array of bytes without updating the stream position
+            ByteStream.prototype.peekBytes = function(n) {
                 var bytes = new Array(n);
                 for (var i = 0; i < n; i++) {
                     bytes[i] = this.data[this.pos + i];
@@ -100,8 +101,8 @@ require(['./gif'], function (encoder) {
                 return bytes;
             };
 
-// read a string from a byte set
-            ByteStream.prototype.readString = function (len) {
+            // read a string from a byte set
+            ByteStream.prototype.readString = function(len) {
                 var str = '';
                 for (var i = 0; i < len; i++) {
                     str += String.fromCharCode(this.readByte());
@@ -109,8 +110,8 @@ require(['./gif'], function (encoder) {
                 return str;
             };
 
-// read a single byte and return an array of bit booleans
-            ByteStream.prototype.readBitArray = function () {
+            // read a single byte and return an array of bit booleans
+            ByteStream.prototype.readBitArray = function() {
                 var arr = [];
                 var bite = this.readByte();
                 for (var i = 7; i >= 0; i--) {
@@ -119,8 +120,8 @@ require(['./gif'], function (encoder) {
                 return arr;
             };
 
-// read an unsigned int with endian option
-            ByteStream.prototype.readUnsigned = function (littleEndian) {
+            // read an unsigned int with endian option
+            ByteStream.prototype.readUnsigned = function(littleEndian) {
                 var a = this.readBytes(2);
                 if (littleEndian) {
                     return (a[1] << 8) + a[0];
@@ -131,9 +132,9 @@ require(['./gif'], function (encoder) {
 
             module.exports = ByteStream;
         }, {}],
-        2: [function (require, module, exports) {
+        2: [function(require, module, exports) {
 
-// Primary data parsing object used to parse byte arrays
+            // Primary data parsing object used to parse byte arrays
 
             var ByteStream = require('./bytestream');
 
@@ -143,21 +144,21 @@ require(['./gif'], function (encoder) {
                 this.output = {};
             }
 
-            DataParser.prototype.parse = function (schema) {
+            DataParser.prototype.parse = function(schema) {
                 // the top level schema is just the top level parts array
                 this.parseParts(this.output, schema);
                 return this.output;
             };
 
-// parse a set of hierarchy parts providing the parent object, and the subschema
-            DataParser.prototype.parseParts = function (obj, schema) {
+            // parse a set of hierarchy parts providing the parent object, and the subschema
+            DataParser.prototype.parseParts = function(obj, schema) {
                 for (var i = 0; i < schema.length; i++) {
                     var part = schema[i];
                     this.parsePart(obj, part);
                 }
             };
 
-            DataParser.prototype.parsePart = function (obj, part) {
+            DataParser.prototype.parsePart = function(obj, part) {
                 var name = part.label;
                 var value;
 
@@ -192,15 +193,15 @@ require(['./gif'], function (encoder) {
                 }
             };
 
-// combine bits to calculate value
+            // combine bits to calculate value
             function bitsToNum(bitArray) {
-                return bitArray.reduce(function (s, n) {
+                return bitArray.reduce(function(s, n) {
                     return s * 2 + n;
                 }, 0);
             }
 
-// parse a byte as a bit set (flags and values)
-            DataParser.prototype.parseBits = function (details) {
+            // parse a byte as a bit set (flags and values)
+            DataParser.prototype.parseBits = function(details) {
                 var out = {};
                 var bits = this.stream.readBitArray();
                 for (var key in details) {
@@ -216,39 +217,39 @@ require(['./gif'], function (encoder) {
             };
 
             module.exports = DataParser;
-        }, {"./bytestream": 1}],
-        3: [function (require, module, exports) {
+        }, { "./bytestream": 1 }],
+        3: [function(require, module, exports) {
 
-// a set of common parsers used with DataParser
+            // a set of common parsers used with DataParser
 
             var Parsers = {
                 // read a byte
-                readByte: function () {
-                    return function (stream) {
+                readByte: function() {
+                    return function(stream) {
                         return stream.readByte();
                     };
                 },
                 // read an array of bytes
-                readBytes: function (length) {
-                    return function (stream) {
+                readBytes: function(length) {
+                    return function(stream) {
                         return stream.readBytes(length);
                     };
                 },
                 // read a string from bytes
-                readString: function (length) {
-                    return function (stream) {
+                readString: function(length) {
+                    return function(stream) {
                         return stream.readString(length);
                     };
                 },
                 // read an unsigned int (with endian)
-                readUnsigned: function (littleEndian) {
-                    return function (stream) {
+                readUnsigned: function(littleEndian) {
+                    return function(stream) {
                         return stream.readUnsigned(littleEndian);
                     };
                 },
                 // read an array of byte sets
-                readArray: function (size, countFunc) {
-                    return function (stream, obj, parent) {
+                readArray: function(size, countFunc) {
+                    return function(stream, obj, parent) {
                         var count = countFunc(stream, obj, parent);
                         var arr = new Array(count);
                         for (var i = 0; i < count; i++) {
@@ -261,18 +262,18 @@ require(['./gif'], function (encoder) {
 
             module.exports = Parsers;
         }, {}],
-        4: [function (require, module, exports) {
-// export wrapper for exposing library
+        4: [function(require, module, exports) {
+            // export wrapper for exposing library
 
             var GIF = window.GIF || {};
 
             GIF = require('./gif');
 
             window.GIF = GIF;
-        }, {"./gif": 5}],
-        5: [function (require, module, exports) {
+        }, { "./gif": 5 }],
+        5: [function(require, module, exports) {
 
-// object used to represent array buffer data for a gif file
+            // object used to represent array buffer data for a gif file
 
             var DataParser = require('../bower_components/js-binary-schema-parser/src/dataparser');
             var gifSchema = require('./schema');
@@ -294,10 +295,10 @@ require(['./gif'], function (encoder) {
                 }
             }
 
-// process a single gif image frames data, decompressing it using LZW
-// if buildPatch is true, the returned image will be a clamped 8 bit image patch
-// for use directly with a canvas.
-            GIF.prototype.decompressFrame = function (index, buildPatch) {
+            // process a single gif image frames data, decompressing it using LZW
+            // if buildPatch is true, the returned image will be a clamped 8 bit image patch
+            // for use directly with a canvas.
+            GIF.prototype.decompressFrame = function(index, buildPatch) {
 
                 // make sure a valid frame is requested
                 if (index >= this.raw.frames.length) {
@@ -468,7 +469,7 @@ require(['./gif'], function (encoder) {
 
                     var newPixels = new Array(pixels.length);
                     var rows = pixels.length / width;
-                    var cpRow = function (toRow, fromRow) {
+                    var cpRow = function(toRow, fromRow) {
                         var fromPixels = pixels.slice(fromRow * width, (fromRow + 1) * width);
                         newPixels.splice.apply(newPixels, [toRow * width, width].concat(fromPixels));
                     };
@@ -508,8 +509,8 @@ require(['./gif'], function (encoder) {
                 }
             };
 
-// returns all frames decompressed
-            GIF.prototype.decompressFrames = function (buildPatch) {
+            // returns all frames decompressed
+            GIF.prototype.decompressFrames = function(buildPatch) {
                 var frames = [];
                 for (var i = 0; i < this.raw.frames.length; i++) {
                     var frame = this.raw.frames[i];
@@ -521,19 +522,19 @@ require(['./gif'], function (encoder) {
             };
 
             module.exports = GIF;
-        }, {"../bower_components/js-binary-schema-parser/src/dataparser": 2, "./schema": 6}],
-        6: [function (require, module, exports) {
+        }, { "../bower_components/js-binary-schema-parser/src/dataparser": 2, "./schema": 6 }],
+        6: [function(require, module, exports) {
 
-// Schema for the js file parser to use to parse gif files
-// For js object convenience (re-use), the schema objects are approximately reverse ordered
+            // Schema for the js file parser to use to parse gif files
+            // For js object convenience (re-use), the schema objects are approximately reverse ordered
 
-// common parsers available
+            // common parsers available
             var Parsers = require('../bower_components/js-binary-schema-parser/src/parsers');
 
-// a set of 0x00 terminated subblocks
+            // a set of 0x00 terminated subblocks
             var subBlocks = {
                 label: 'blocks',
-                parser: function (stream) {
+                parser: function(stream) {
                     var out = [];
                     var terminator = 0x00;
                     for (var size = stream.readByte(); size !== terminator; size = stream.readByte()) {
@@ -543,90 +544,92 @@ require(['./gif'], function (encoder) {
                 }
             };
 
-// global control extension
+            // global control extension
             var gce = {
                 label: 'gce',
-                requires: function (stream) {
+                requires: function(stream) {
                     // just peek at the top two bytes, and if true do this
                     var codes = stream.peekBytes(2);
                     return codes[0] === 0x21 && codes[1] === 0xF9;
                 },
                 parts: [
-                    {label: 'codes', parser: Parsers.readBytes(2), skip: true},
-                    {label: 'byteSize', parser: Parsers.readByte()},
+                    { label: 'codes', parser: Parsers.readBytes(2), skip: true },
+                    { label: 'byteSize', parser: Parsers.readByte() },
                     {
-                        label: 'extras', bits: {
-                        future: {index: 0, length: 3},
-                        disposal: {index: 3, length: 3},
-                        userInput: {index: 6},
-                        transparentColorGiven: {index: 7}
-                    }
+                        label: 'extras',
+                        bits: {
+                            future: { index: 0, length: 3 },
+                            disposal: { index: 3, length: 3 },
+                            userInput: { index: 6 },
+                            transparentColorGiven: { index: 7 }
+                        }
                     },
-                    {label: 'delay', parser: Parsers.readUnsigned(true)},
-                    {label: 'transparentColorIndex', parser: Parsers.readByte()},
-                    {label: 'terminator', parser: Parsers.readByte(), skip: true}
+                    { label: 'delay', parser: Parsers.readUnsigned(true) },
+                    { label: 'transparentColorIndex', parser: Parsers.readByte() },
+                    { label: 'terminator', parser: Parsers.readByte(), skip: true }
                 ]
             };
 
-// image pipeline block
+            // image pipeline block
             var image = {
                 label: 'image',
-                requires: function (stream) {
+                requires: function(stream) {
                     // peek at the next byte
                     var code = stream.peekByte();
                     return code === 0x2C;
                 },
                 parts: [
-                    {label: 'code', parser: Parsers.readByte(), skip: true},
+                    { label: 'code', parser: Parsers.readByte(), skip: true },
                     {
                         label: 'descriptor', // image descriptor
                         parts: [
-                            {label: 'left', parser: Parsers.readUnsigned(true)},
-                            {label: 'top', parser: Parsers.readUnsigned(true)},
-                            {label: 'width', parser: Parsers.readUnsigned(true)},
-                            {label: 'height', parser: Parsers.readUnsigned(true)},
+                            { label: 'left', parser: Parsers.readUnsigned(true) },
+                            { label: 'top', parser: Parsers.readUnsigned(true) },
+                            { label: 'width', parser: Parsers.readUnsigned(true) },
+                            { label: 'height', parser: Parsers.readUnsigned(true) },
                             {
-                                label: 'lct', bits: {
-                                exists: {index: 0},
-                                interlaced: {index: 1},
-                                sort: {index: 2},
-                                future: {index: 3, length: 2},
-                                size: {index: 5, length: 3}
-                            }
+                                label: 'lct',
+                                bits: {
+                                    exists: { index: 0 },
+                                    interlaced: { index: 1 },
+                                    sort: { index: 2 },
+                                    future: { index: 3, length: 2 },
+                                    size: { index: 5, length: 3 }
+                                }
                             }
                         ]
                     }, {
                         label: 'lct', // optional local color table
-                        requires: function (stream, obj, parent) {
+                        requires: function(stream, obj, parent) {
                             return parent.descriptor.lct.exists;
                         },
-                        parser: Parsers.readArray(3, function (stream, obj, parent) {
+                        parser: Parsers.readArray(3, function(stream, obj, parent) {
                             return Math.pow(2, parent.descriptor.lct.size + 1);
                         })
                     }, {
                         label: 'data', // the image data blocks
                         parts: [
-                            {label: 'minCodeSize', parser: Parsers.readByte()},
+                            { label: 'minCodeSize', parser: Parsers.readByte() },
                             subBlocks
                         ]
                     }
                 ]
             };
 
-// plain text block
+            // plain text block
             var text = {
                 label: 'text',
-                requires: function (stream) {
+                requires: function(stream) {
                     // just peek at the top two bytes, and if true do this
                     var codes = stream.peekBytes(2);
                     return codes[0] === 0x21 && codes[1] === 0x01;
                 },
                 parts: [
-                    {label: 'codes', parser: Parsers.readBytes(2), skip: true},
-                    {label: 'blockSize', parser: Parsers.readByte()},
+                    { label: 'codes', parser: Parsers.readBytes(2), skip: true },
+                    { label: 'blockSize', parser: Parsers.readByte() },
                     {
                         label: 'preData',
-                        parser: function (stream, obj, parent) {
+                        parser: function(stream, obj, parent) {
                             return stream.readBytes(parent.text.blockSize);
                         }
                     },
@@ -634,10 +637,10 @@ require(['./gif'], function (encoder) {
                 ]
             };
 
-// application block
+            // application block
             var application = {
                 label: 'application',
-                requires: function (stream, obj, parent) {
+                requires: function(stream, obj, parent) {
                     // make sure this frame doesn't already have a gce, text, comment, or image
                     // as that means this block should be attached to the next frame
                     //if(parent.gce || parent.text || parent.image || parent.comment){ return false; }
@@ -647,11 +650,11 @@ require(['./gif'], function (encoder) {
                     return codes[0] === 0x21 && codes[1] === 0xFF;
                 },
                 parts: [
-                    {label: 'codes', parser: Parsers.readBytes(2), skip: true},
-                    {label: 'blockSize', parser: Parsers.readByte()},
+                    { label: 'codes', parser: Parsers.readBytes(2), skip: true },
+                    { label: 'blockSize', parser: Parsers.readByte() },
                     {
                         label: 'id',
-                        parser: function (stream, obj, parent) {
+                        parser: function(stream, obj, parent) {
                             return stream.readString(parent.blockSize);
                         }
                     },
@@ -659,10 +662,10 @@ require(['./gif'], function (encoder) {
                 ]
             };
 
-// comment block
+            // comment block
             var comment = {
                 label: 'comment',
-                requires: function (stream, obj, parent) {
+                requires: function(stream, obj, parent) {
                     // make sure this frame doesn't already have a gce, text, comment, or image
                     // as that means this block should be attached to the next frame
                     //if(parent.gce || parent.text || parent.image || parent.comment){ return false; }
@@ -672,12 +675,12 @@ require(['./gif'], function (encoder) {
                     return codes[0] === 0x21 && codes[1] === 0xFE;
                 },
                 parts: [
-                    {label: 'codes', parser: Parsers.readBytes(2), skip: true},
+                    { label: 'codes', parser: Parsers.readBytes(2), skip: true },
                     subBlocks
                 ]
             };
 
-// frames of ext and image data
+            // frames of ext and image data
             var frames = {
                 label: 'frames',
                 parts: [
@@ -687,7 +690,7 @@ require(['./gif'], function (encoder) {
                     image,
                     text
                 ],
-                loop: function (stream) {
+                loop: function(stream) {
                     var nextCode = stream.peekByte();
                     // rather than check for a terminator, we should check for the existence
                     // of an ext or image block to avoid infinite loops
@@ -697,36 +700,36 @@ require(['./gif'], function (encoder) {
                 }
             };
 
-// main GIF schema
-            var schemaGIF = [
-                {
+            // main GIF schema
+            var schemaGIF = [{
                     label: 'header', // gif header
                     parts: [
-                        {label: 'signature', parser: Parsers.readString(3)},
-                        {label: 'version', parser: Parsers.readString(3)}
+                        { label: 'signature', parser: Parsers.readString(3) },
+                        { label: 'version', parser: Parsers.readString(3) }
                     ]
                 }, {
                     label: 'lsd', // local screen descriptor
                     parts: [
-                        {label: 'width', parser: Parsers.readUnsigned(true)},
-                        {label: 'height', parser: Parsers.readUnsigned(true)},
+                        { label: 'width', parser: Parsers.readUnsigned(true) },
+                        { label: 'height', parser: Parsers.readUnsigned(true) },
                         {
-                            label: 'gct', bits: {
-                            exists: {index: 0},
-                            resolution: {index: 1, length: 3},
-                            sort: {index: 4},
-                            size: {index: 5, length: 3}
-                        }
+                            label: 'gct',
+                            bits: {
+                                exists: { index: 0 },
+                                resolution: { index: 1, length: 3 },
+                                sort: { index: 4 },
+                                size: { index: 5, length: 3 }
+                            }
                         },
-                        {label: 'backgroundColorIndex', parser: Parsers.readByte()},
-                        {label: 'pixelAspectRatio', parser: Parsers.readByte()}
+                        { label: 'backgroundColorIndex', parser: Parsers.readByte() },
+                        { label: 'pixelAspectRatio', parser: Parsers.readByte() }
                     ]
                 }, {
                     label: 'gct', // global color table
-                    requires: function (stream, obj) {
+                    requires: function(stream, obj) {
                         return obj.lsd.gct.exists;
                     },
-                    parser: Parsers.readArray(3, function (stream, obj) {
+                    parser: Parsers.readArray(3, function(stream, obj) {
                         return Math.pow(2, obj.lsd.gct.size + 1);
                     })
                 },
@@ -734,27 +737,27 @@ require(['./gif'], function (encoder) {
             ];
 
             module.exports = schemaGIF;
-        }, {"../bower_components/js-binary-schema-parser/src/parsers": 3}]
+        }, { "../bower_components/js-binary-schema-parser/src/parsers": 3 }]
     }, {}, [4])
 })();
 
 // QR CODE CORE LIBRARY DEFINITION
-(function () {
-// QR CODE CORE LIBRARY DEFINITION START
-// SHOULD NOT BE MODIFIED
-//
-// QRCode for JavaScript
-//
-// Copyright (c) 2009 Kazuhiko Arase
-//
-// URL: http://www.d-project.com/
-//
-// Licensed under the MIT license:
-//   http://www.opensource.org/licenses/mit-license.php
-//
-// The word "QR Code" is registered trademark of DENSO WAVE INCORPORATED
-//   http://www.denso-wave.com/qrcode/faqpatent-e.html
-//
+(function() {
+    // QR CODE CORE LIBRARY DEFINITION START
+    // SHOULD NOT BE MODIFIED
+    //
+    // QRCode for JavaScript
+    //
+    // Copyright (c) 2009 Kazuhiko Arase
+    //
+    // URL: http://www.d-project.com/
+    //
+    // Licensed under the MIT license:
+    //   http://www.opensource.org/licenses/mit-license.php
+    //
+    // The word "QR Code" is registered trademark of DENSO WAVE INCORPORATED
+    //   http://www.denso-wave.com/qrcode/faqpatent-e.html
+    //
 
     function QR8bitByte(data) {
         this.mode = QRMode.MODE_8BIT_BYTE;
@@ -789,14 +792,16 @@ require(['./gif'], function (encoder) {
     }
 
     QR8bitByte.prototype = {
-        getLength: function (buffer) {
+        getLength: function(buffer) {
             return this.parsedData.length
-        }, write: function (buffer) {
+        },
+        write: function(buffer) {
             for (var i = 0, l = this.parsedData.length; i < l; i++) {
                 buffer.put(this.parsedData[i], 8)
             }
         }
     };
+
     function QRCodeModel(typeNumber, errorCorrectLevel) {
         this.typeNumber = typeNumber;
         this.errorCorrectLevel = errorCorrectLevel;
@@ -807,18 +812,21 @@ require(['./gif'], function (encoder) {
     }
 
     QRCodeModel.prototype = {
-        addData: function (data) {
+        addData: function(data) {
             var newData = new QR8bitByte(data);
             this.dataList.push(newData);
             this.dataCache = null
-        }, isDark: function (row, col) {
+        },
+        isDark: function(row, col) {
             if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
                 throw new Error(row + "," + col)
             }
             return this.modules[row][col]
-        }, getModuleCount: function () {
+        },
+        getModuleCount: function() {
             return this.moduleCount
-        }, make: function () {
+        },
+        make: function() {
             /////////////////////////////////////////////
             if (this.typeNumber < 1) {
                 var typeNumber = 1;
@@ -844,7 +852,8 @@ require(['./gif'], function (encoder) {
             }
             /////////////////////////////////////////////
             this.makeImpl(!1, this.getBestMaskPattern())
-        }, makeImpl: function (test, maskPattern) {
+        },
+        makeImpl: function(test, maskPattern) {
             this.moduleCount = this.typeNumber * 4 + 17;
             this.modules = new Array(this.moduleCount);
             for (var row = 0; row < this.moduleCount; row++) {
@@ -866,11 +875,12 @@ require(['./gif'], function (encoder) {
                 this.dataCache = QRCodeModel.createData(this.typeNumber, this.errorCorrectLevel, this.dataList)
             }
             this.mapData(this.dataCache, maskPattern)
-        }, setupPositionProbePattern: function (row, col) {
+        },
+        setupPositionProbePattern: function(row, col) {
             for (var r = -1; r <= 7; r++) {
-                if (row + r <= -1 || this.moduleCount <= row + r)continue;
+                if (row + r <= -1 || this.moduleCount <= row + r) continue;
                 for (var c = -1; c <= 7; c++) {
-                    if (col + c <= -1 || this.moduleCount <= col + c)continue;
+                    if (col + c <= -1 || this.moduleCount <= col + c) continue;
                     if ((0 <= r && r <= 6 && (c == 0 || c == 6)) || (0 <= c && c <= 6 && (r == 0 || r == 6)) || (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
                         this.modules[row + r][col + c] = !0
                     } else {
@@ -878,7 +888,8 @@ require(['./gif'], function (encoder) {
                     }
                 }
             }
-        }, getBestMaskPattern: function () {
+        },
+        getBestMaskPattern: function() {
             var minLostPoint = 0;
             var pattern = 0;
             for (var i = 0; i < 8; i++) {
@@ -890,7 +901,8 @@ require(['./gif'], function (encoder) {
                 }
             }
             return pattern
-        }, createMovieClip: function (target_mc, instance_name, depth) {
+        },
+        createMovieClip: function(target_mc, instance_name, depth) {
             var qr_mc = target_mc.createEmptyMovieClip(instance_name, depth);
             var cs = 1;
             this.make();
@@ -910,7 +922,8 @@ require(['./gif'], function (encoder) {
                 }
             }
             return qr_mc
-        }, setupTimingPattern: function () {
+        },
+        setupTimingPattern: function() {
             for (var r = 8; r < this.moduleCount - 8; r++) {
                 if (this.modules[r][6] != null) {
                     continue
@@ -923,7 +936,8 @@ require(['./gif'], function (encoder) {
                 }
                 this.modules[6][c] = (c % 2 == 0)
             }
-        }, setupPositionAdjustPattern: function () {
+        },
+        setupPositionAdjustPattern: function() {
             var pos = QRUtil.getPatternPosition(this.typeNumber);
             for (var i = 0; i < pos.length; i++) {
                 for (var j = 0; j < pos.length; j++) {
@@ -943,7 +957,8 @@ require(['./gif'], function (encoder) {
                     }
                 }
             }
-        }, setupTypeNumber: function (test) {
+        },
+        setupTypeNumber: function(test) {
             var bits = QRUtil.getBCHTypeNumber(this.typeNumber);
             for (var i = 0; i < 18; i++) {
                 var mod = (!test && ((bits >> i) & 1) == 1);
@@ -953,7 +968,8 @@ require(['./gif'], function (encoder) {
                 var mod = (!test && ((bits >> i) & 1) == 1);
                 this.modules[i % 3 + this.moduleCount - 8 - 3][Math.floor(i / 3)] = mod
             }
-        }, setupTypeInfo: function (test, maskPattern) {
+        },
+        setupTypeInfo: function(test, maskPattern) {
             var data = (this.errorCorrectLevel << 3) | maskPattern;
             var bits = QRUtil.getBCHTypeInfo(data);
             for (var i = 0; i < 15; i++) {
@@ -977,7 +993,8 @@ require(['./gif'], function (encoder) {
                 }
             }
             this.modules[this.moduleCount - 8][8] = (!test)
-        }, mapData: function (data, maskPattern) {
+        },
+        mapData: function(data, maskPattern) {
             var inc = -1;
             var row = this.moduleCount - 1;
             var bitIndex = 7;
@@ -1015,7 +1032,7 @@ require(['./gif'], function (encoder) {
     };
     QRCodeModel.PAD0 = 0xEC;
     QRCodeModel.PAD1 = 0x11;
-    QRCodeModel.createData = function (typeNumber, errorCorrectLevel, dataList) {
+    QRCodeModel.createData = function(typeNumber, errorCorrectLevel, dataList) {
         var rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
         var buffer = new QRBitBuffer();
         for (var i = 0; i < dataList.length; i++) {
@@ -1049,7 +1066,7 @@ require(['./gif'], function (encoder) {
         }
         return QRCodeModel.createBytes(buffer, rsBlocks)
     };
-    QRCodeModel.createBytes = function (buffer, rsBlocks) {
+    QRCodeModel.createBytes = function(buffer, rsBlocks) {
         var offset = 0;
         var maxDcCount = 0;
         var maxEcCount = 0;
@@ -1096,8 +1113,8 @@ require(['./gif'], function (encoder) {
         }
         return data
     };
-    var QRMode = {MODE_NUMBER: 1 << 0, MODE_ALPHA_NUM: 1 << 1, MODE_8BIT_BYTE: 1 << 2, MODE_KANJI: 1 << 3};
-    var QRErrorCorrectLevel = {L: 1, M: 0, Q: 3, H: 2};
+    var QRMode = { MODE_NUMBER: 1 << 0, MODE_ALPHA_NUM: 1 << 1, MODE_8BIT_BYTE: 1 << 2, MODE_KANJI: 1 << 3 };
+    var QRErrorCorrectLevel = { L: 1, M: 0, Q: 3, H: 2 };
     var QRMaskPattern = {
         PATTERN000: 0,
         PATTERN001: 1,
@@ -1109,25 +1126,66 @@ require(['./gif'], function (encoder) {
         PATTERN111: 7
     };
     var QRUtil = {
-        PATTERN_POSITION_TABLE: [[], [6, 18], [6, 22], [6, 26], [6, 30], [6, 34], [6, 22, 38], [6, 24, 42], [6, 26, 46], [6, 28, 50], [6, 30, 54], [6, 32, 58], [6, 34, 62], [6, 26, 46, 66], [6, 26, 48, 70], [6, 26, 50, 74], [6, 30, 54, 78], [6, 30, 56, 82], [6, 30, 58, 86], [6, 34, 62, 90], [6, 28, 50, 72, 94], [6, 26, 50, 74, 98], [6, 30, 54, 78, 102], [6, 28, 54, 80, 106], [6, 32, 58, 84, 110], [6, 30, 58, 86, 114], [6, 34, 62, 90, 118], [6, 26, 50, 74, 98, 122], [6, 30, 54, 78, 102, 126], [6, 26, 52, 78, 104, 130], [6, 30, 56, 82, 108, 134], [6, 34, 60, 86, 112, 138], [6, 30, 58, 86, 114, 142], [6, 34, 62, 90, 118, 146], [6, 30, 54, 78, 102, 126, 150], [6, 24, 50, 76, 102, 128, 154], [6, 28, 54, 80, 106, 132, 158], [6, 32, 58, 84, 110, 136, 162], [6, 26, 54, 82, 110, 138, 166], [6, 30, 58, 86, 114, 142, 170]],
+        PATTERN_POSITION_TABLE: [
+            [],
+            [6, 18],
+            [6, 22],
+            [6, 26],
+            [6, 30],
+            [6, 34],
+            [6, 22, 38],
+            [6, 24, 42],
+            [6, 26, 46],
+            [6, 28, 50],
+            [6, 30, 54],
+            [6, 32, 58],
+            [6, 34, 62],
+            [6, 26, 46, 66],
+            [6, 26, 48, 70],
+            [6, 26, 50, 74],
+            [6, 30, 54, 78],
+            [6, 30, 56, 82],
+            [6, 30, 58, 86],
+            [6, 34, 62, 90],
+            [6, 28, 50, 72, 94],
+            [6, 26, 50, 74, 98],
+            [6, 30, 54, 78, 102],
+            [6, 28, 54, 80, 106],
+            [6, 32, 58, 84, 110],
+            [6, 30, 58, 86, 114],
+            [6, 34, 62, 90, 118],
+            [6, 26, 50, 74, 98, 122],
+            [6, 30, 54, 78, 102, 126],
+            [6, 26, 52, 78, 104, 130],
+            [6, 30, 56, 82, 108, 134],
+            [6, 34, 60, 86, 112, 138],
+            [6, 30, 58, 86, 114, 142],
+            [6, 34, 62, 90, 118, 146],
+            [6, 30, 54, 78, 102, 126, 150],
+            [6, 24, 50, 76, 102, 128, 154],
+            [6, 28, 54, 80, 106, 132, 158],
+            [6, 32, 58, 84, 110, 136, 162],
+            [6, 26, 54, 82, 110, 138, 166],
+            [6, 30, 58, 86, 114, 142, 170]
+        ],
         G15: (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0),
         G18: (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0),
         G15_MASK: (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1),
-        getBCHTypeInfo: function (data) {
+        getBCHTypeInfo: function(data) {
             var d = data << 10;
             while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
                 d ^= (QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15)))
             }
             return ((data << 10) | d) ^ QRUtil.G15_MASK
         },
-        getBCHTypeNumber: function (data) {
+        getBCHTypeNumber: function(data) {
             var d = data << 12;
             while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
                 d ^= (QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18)))
             }
             return (data << 12) | d
         },
-        getBCHDigit: function (data) {
+        getBCHDigit: function(data) {
             var digit = 0;
             while (data != 0) {
                 digit++;
@@ -1135,10 +1193,10 @@ require(['./gif'], function (encoder) {
             }
             return digit
         },
-        getPatternPosition: function (typeNumber) {
+        getPatternPosition: function(typeNumber) {
             return QRUtil.PATTERN_POSITION_TABLE[typeNumber - 1]
         },
-        getMask: function (maskPattern, i, j) {
+        getMask: function(maskPattern, i, j) {
             switch (maskPattern) {
                 case QRMaskPattern.PATTERN000:
                     return (i + j) % 2 == 0;
@@ -1160,14 +1218,14 @@ require(['./gif'], function (encoder) {
                     throw new Error("bad maskPattern:" + maskPattern)
             }
         },
-        getErrorCorrectPolynomial: function (errorCorrectLength) {
+        getErrorCorrectPolynomial: function(errorCorrectLength) {
             var a = new QRPolynomial([1], 0);
             for (var i = 0; i < errorCorrectLength; i++) {
                 a = a.multiply(new QRPolynomial([1, QRMath.gexp(i)], 0))
             }
             return a
         },
-        getLengthInBits: function (mode, type) {
+        getLengthInBits: function(mode, type) {
             if (1 <= type && type < 10) {
                 switch (mode) {
                     case QRMode.MODE_NUMBER:
@@ -1211,7 +1269,7 @@ require(['./gif'], function (encoder) {
                 throw new Error("type:" + type)
             }
         },
-        getLostPoint: function (qrCode) {
+        getLostPoint: function(qrCode) {
             var moduleCount = qrCode.getModuleCount();
             var lostPoint = 0;
             for (var row = 0; row < moduleCount; row++) {
@@ -1279,12 +1337,13 @@ require(['./gif'], function (encoder) {
         }
     };
     var QRMath = {
-        glog: function (n) {
+        glog: function(n) {
             if (n < 1) {
                 throw new Error("glog(" + n + ")")
             }
             return QRMath.LOG_TABLE[n]
-        }, gexp: function (n) {
+        },
+        gexp: function(n) {
             while (n < 0) {
                 n += 255
             }
@@ -1292,7 +1351,9 @@ require(['./gif'], function (encoder) {
                 n -= 255
             }
             return QRMath.EXP_TABLE[n]
-        }, EXP_TABLE: new Array(256), LOG_TABLE: new Array(256)
+        },
+        EXP_TABLE: new Array(256),
+        LOG_TABLE: new Array(256)
     };
     for (var i = 0; i < 8; i++) {
         QRMath.EXP_TABLE[i] = 1 << i
@@ -1303,6 +1364,7 @@ require(['./gif'], function (encoder) {
     for (var i = 0; i < 255; i++) {
         QRMath.LOG_TABLE[QRMath.EXP_TABLE[i]] = i
     }
+
     function QRPolynomial(num, shift) {
         if (num.length == undefined) {
             throw new Error(num.length + "/" + shift)
@@ -1318,11 +1380,13 @@ require(['./gif'], function (encoder) {
     }
 
     QRPolynomial.prototype = {
-        get: function (index) {
+        get: function(index) {
             return this.num[index]
-        }, getLength: function () {
+        },
+        getLength: function() {
             return this.num.length
-        }, multiply: function (e) {
+        },
+        multiply: function(e) {
             var num = new Array(this.getLength() + e.getLength() - 1);
             for (var i = 0; i < this.getLength(); i++) {
                 for (var j = 0; j < e.getLength(); j++) {
@@ -1330,7 +1394,8 @@ require(['./gif'], function (encoder) {
                 }
             }
             return new QRPolynomial(num, 0)
-        }, mod: function (e) {
+        },
+        mod: function(e) {
             if (this.getLength() - e.getLength() < 0) {
                 return this
             }
@@ -1345,13 +1410,175 @@ require(['./gif'], function (encoder) {
             return new QRPolynomial(num, 0).mod(e)
         }
     };
+
     function QRRSBlock(totalCount, dataCount) {
         this.totalCount = totalCount;
         this.dataCount = dataCount
     }
 
-    QRRSBlock.RS_BLOCK_TABLE = [[1, 26, 19], [1, 26, 16], [1, 26, 13], [1, 26, 9], [1, 44, 34], [1, 44, 28], [1, 44, 22], [1, 44, 16], [1, 70, 55], [1, 70, 44], [2, 35, 17], [2, 35, 13], [1, 100, 80], [2, 50, 32], [2, 50, 24], [4, 25, 9], [1, 134, 108], [2, 67, 43], [2, 33, 15, 2, 34, 16], [2, 33, 11, 2, 34, 12], [2, 86, 68], [4, 43, 27], [4, 43, 19], [4, 43, 15], [2, 98, 78], [4, 49, 31], [2, 32, 14, 4, 33, 15], [4, 39, 13, 1, 40, 14], [2, 121, 97], [2, 60, 38, 2, 61, 39], [4, 40, 18, 2, 41, 19], [4, 40, 14, 2, 41, 15], [2, 146, 116], [3, 58, 36, 2, 59, 37], [4, 36, 16, 4, 37, 17], [4, 36, 12, 4, 37, 13], [2, 86, 68, 2, 87, 69], [4, 69, 43, 1, 70, 44], [6, 43, 19, 2, 44, 20], [6, 43, 15, 2, 44, 16], [4, 101, 81], [1, 80, 50, 4, 81, 51], [4, 50, 22, 4, 51, 23], [3, 36, 12, 8, 37, 13], [2, 116, 92, 2, 117, 93], [6, 58, 36, 2, 59, 37], [4, 46, 20, 6, 47, 21], [7, 42, 14, 4, 43, 15], [4, 133, 107], [8, 59, 37, 1, 60, 38], [8, 44, 20, 4, 45, 21], [12, 33, 11, 4, 34, 12], [3, 145, 115, 1, 146, 116], [4, 64, 40, 5, 65, 41], [11, 36, 16, 5, 37, 17], [11, 36, 12, 5, 37, 13], [5, 109, 87, 1, 110, 88], [5, 65, 41, 5, 66, 42], [5, 54, 24, 7, 55, 25], [11, 36, 12], [5, 122, 98, 1, 123, 99], [7, 73, 45, 3, 74, 46], [15, 43, 19, 2, 44, 20], [3, 45, 15, 13, 46, 16], [1, 135, 107, 5, 136, 108], [10, 74, 46, 1, 75, 47], [1, 50, 22, 15, 51, 23], [2, 42, 14, 17, 43, 15], [5, 150, 120, 1, 151, 121], [9, 69, 43, 4, 70, 44], [17, 50, 22, 1, 51, 23], [2, 42, 14, 19, 43, 15], [3, 141, 113, 4, 142, 114], [3, 70, 44, 11, 71, 45], [17, 47, 21, 4, 48, 22], [9, 39, 13, 16, 40, 14], [3, 135, 107, 5, 136, 108], [3, 67, 41, 13, 68, 42], [15, 54, 24, 5, 55, 25], [15, 43, 15, 10, 44, 16], [4, 144, 116, 4, 145, 117], [17, 68, 42], [17, 50, 22, 6, 51, 23], [19, 46, 16, 6, 47, 17], [2, 139, 111, 7, 140, 112], [17, 74, 46], [7, 54, 24, 16, 55, 25], [34, 37, 13], [4, 151, 121, 5, 152, 122], [4, 75, 47, 14, 76, 48], [11, 54, 24, 14, 55, 25], [16, 45, 15, 14, 46, 16], [6, 147, 117, 4, 148, 118], [6, 73, 45, 14, 74, 46], [11, 54, 24, 16, 55, 25], [30, 46, 16, 2, 47, 17], [8, 132, 106, 4, 133, 107], [8, 75, 47, 13, 76, 48], [7, 54, 24, 22, 55, 25], [22, 45, 15, 13, 46, 16], [10, 142, 114, 2, 143, 115], [19, 74, 46, 4, 75, 47], [28, 50, 22, 6, 51, 23], [33, 46, 16, 4, 47, 17], [8, 152, 122, 4, 153, 123], [22, 73, 45, 3, 74, 46], [8, 53, 23, 26, 54, 24], [12, 45, 15, 28, 46, 16], [3, 147, 117, 10, 148, 118], [3, 73, 45, 23, 74, 46], [4, 54, 24, 31, 55, 25], [11, 45, 15, 31, 46, 16], [7, 146, 116, 7, 147, 117], [21, 73, 45, 7, 74, 46], [1, 53, 23, 37, 54, 24], [19, 45, 15, 26, 46, 16], [5, 145, 115, 10, 146, 116], [19, 75, 47, 10, 76, 48], [15, 54, 24, 25, 55, 25], [23, 45, 15, 25, 46, 16], [13, 145, 115, 3, 146, 116], [2, 74, 46, 29, 75, 47], [42, 54, 24, 1, 55, 25], [23, 45, 15, 28, 46, 16], [17, 145, 115], [10, 74, 46, 23, 75, 47], [10, 54, 24, 35, 55, 25], [19, 45, 15, 35, 46, 16], [17, 145, 115, 1, 146, 116], [14, 74, 46, 21, 75, 47], [29, 54, 24, 19, 55, 25], [11, 45, 15, 46, 46, 16], [13, 145, 115, 6, 146, 116], [14, 74, 46, 23, 75, 47], [44, 54, 24, 7, 55, 25], [59, 46, 16, 1, 47, 17], [12, 151, 121, 7, 152, 122], [12, 75, 47, 26, 76, 48], [39, 54, 24, 14, 55, 25], [22, 45, 15, 41, 46, 16], [6, 151, 121, 14, 152, 122], [6, 75, 47, 34, 76, 48], [46, 54, 24, 10, 55, 25], [2, 45, 15, 64, 46, 16], [17, 152, 122, 4, 153, 123], [29, 74, 46, 14, 75, 47], [49, 54, 24, 10, 55, 25], [24, 45, 15, 46, 46, 16], [4, 152, 122, 18, 153, 123], [13, 74, 46, 32, 75, 47], [48, 54, 24, 14, 55, 25], [42, 45, 15, 32, 46, 16], [20, 147, 117, 4, 148, 118], [40, 75, 47, 7, 76, 48], [43, 54, 24, 22, 55, 25], [10, 45, 15, 67, 46, 16], [19, 148, 118, 6, 149, 119], [18, 75, 47, 31, 76, 48], [34, 54, 24, 34, 55, 25], [20, 45, 15, 61, 46, 16]];
-    QRRSBlock.getRSBlocks = function (typeNumber, errorCorrectLevel) {
+    QRRSBlock.RS_BLOCK_TABLE = [
+        [1, 26, 19],
+        [1, 26, 16],
+        [1, 26, 13],
+        [1, 26, 9],
+        [1, 44, 34],
+        [1, 44, 28],
+        [1, 44, 22],
+        [1, 44, 16],
+        [1, 70, 55],
+        [1, 70, 44],
+        [2, 35, 17],
+        [2, 35, 13],
+        [1, 100, 80],
+        [2, 50, 32],
+        [2, 50, 24],
+        [4, 25, 9],
+        [1, 134, 108],
+        [2, 67, 43],
+        [2, 33, 15, 2, 34, 16],
+        [2, 33, 11, 2, 34, 12],
+        [2, 86, 68],
+        [4, 43, 27],
+        [4, 43, 19],
+        [4, 43, 15],
+        [2, 98, 78],
+        [4, 49, 31],
+        [2, 32, 14, 4, 33, 15],
+        [4, 39, 13, 1, 40, 14],
+        [2, 121, 97],
+        [2, 60, 38, 2, 61, 39],
+        [4, 40, 18, 2, 41, 19],
+        [4, 40, 14, 2, 41, 15],
+        [2, 146, 116],
+        [3, 58, 36, 2, 59, 37],
+        [4, 36, 16, 4, 37, 17],
+        [4, 36, 12, 4, 37, 13],
+        [2, 86, 68, 2, 87, 69],
+        [4, 69, 43, 1, 70, 44],
+        [6, 43, 19, 2, 44, 20],
+        [6, 43, 15, 2, 44, 16],
+        [4, 101, 81],
+        [1, 80, 50, 4, 81, 51],
+        [4, 50, 22, 4, 51, 23],
+        [3, 36, 12, 8, 37, 13],
+        [2, 116, 92, 2, 117, 93],
+        [6, 58, 36, 2, 59, 37],
+        [4, 46, 20, 6, 47, 21],
+        [7, 42, 14, 4, 43, 15],
+        [4, 133, 107],
+        [8, 59, 37, 1, 60, 38],
+        [8, 44, 20, 4, 45, 21],
+        [12, 33, 11, 4, 34, 12],
+        [3, 145, 115, 1, 146, 116],
+        [4, 64, 40, 5, 65, 41],
+        [11, 36, 16, 5, 37, 17],
+        [11, 36, 12, 5, 37, 13],
+        [5, 109, 87, 1, 110, 88],
+        [5, 65, 41, 5, 66, 42],
+        [5, 54, 24, 7, 55, 25],
+        [11, 36, 12],
+        [5, 122, 98, 1, 123, 99],
+        [7, 73, 45, 3, 74, 46],
+        [15, 43, 19, 2, 44, 20],
+        [3, 45, 15, 13, 46, 16],
+        [1, 135, 107, 5, 136, 108],
+        [10, 74, 46, 1, 75, 47],
+        [1, 50, 22, 15, 51, 23],
+        [2, 42, 14, 17, 43, 15],
+        [5, 150, 120, 1, 151, 121],
+        [9, 69, 43, 4, 70, 44],
+        [17, 50, 22, 1, 51, 23],
+        [2, 42, 14, 19, 43, 15],
+        [3, 141, 113, 4, 142, 114],
+        [3, 70, 44, 11, 71, 45],
+        [17, 47, 21, 4, 48, 22],
+        [9, 39, 13, 16, 40, 14],
+        [3, 135, 107, 5, 136, 108],
+        [3, 67, 41, 13, 68, 42],
+        [15, 54, 24, 5, 55, 25],
+        [15, 43, 15, 10, 44, 16],
+        [4, 144, 116, 4, 145, 117],
+        [17, 68, 42],
+        [17, 50, 22, 6, 51, 23],
+        [19, 46, 16, 6, 47, 17],
+        [2, 139, 111, 7, 140, 112],
+        [17, 74, 46],
+        [7, 54, 24, 16, 55, 25],
+        [34, 37, 13],
+        [4, 151, 121, 5, 152, 122],
+        [4, 75, 47, 14, 76, 48],
+        [11, 54, 24, 14, 55, 25],
+        [16, 45, 15, 14, 46, 16],
+        [6, 147, 117, 4, 148, 118],
+        [6, 73, 45, 14, 74, 46],
+        [11, 54, 24, 16, 55, 25],
+        [30, 46, 16, 2, 47, 17],
+        [8, 132, 106, 4, 133, 107],
+        [8, 75, 47, 13, 76, 48],
+        [7, 54, 24, 22, 55, 25],
+        [22, 45, 15, 13, 46, 16],
+        [10, 142, 114, 2, 143, 115],
+        [19, 74, 46, 4, 75, 47],
+        [28, 50, 22, 6, 51, 23],
+        [33, 46, 16, 4, 47, 17],
+        [8, 152, 122, 4, 153, 123],
+        [22, 73, 45, 3, 74, 46],
+        [8, 53, 23, 26, 54, 24],
+        [12, 45, 15, 28, 46, 16],
+        [3, 147, 117, 10, 148, 118],
+        [3, 73, 45, 23, 74, 46],
+        [4, 54, 24, 31, 55, 25],
+        [11, 45, 15, 31, 46, 16],
+        [7, 146, 116, 7, 147, 117],
+        [21, 73, 45, 7, 74, 46],
+        [1, 53, 23, 37, 54, 24],
+        [19, 45, 15, 26, 46, 16],
+        [5, 145, 115, 10, 146, 116],
+        [19, 75, 47, 10, 76, 48],
+        [15, 54, 24, 25, 55, 25],
+        [23, 45, 15, 25, 46, 16],
+        [13, 145, 115, 3, 146, 116],
+        [2, 74, 46, 29, 75, 47],
+        [42, 54, 24, 1, 55, 25],
+        [23, 45, 15, 28, 46, 16],
+        [17, 145, 115],
+        [10, 74, 46, 23, 75, 47],
+        [10, 54, 24, 35, 55, 25],
+        [19, 45, 15, 35, 46, 16],
+        [17, 145, 115, 1, 146, 116],
+        [14, 74, 46, 21, 75, 47],
+        [29, 54, 24, 19, 55, 25],
+        [11, 45, 15, 46, 46, 16],
+        [13, 145, 115, 6, 146, 116],
+        [14, 74, 46, 23, 75, 47],
+        [44, 54, 24, 7, 55, 25],
+        [59, 46, 16, 1, 47, 17],
+        [12, 151, 121, 7, 152, 122],
+        [12, 75, 47, 26, 76, 48],
+        [39, 54, 24, 14, 55, 25],
+        [22, 45, 15, 41, 46, 16],
+        [6, 151, 121, 14, 152, 122],
+        [6, 75, 47, 34, 76, 48],
+        [46, 54, 24, 10, 55, 25],
+        [2, 45, 15, 64, 46, 16],
+        [17, 152, 122, 4, 153, 123],
+        [29, 74, 46, 14, 75, 47],
+        [49, 54, 24, 10, 55, 25],
+        [24, 45, 15, 46, 46, 16],
+        [4, 152, 122, 18, 153, 123],
+        [13, 74, 46, 32, 75, 47],
+        [48, 54, 24, 14, 55, 25],
+        [42, 45, 15, 32, 46, 16],
+        [20, 147, 117, 4, 148, 118],
+        [40, 75, 47, 7, 76, 48],
+        [43, 54, 24, 22, 55, 25],
+        [10, 45, 15, 67, 46, 16],
+        [19, 148, 118, 6, 149, 119],
+        [18, 75, 47, 31, 76, 48],
+        [34, 54, 24, 34, 55, 25],
+        [20, 45, 15, 61, 46, 16]
+    ];
+    QRRSBlock.getRSBlocks = function(typeNumber, errorCorrectLevel) {
         var rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
         if (rsBlock == undefined) {
             throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel)
@@ -1368,7 +1595,7 @@ require(['./gif'], function (encoder) {
         }
         return list
     };
-    QRRSBlock.getRsBlockTable = function (typeNumber, errorCorrectLevel) {
+    QRRSBlock.getRsBlockTable = function(typeNumber, errorCorrectLevel) {
         switch (errorCorrectLevel) {
             case QRErrorCorrectLevel.L:
                 return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];
@@ -1382,22 +1609,26 @@ require(['./gif'], function (encoder) {
                 return undefined
         }
     };
+
     function QRBitBuffer() {
         this.buffer = [];
         this.length = 0
     }
 
     QRBitBuffer.prototype = {
-        get: function (index) {
+        get: function(index) {
             var bufIndex = Math.floor(index / 8);
             return ((this.buffer[bufIndex] >>> (7 - index % 8)) & 1) == 1
-        }, put: function (num, length) {
+        },
+        put: function(num, length) {
             for (var i = 0; i < length; i++) {
                 this.putBit(((num >>> (length - i - 1)) & 1) == 1)
             }
-        }, getLengthInBits: function () {
+        },
+        getLengthInBits: function() {
             return this.length
-        }, putBit: function (bit) {
+        },
+        putBit: function(bit) {
             var bufIndex = Math.floor(this.length / 8);
             if (this.buffer.length <= bufIndex) {
                 this.buffer.push(0)
@@ -1408,11 +1639,52 @@ require(['./gif'], function (encoder) {
             this.length++
         }
     };
-    var QRCodeLimitLength = [[17, 14, 11, 7], [32, 26, 20, 14], [53, 42, 32, 24], [78, 62, 46, 34], [106, 84, 60, 44], [134, 106, 74, 58], [154, 122, 86, 64], [192, 152, 108, 84], [230, 180, 130, 98], [271, 213, 151, 119], [321, 251, 177, 137], [367, 287, 203, 155], [425, 331, 241, 177], [458, 362, 258, 194], [520, 412, 292, 220], [586, 450, 322, 250], [644, 504, 364, 280], [718, 560, 394, 310], [792, 624, 442, 338], [858, 666, 482, 382], [929, 711, 509, 403], [1003, 779, 565, 439], [1091, 857, 611, 461], [1171, 911, 661, 511], [1273, 997, 715, 535], [1367, 1059, 751, 593], [1465, 1125, 805, 625], [1528, 1190, 868, 658], [1628, 1264, 908, 698], [1732, 1370, 982, 742], [1840, 1452, 1030, 790], [1952, 1538, 1112, 842], [2068, 1628, 1168, 898], [2188, 1722, 1228, 958], [2303, 1809, 1283, 983], [2431, 1911, 1351, 1051], [2563, 1989, 1423, 1093], [2699, 2099, 1499, 1139], [2809, 2213, 1579, 1219], [2953, 2331, 1663, 1273]]
+    var QRCodeLimitLength = [
+        [17, 14, 11, 7],
+        [32, 26, 20, 14],
+        [53, 42, 32, 24],
+        [78, 62, 46, 34],
+        [106, 84, 60, 44],
+        [134, 106, 74, 58],
+        [154, 122, 86, 64],
+        [192, 152, 108, 84],
+        [230, 180, 130, 98],
+        [271, 213, 151, 119],
+        [321, 251, 177, 137],
+        [367, 287, 203, 155],
+        [425, 331, 241, 177],
+        [458, 362, 258, 194],
+        [520, 412, 292, 220],
+        [586, 450, 322, 250],
+        [644, 504, 364, 280],
+        [718, 560, 394, 310],
+        [792, 624, 442, 338],
+        [858, 666, 482, 382],
+        [929, 711, 509, 403],
+        [1003, 779, 565, 439],
+        [1091, 857, 611, 461],
+        [1171, 911, 661, 511],
+        [1273, 997, 715, 535],
+        [1367, 1059, 751, 593],
+        [1465, 1125, 805, 625],
+        [1528, 1190, 868, 658],
+        [1628, 1264, 908, 698],
+        [1732, 1370, 982, 742],
+        [1840, 1452, 1030, 790],
+        [1952, 1538, 1112, 842],
+        [2068, 1628, 1168, 898],
+        [2188, 1722, 1228, 958],
+        [2303, 1809, 1283, 983],
+        [2431, 1911, 1351, 1051],
+        [2563, 1989, 1423, 1093],
+        [2699, 2099, 1499, 1139],
+        [2809, 2213, 1579, 1219],
+        [2953, 2331, 1663, 1273]
+    ]
 
     // END OF QR CODE CORE LIBRARY DEFINITION
 
-    var Drawing = (function () { // Drawing in Canvas
+    var Drawing = (function() { // Drawing in Canvas
         function _onMakeImage() {
             this._elImage.src = this._elCanvas.toDataURL("image/png");
             this._elImage.style.display = "block";
@@ -1427,14 +1699,14 @@ require(['./gif'], function (encoder) {
             // Check it just once
             if (self._bSupportDataURI === null) {
                 var el = document.createElement("img");
-                var fOnError = function () {
+                var fOnError = function() {
                     self._bSupportDataURI = false;
 
                     if (self._fFail) {
                         self._fFail.call(self);
                     }
                 };
-                var fOnSuccess = function () {
+                var fOnSuccess = function() {
                     self._bSupportDataURI = true;
 
                     if (self._fSuccess) {
@@ -1454,7 +1726,7 @@ require(['./gif'], function (encoder) {
             }
         }
 
-        var Drawing = function (htOption) {
+        var Drawing = function(htOption) {
             this._bIsPainted = false;
 
             this._htOption = htOption;
@@ -1471,7 +1743,7 @@ require(['./gif'], function (encoder) {
             this._bindElement = htOption.bindElement;
         };
 
-        Drawing.prototype.draw = function (oQRCode) {
+        Drawing.prototype.draw = function(oQRCode) {
             var _elImage = this._elImage;
             var _tCanvas = document.createElement("canvas");
             var _oContext = _tCanvas.getContext("2d");
@@ -1533,7 +1805,9 @@ require(['./gif'], function (encoder) {
                 gifFrames = gif.decompressFrames(true);
                 // console.log(gifFrames);
                 if (_htOption.autoColor) {
-                    var r = 0, g = 0, b = 0;
+                    var r = 0,
+                        g = 0,
+                        b = 0;
                     var count = 0;
                     for (var i = 0; i < gifFrames[0].colorTable.length; i++) {
                         var c = gifFrames[0].colorTable[i];
@@ -1551,8 +1825,7 @@ require(['./gif'], function (encoder) {
                     // console.log("rgb(" + r + ", " + g + ", " + b + ")");
                     _htOption.colorDark = "rgb(" + r + ", " + g + ", " + b + ")";
                 }
-            }
-            else if (_htOption.backgroundImage !== undefined) {
+            } else if (_htOption.backgroundImage !== undefined) {
                 if (_htOption.autoColor) {
                     var avgRGB = getAverageRGB(_htOption.backgroundImage);
                     _htOption.colorDark = "rgb(" + avgRGB.r + ", " + avgRGB.g + ", " + avgRGB.b + ")";
@@ -1588,8 +1861,7 @@ require(['./gif'], function (encoder) {
                     _bContext.fillStyle = backgroundDimming;
                     _bContext.fill();
                 }
-            }
-            else {
+            } else {
                 _bContext.rect(0, 0, size, size);
                 _bContext.fillStyle = "#ffffff";
                 _bContext.fill();
@@ -1815,7 +2087,7 @@ require(['./gif'], function (encoder) {
                 var hPatchCanvas = patchCanvas.getContext("2d");
                 var patchData;
 
-                gifFrames.forEach(function (frame) {
+                gifFrames.forEach(function(frame) {
                     // console.log(frame);
                     if (gifOutput === undefined) {
                         gifOutput = new GIFE({
@@ -1863,17 +2135,17 @@ require(['./gif'], function (encoder) {
                     _fCanvas.height = rawSize;
                     _fContext.drawImage(stdCanvas, 0, 0, rawSize, rawSize);
                     // console.log(_fContext);
-                    gifOutput.addFrame(_fContext, {copy: true, delay: frame.delay});
+                    gifOutput.addFrame(_fContext, { copy: true, delay: frame.delay });
                 });
 
                 if (gifOutput === undefined) {
                     throw new Error("No frames.")
                 }
                 var ref = this;
-                gifOutput.on('finished', function (blob) {
+                gifOutput.on('finished', function(blob) {
                     // Painting work completed
                     var r = new FileReader();
-                    r.onload = function (e) {
+                    r.onload = function(e) {
                         var data = e.target.result;
                         ref._bIsPainted = true;
                         if (ref._callback !== undefined) {
@@ -1904,22 +2176,22 @@ require(['./gif'], function (encoder) {
 
         };
 
-        Drawing.prototype.makeImage = function () {
+        Drawing.prototype.makeImage = function() {
             if (this._bIsPainted) {
                 _safeSetDataURI.call(this, _onMakeImage);
             }
         };
 
-        Drawing.prototype.isPainted = function () {
+        Drawing.prototype.isPainted = function() {
             return this._bIsPainted;
         };
 
-        Drawing.prototype.clear = function () {
+        Drawing.prototype.clear = function() {
             this._oContext.clearRect(0, 0, this._elCanvas.width, this._elCanvas.height);
             this._bIsPainted = false;
         };
 
-        Drawing.prototype.round = function (nNumber) {
+        Drawing.prototype.round = function(nNumber) {
             if (!nNumber) {
                 return nNumber;
             }
@@ -1930,7 +2202,7 @@ require(['./gif'], function (encoder) {
         return Drawing;
     })();
 
-// Utilities and useful helpers
+    // Utilities and useful helpers
 
     function _getUTF8Length(sText) {
         var replacedText = encodeURI(sText).toString().replace(/\%[0-9a-fA-F]{2}/g, 'a');
@@ -1973,22 +2245,21 @@ require(['./gif'], function (encoder) {
     }
 
     function _drawAlignProtector(context, centerX, centerY, nWidth, nHeight) {
-        context.clearRect((centerX - 2 ) * nWidth, (centerY - 2 ) * nHeight, 5 * nWidth, 5 * nHeight);
-        context.fillRect((centerX - 2 ) * nWidth, (centerY - 2 ) * nHeight, 5 * nWidth, 5 * nHeight);
+        context.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
+        context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
     }
 
     function _drawAlign(context, centerX, centerY, nWidth, nHeight) {
         context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, nWidth, 4 * nHeight);
         context.fillRect((centerX + 2) * nWidth, (centerY - 2 + 1) * nHeight, nWidth, 4 * nHeight);
         context.fillRect((centerX - 2 + 1) * nWidth, (centerY - 2) * nHeight, 4 * nWidth, nHeight);
-        context.fillRect((centerX - 2 ) * nWidth, (centerY + 2) * nHeight, 4 * nWidth, nHeight);
+        context.fillRect((centerX - 2) * nWidth, (centerY + 2) * nHeight, 4 * nWidth, nHeight);
         context.fillRect(centerX * nWidth, centerY * nHeight, nWidth, nHeight);
     }
 
-    AwesomeQRCode = function () {
-    };
+    AwesomeQRCode = function() {};
 
-    AwesomeQRCode.prototype.create = function (vOption) {
+    AwesomeQRCode.prototype.create = function(vOption) {
         this._htOption = {
             size: 800,
             margin: 20,
@@ -2069,7 +2340,7 @@ require(['./gif'], function (encoder) {
         return nType;
     }
 
-    AwesomeQRCode.prototype.makeCode = function (sText) {
+    AwesomeQRCode.prototype.makeCode = function(sText) {
         //this._oQRCode = new QRCodeModel(_getTypeNumber(sText, this._htOption.correctLevel), this._htOption.correctLevel);
         this._oQRCode = new QRCodeModel(-1, this._htOption.correctLevel);
         this._oQRCode.addData(sText);
@@ -2078,13 +2349,13 @@ require(['./gif'], function (encoder) {
         this.makeImage();
     };
 
-    AwesomeQRCode.prototype.makeImage = function () {
+    AwesomeQRCode.prototype.makeImage = function() {
         if (typeof this._oDrawing.makeImage == "function") {
             this._oDrawing.makeImage();
         }
     };
 
-    AwesomeQRCode.prototype.clear = function () {
+    AwesomeQRCode.prototype.clear = function() {
         this._oDrawing.clear();
     };
 
@@ -2143,7 +2414,7 @@ require(['./gif'], function (encoder) {
     }
 })();
 
-(function (window, factory) {
+(function(window, factory) {
     if (typeof exports === 'object') {
         module.exports = factory;
     } else if (typeof define === 'function' && define.amd) {
@@ -2151,6 +2422,6 @@ require(['./gif'], function (encoder) {
     } else {
         window.eventUtil = factory();
     }
-})(this, function () {
+})(this, function() {
     return new AwesomeQRCode();
 });
