@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0a164c1b-2142-412e-9427-b11e356b499e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/awesome-qr.js" afterPath="$PROJECT_DIR$/dist/awesome-qr.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/gif.js" afterPath="$PROJECT_DIR$/dist/gif.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dist/gif.worker.js" afterPath="$PROJECT_DIR$/dist/gif.worker.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
-    </list>
+    <list default="true" id="0a164c1b-2142-412e-9427-b11e356b499e" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
     <ignored path="$PROJECT_DIR$/tmp/" />
@@ -22,51 +15,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="indx_.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/indx_.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="552" column="27" lean-forward="true" selection-start-line="552" selection-start-column="27" selection-end-line="552" selection-end-column="27" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/index.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4085">
-              <caret line="258" column="20" lean-forward="false" selection-start-line="258" selection-start-column="20" selection-end-line="258" selection-end-column="20" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index3.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/index3.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="110">
-              <caret line="14" column="44" lean-forward="false" selection-start-line="14" selection-start-column="44" selection-end-line="14" selection-end-column="44" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-510">
-              <caret line="3" column="36" lean-forward="true" selection-start-line="3" selection-start-column="36" selection-end-line="4" selection-end-column="34" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="awesome-qr.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dist/awesome-qr.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="149">
-              <caret line="2268" column="34" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="2426" selection-end-column="3" />
+              <caret line="2268" column="48" lean-forward="true" selection-start-line="2268" selection-start-column="48" selection-end-line="2268" selection-end-column="48" />
               <folding />
             </state>
           </provider>
@@ -1013,12 +966,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1510587124045</updated>
-      <workItem from="1510587125840" duration="4349000" />
+      <workItem from="1510587125840" duration="4355000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4349000" />
+    <option name="totallyTimeSpent" value="4355000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="459" y="196" width="1397" height="787" extended-state="0" />
@@ -1839,7 +1792,7 @@
     <entry file="file://$PROJECT_DIR$/dist/awesome-qr.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="149">
-          <caret line="2268" column="34" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="2426" selection-end-column="3" />
+          <caret line="2268" column="48" lean-forward="true" selection-start-line="2268" selection-start-column="48" selection-end-line="2268" selection-end-column="48" />
           <folding />
         </state>
       </provider>

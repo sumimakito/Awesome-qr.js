@@ -240,15 +240,15 @@ r.readAsArrayBuffer(file);
 
 Option | 客户端（浏览器） | 服务器端（Node.js）
 :------|:-----------------------|:---------------------
-text | Required | Required
-size | Required | Required
-margin | Optional | Optional
-dotScale | Optional | Optional
-maskedDots | Optional | Not supported
-correctLevel | Optional | Optional
-whiteMargin | Optional | Optional
-bindElement | Optional | Not supported
-callback | Optional | Optional
+text | 必需 | 必需
+size | 必需 | 必需
+margin | 可选 | 可选
+dotScale | 可选 | 可选
+maskedDots | 可选 | 不支持
+correctLevel | 可选 | 可选
+whiteMargin | 可选 | 可选
+bindElement | 可选 | 不支持
+callback | 可选 | 可选
 
 > 可以使用 `bindElement` 来指定要自动填入二维码图像的元素的 ID（不含前导「#」），支持 `<div>` 或是 `<img>`。
 
@@ -258,9 +258,9 @@ callback | Optional | Optional
 
 Option | 客户端（浏览器） | 服务器端（Node.js）
 :------|:-----------------------|:---------------------
-colorDark | Optional | Optional
-colorLight | Optional | Optional
-autoColor | Optional | Optional
+colorDark | 可选 | 可选
+colorLight | 可选 | 可选
+autoColor | 可选 | 可选
 
 > 若设置了 `autoColor`，则 `colorDark` 和 `colorLight` 都将被忽略。
 
@@ -268,9 +268,9 @@ autoColor | Optional | Optional
 
 Option | 客户端（浏览器） | 服务器端（Node.js）
 :------|:-----------------------|:---------------------
-backgroundImage | Optional | Optional
-backgroundDimming | Optional | Optional
-gifBackground | Optional | Not supported
+backgroundImage | 可选 | 可选
+backgroundDimming | 可选 | 可选
+gifBackground | 可选 | 不支持
 
 > 若设定了 `gifBackground `，则 `backgroundImage ` 将会被忽略。
 
@@ -278,10 +278,10 @@ gifBackground | Optional | Not supported
 
 Option | 客户端（浏览器） | 服务器端（Node.js）
 :------|:-----------------------|:---------------------
-logoImage | Optional | Not supported
-logoScale | Optional | Not supported
-logoMargin | Optional | Not supported
-logoCornerRadius | Optional | Not supported
+logoImage | 可选 | 不支持
+logoScale | 可选 | 不支持
+logoMargin | 可选 | 不支持
+logoCornerRadius | 可选 | 不支持
 
 > Logo 的真实大小将使用 `logoScale*(size-2*margin)` 计算。
 
@@ -289,8 +289,8 @@ logoCornerRadius | Optional | Not supported
 
 Option | 客户端（浏览器） | 服务器端（Node.js）
 :------|:-----------------------|:---------------------
-binarize | Optional | Not supported
-binarizeThreshold | Optional | Not supported
+binarize | 可选 | 不支持
+binarizeThreshold | 可选 | 不支持
 
 > 选项 `binarizeThreshold ` 的值应该是大于 0 并小于 255 的整数。
 
@@ -430,7 +430,7 @@ You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
+Unless 必需 by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
