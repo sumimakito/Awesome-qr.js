@@ -298,7 +298,7 @@ binarizeThreshold | Optional | Not supported
 
 Awesome-qr.js will use the values below for the missing fields in the custom option.
 
-```json
+```
 {
 	size: 800,
 	margin: 20,

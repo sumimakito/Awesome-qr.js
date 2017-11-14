@@ -298,7 +298,7 @@ binarizeThreshold | Optional | Not supported
 
 Awesome-qr.js 将使用以下默认值来填补自定义选项中缺少的部分。
 
-```json
+```
 {
 	size: 800,
 	margin: 20,
