@@ -350,7 +350,7 @@ Also, you can try to scan the following QR code with Alipay or WeChat.
 
 <img src="https://raw.githubusercontent.com/SumiMakito/Misc/master/alipay-2.jpg" width="300">
 
-<img src="https://raw.githubusercontent.com/SumiMakito/Misc/master/wechat-2.jpg" width="300">
+<img src="https://raw.githubusercontent.com/SumiMakito/Misc/master/wechat-2.png" width="300">
 
 ### Changelog
 
