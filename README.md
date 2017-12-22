@@ -47,9 +47,13 @@ Binarized|With a logo|Custom color|With GIF background
 
 #### α. Use in Node.js (on server side)
 
+> **IMPORTANT**: Awesome-qr.js uses node-canvas to draw the generated QR code image, so before running the `npm install ...` command, you really should take a carefully look at [its documentation](https://github.com/Automattic/node-canvas#installation) to ensure that node-canvas will work on your server correctly.
+
 ```
 npm install awesome-qr --save
 ```
+
+> Before V1.2.0, Awesome-qr.js was NOT designed for servers running Node.js. Therefore, please do NOT use npm to install versions below V1.2.0 on your server, you may get a painful error otherwise.
 
 ```javascript
 let AwesomeQR = require('awesome-qr');

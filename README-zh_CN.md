@@ -47,9 +47,13 @@ Binarized|With a logo|Custom color|With GIF background
 
 #### α. 在 Node.js（服务端）使用
 
+> **重要提醒**：Awesome-qr.js 使用 node-canvas 来绘制生成的二维码图片，因此在执行 `npm install ...` 之前，请务必参考 node-canvas 的 [官方文档](https://github.com/Automattic/node-canvas#installation) 来确保它在你的服务器上可以正常使用。
+
 ```
 npm install awesome-qr --save
 ```
+
+> 在 1.2.0 版本之前，Awesome-qr.js 并不是为使用 Node.js 的服务器而设计的，因此请**不要**使用 npm 在服务器上安装低于 1.2.0 的版本，否则将会发生奇怪的事情。
 
 ```javascript
 let AwesomeQR = require('awesome-qr');
