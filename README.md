@@ -346,9 +346,11 @@ You can find me by searching `sumimakito` in Alipay on Android/iOS devices, or c
 - [PayPal](https://www.paypal.me/makito)
 - [Alipay](https://qr.alipay.com/a6x02021re1jk4ftcymlw79)
 
-Also, you can try to scan the following QR code with Alipay.
+Also, you can try to scan the following QR code with Alipay or WeChat.
 
 <img src="https://raw.githubusercontent.com/SumiMakito/Misc/master/alipay-2.jpg" width="300">
+
+<img src="https://raw.githubusercontent.com/SumiMakito/Misc/master/wechat-2.jpg" width="300">
 
 ### Changelog
 

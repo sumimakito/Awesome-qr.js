@@ -344,9 +344,11 @@ Awesome-qr.js 将使用以下默认值来填补自定义选项中缺少的部分
 - [PayPal](https://www.paypal.me/makito)
 - [支付宝](https://qr.alipay.com/a6x02021re1jk4ftcymlw79)
 
-您也可以使用手机扫描下方的二维码来找到我。
+您也可以使用「支付宝」或「微信」扫描下方的二维码来找到我。
 
 <img src="https://raw.githubusercontent.com/SumiMakito/Misc/master/alipay-2.jpg" width="300">
+
+<img src="https://raw.githubusercontent.com/SumiMakito/Misc/master/wechat-2.jpg" width="300">
 
 ### 更新日志
 
