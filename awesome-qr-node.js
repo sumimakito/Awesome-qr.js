@@ -1026,7 +1026,7 @@ var Drawing = (function() { // Drawing in Canvas
         this.clear();
 
         if (dotScale <= 0 || dotScale > 1) {
-            throw new Error("Scale should be in range (0, 1).")
+            throw new Error("Scale should be in range (0, 1].")
         }
 
         // Leave room for margin
