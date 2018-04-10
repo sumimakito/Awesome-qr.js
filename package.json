@@ -1,6 +1,6 @@
 {
     "name": "awesome-qr",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "An awesome QR code generator written in JavaScript.",
     "main": "awesome-qr-node.js",
     "scripts": {
@@ -22,7 +22,7 @@
     },
     "homepage": "https://github.com/SumiMakito/Awesome-qr.js#readme",
     "dependencies": {
-        "canvas": "^1.6.7",
+        "canvas-prebuilt": "^1.6.5-prerelease.1",
         "request": "^2.83.0"
     }
 }

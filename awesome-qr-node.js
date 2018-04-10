@@ -33,7 +33,7 @@
 let fs = require('fs');
 let http = require('http');
 let url = require('url');
-let Canvas = require('canvas');
+let Canvas = require('canvas-prebuilt');
 let Image = Canvas.Image;
 let request = require('request');
 
@@ -1042,10 +1042,10 @@ var Drawing = (function() { // Drawing in Canvas
         var _mContext = undefined;
 
         if (_htOption.backgroundImage !== undefined) {
-            console.log("No bkg");
+            //console.log("No bkg");
             if (_htOption.autoColor) {
-                console.log(typeof(_htOption.backgroundImage));
-                console.log(_htOption.backgroundImage);
+                //console.log(typeof(_htOption.backgroundImage));
+                //console.log(_htOption.backgroundImage);
                 var avgRGB = getAverageRGB(_htOption.backgroundImage);
                 _htOption.colorDark = "rgb(" + avgRGB.r + ", " + avgRGB.g + ", " + avgRGB.b + ")";
             }
@@ -1074,15 +1074,17 @@ var Drawing = (function() { // Drawing in Canvas
                  whiteMargin ? 0 : -margin, whiteMargin ? 0 : -margin, whiteMargin ? viewportSize : size, whiteMargin ? viewportSize : size);
                  */
 
-                _bContext.drawImage(_htOption.backgroundImage,
-                    0, 0, _htOption.backgroundImage.width, _htOption.backgroundImage.height,
+                var backgroundImage = new Image();
+                backgroundImage.src = _htOption.backgroundImage;
+                _bContext.drawImage(backgroundImage,
+                    0, 0, backgroundImage.width,backgroundImage.height,
                     0, 0, size, size);
                 _bContext.rect(0, 0, size, size);
                 _bContext.fillStyle = backgroundDimming;
                 _bContext.fill();
             }
         } else {
-            console.log("has bkg");
+            //console.log("has bkg");
             _bContext.rect(0, 0, size, size);
             _bContext.fillStyle = "#ffffff";
             _bContext.fill();
@@ -1126,7 +1128,7 @@ var Drawing = (function() { // Drawing in Canvas
             }
         }
 
-        console.log("POSITION protectors");
+        //console.log("POSITION protectors");
         // Draw POSITION protectors
         var protectorStyle = "rgba(255, 255, 255, 0.6)";
         _oContext.fillStyle = protectorStyle;
@@ -1136,7 +1138,7 @@ var Drawing = (function() { // Drawing in Canvas
         _oContext.fillRect(8 * nSize, 6 * nSize, (nCount - 8 - 8) * nSize, nSize);
         _oContext.fillRect(6 * nSize, 8 * nSize, nSize, (nCount - 8 - 8) * nSize);
 
-        console.log("ALIGN protectors");
+        //console.log("ALIGN protectors");
         // Draw ALIGN protectors
         var edgeCenter = agnPatternCenter[agnPatternCenter.length - 1];
         for (var i = 0; i < agnPatternCenter.length; i++) {
@@ -1206,10 +1208,12 @@ var Drawing = (function() { // Drawing in Canvas
             _oContext.fillRect(-margin, -margin, margin, size);
         }
 
-        if (false && _htOption.logoImage !== undefined) {
+        if (_htOption.logoImage !== undefined) {
             var logoScale = _htOption.logoScale;
             var logoMargin = _htOption.logoMargin;
             var logoCornerRadius = _htOption.logoCornerRadius;
+            var logoImage = new Image();
+            logoImage.src = _htOption.logoImage;
             if (logoScale <= 0 || logoScale >= 1.0) {
                 logoScale = 0.2;
             }
@@ -1236,7 +1240,7 @@ var Drawing = (function() { // Drawing in Canvas
             _oContext.save();
             _prepareRoundedCornerClip(_oContext, x, y, logoSize, logoSize, logoCornerRadius);
             _oContext.clip();
-            _oContext.drawImage(_htOption.logoImage, x, y, logoSize, logoSize);
+            _oContext.drawImage(logoImage, x, y, logoSize, logoSize);
             _oContext.restore();
         }
         // Swap and merge the foreground and the background
@@ -1375,6 +1379,10 @@ AwesomeQRCode.prototype.create = function(vOption) {
             correctLevel: QRErrorCorrectLevel.M,
             backgroundImage: undefined,
             backgroundDimming: 'rgba(0,0,0,0)',
+            logoImage: undefined,
+            logoScale: 0.2,
+            logoMargin: 6,
+            logoCornerRadius: 8,
             whiteMargin: true,
             dotScale: 0.35,
             autoColor: true,
@@ -1463,8 +1471,9 @@ AwesomeQRCode.prototype.clear = function() {
 
 AwesomeQRCode.CorrectLevel = QRErrorCorrectLevel;
 
-function getAverageRGB(imgEl) {
-
+function getAverageRGB(imgSrc) {
+    var imgEl = new Image();
+    imgEl.src = imgSrc;
     var blockSize = 5,
         defaultRGB = {
             r: 0,
