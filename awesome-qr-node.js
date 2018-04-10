@@ -1074,8 +1074,10 @@ var Drawing = (function() { // Drawing in Canvas
                  whiteMargin ? 0 : -margin, whiteMargin ? 0 : -margin, whiteMargin ? viewportSize : size, whiteMargin ? viewportSize : size);
                  */
 
-                _bContext.drawImage(_htOption.backgroundImage,
-                    0, 0, _htOption.backgroundImage.width, _htOption.backgroundImage.height,
+                var backgroundImage = new Image();
+                backgroundImage.src = _htOption.backgroundImage;
+                _bContext.drawImage(backgroundImage,
+                    0, 0, backgroundImage.width,backgroundImage.height,
                     0, 0, size, size);
                 _bContext.rect(0, 0, size, size);
                 _bContext.fillStyle = backgroundDimming;
@@ -1210,6 +1212,8 @@ var Drawing = (function() { // Drawing in Canvas
             var logoScale = _htOption.logoScale;
             var logoMargin = _htOption.logoMargin;
             var logoCornerRadius = _htOption.logoCornerRadius;
+            var logoImage = new Image();
+            logoImage.src = _htOption.logoImage;
             if (logoScale <= 0 || logoScale >= 1.0) {
                 logoScale = 0.2;
             }
@@ -1236,7 +1240,7 @@ var Drawing = (function() { // Drawing in Canvas
             _oContext.save();
             _prepareRoundedCornerClip(_oContext, x, y, logoSize, logoSize, logoCornerRadius);
             _oContext.clip();
-            _oContext.drawImage(_htOption.logoImage, x, y, logoSize, logoSize);
+            _oContext.drawImage(logoImage, x, y, logoSize, logoSize);
             _oContext.restore();
         }
         // Swap and merge the foreground and the background
@@ -1467,8 +1471,9 @@ AwesomeQRCode.prototype.clear = function() {
 
 AwesomeQRCode.CorrectLevel = QRErrorCorrectLevel;
 
-function getAverageRGB(imgEl) {
-
+function getAverageRGB(imgSrc) {
+    var imgEl = new Image();
+    imgEl.src = imgSrc;
     var blockSize = 5,
         defaultRGB = {
             r: 0,
