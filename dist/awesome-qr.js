@@ -267,10 +267,11 @@ require([__awesome_qr_base_path+'/gif'], function (gifEncoder) {
 
             var GIF = window.GIF || {};
 
-            GIF = require('./gif');
+            //GIF = require('./gif');
+            GIF = require([__awesome_qr_base_path+'/gif']);
 
             window.GIF = GIF;
-        }, { "./gif": 5 }],
+        }, {[__awesome_qr_base_path+'/gif']: 5 }],
         5: [function(require, module, exports) {
 
             // object used to represent array buffer data for a gif file
