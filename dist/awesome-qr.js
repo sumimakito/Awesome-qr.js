@@ -1864,7 +1864,7 @@ require([__awesome_qr_base_path+'/gif'], function (gifEncoder) {
                 }
             } else {
                 _bContext.rect(0, 0, size, size);
-                _bContext.fillStyle = "#ffffff";
+                _bContext.fillStyle = _htOption.backgroundColor;
                 _bContext.fill();
             }
 
@@ -1893,7 +1893,7 @@ require([__awesome_qr_base_path+'/gif'], function (gifEncoder) {
                     var nTop = row * nSize + (bProtected ? 0 : (xyOffset * nSize));
                     _oContext.strokeStyle = bIsDark ? _htOption.colorDark : _htOption.colorLight;
                     _oContext.lineWidth = 0.5;
-                    _oContext.fillStyle = bIsDark ? _htOption.colorDark : "rgba(255, 255, 255, 0.6)"; //_htOption.colorLight;
+                    _oContext.fillStyle = bIsDark ? _htOption.colorDark : _htOption.colorLight;
                     if (agnPatternCenter.length === 0) {
                         // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
                         if (!bProtected)
@@ -1907,7 +1907,7 @@ require([__awesome_qr_base_path+'/gif'], function (gifEncoder) {
             }
 
             // Draw POSITION protectors
-            var protectorStyle = "rgba(255, 255, 255, 0.6)";
+            var protectorStyle = _htOption.colorLight;
             _oContext.fillStyle = protectorStyle;
             _oContext.fillRect(0, 0, 8 * nSize, 8 * nSize);
             _oContext.fillRect(0, (nCount - 8) * nSize, 8 * nSize, 8 * nSize);
@@ -1966,7 +1966,7 @@ require([__awesome_qr_base_path+'/gif'], function (gifEncoder) {
                     } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                         continue;
                     } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-                        _oContext.fillStyle = "rgba(0, 0, 0, .2)";
+                        _oContext.fillStyle = _htOption.colorLight;
                         _drawAlign(_oContext, agnX, agnY, nSize, nSize);
                     } else {
                         _oContext.fillStyle = _htOption.colorDark;
@@ -1977,7 +1977,7 @@ require([__awesome_qr_base_path+'/gif'], function (gifEncoder) {
 
             // Fill the margin
             if (whiteMargin) {
-                _oContext.fillStyle = '#FFFFFF';
+                _oContext.fillStyle = _htOption.backgroundColor;
                 _oContext.fillRect(-margin, -margin, size, margin);
                 _oContext.fillRect(-margin, viewportSize, size, margin);
                 _oContext.fillRect(viewportSize, -margin, margin, size);
@@ -2004,7 +2004,7 @@ require([__awesome_qr_base_path+'/gif'], function (gifEncoder) {
                 var x = 0.5 * (size - logoSize);
                 var y = x;
 
-                _oContext.fillStyle = '#FFFFFF';
+                _oContext.fillStyle = _htOption.logoBackgroundColor;
                 _oContext.save();
                 _prepareRoundedCornerClip(_oContext, x - logoMargin, y - logoMargin, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
                 _oContext.clip();
@@ -2266,14 +2266,16 @@ require([__awesome_qr_base_path+'/gif'], function (gifEncoder) {
             margin: 20,
             typeNumber: 4,
             colorDark: "#000000",
-            colorLight: "#ffffff",
+            colorLight: "rgba(255, 255, 255, 0.6)",
             correctLevel: QRErrorCorrectLevel.M,
             backgroundImage: undefined,
-            backgroundDimming: 'rgba(0,0,0,0)',
+            backgroundDimming: 'rgba(0, 0, 0, 0)',
             logoImage: undefined,
             logoScale: 0.2,
             logoMargin: 6,
             logoCornerRadius: 8,
+            logoBackgroundColor: '#ffffff',
+            backgroundColor: '#ffffff',
             whiteMargin: true,
             dotScale: 0.35,
             maskedDots: false,
