@@ -2,6 +2,8 @@
   "name": "mobstac-awesome-qr",
   "version": "1.0.0",
   "description": "MobStac Awesome QR code library",
+  "homepage": "https://github.com/mobstac/mobstac-awesome-qr",
+  "bugs": "https://github.com/mobstac/mobstac-awesome-qr/issues",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -10,8 +12,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
-    "preversion": "npm run lint",
+    "prepublishOnly": "npm test",
     "version": "npm run format && git add -A src",
     "postversion": "git push && git push --tags"
   },
@@ -35,8 +36,8 @@
     "instrument": true
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "MobStac Inc",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
