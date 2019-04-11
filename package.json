@@ -1,27 +1,60 @@
 {
-    "name": "awesome-qr",
-    "version": "1.2.1",
-    "description": "An awesome QR code generator written in JavaScript.",
-    "main": "awesome-qr-node.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/SumiMakito/Awesome-qr.js.git"
-    },
-    "keywords": [
-        "qr",
-        "qrcode",
-        "barcode"
+  "name": "mobstac-awesome-qr",
+  "version": "1.0.0",
+  "description": "MobStac Awesome QR code library",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "test": "nyc mocha",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.tsx"
     ],
-    "author": "Makito <sumimakito@hotmail.com>",
-    "license": "Apache-2.0",
-    "bugs": {
-        "url": "https://github.com/SumiMakito/Awesome-qr.js/issues"
-    },
-    "homepage": "https://github.com/SumiMakito/Awesome-qr.js#readme",
-    "dependencies": {
-        "canvas": "^2.4.0"
-    }
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "chai": "^4.2.0",
+    "mocha": "^6.0.2",
+    "nyc": "^13.3.0",
+    "prettier": "^1.16.4",
+    "source-map-support": "^0.5.11",
+    "ts-node": "^8.0.3",
+    "tslint": "^5.14.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.3.4000"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "dependencies": {
+    "@types/node": "^11.13.0",
+    "canvas": "^2.4.1"
+  }
 }

@@ -1,2 +1,6 @@
-node_modules/
-.idea/
+node_modules
+.idea
+/lib
+coverage
+.nyc_output
+.DS_Store
