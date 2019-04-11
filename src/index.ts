@@ -1,7 +1,7 @@
 import { QRErrorCorrectLevel } from './Enums';
 import { Drawing, QRCode } from './Models';
 import { QRCodeConfig } from './Types';
-import { Canvas } from 'canvas';
+import { Canvas } from "canvas";
 
 
 export class QRCodeGenerator {

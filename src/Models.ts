@@ -1,7 +1,7 @@
 import { QRMode, QRErrorCorrectLevel } from './Enums';
 import * as constants from './Constants';
 import { BCH, QRMath, Util, CanvasUtil } from './Common';
-import { Canvas, CanvasRenderingContext2D, loadImage } from 'canvas';
+import { Canvas, CanvasRenderingContext2D, loadImage, createCanvas } from 'canvas';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 
 export class QRPolynomial {
@@ -386,7 +386,7 @@ export class Drawing {
 
         this.config = Drawing.generateDrawingConfig(config, qrCode.moduleCount);
         this.isPainted = false;
-        this.canvas = new Canvas(config.size, config.size);
+        this.canvas = createCanvas(config.size, config.size);
         this.context = this.canvas.getContext('2d');
     }
 
@@ -426,14 +426,14 @@ export class Drawing {
 
     public draw(): Promise<Canvas> {
 
-        const mainCanvas = new Canvas(this.config.size, this.config.size);
+        const mainCanvas = createCanvas(this.config.size, this.config.size);
         const mainContext = mainCanvas.getContext("2d");
 
         // Leave room for margin
         mainContext.save();
         mainContext.translate(this.config.margin, this.config.margin);
 
-        const backgroundCanvas = new Canvas(this.config.size, this.config.size);
+        const backgroundCanvas = createCanvas(this.config.size, this.config.size);
         const backgroundContext = backgroundCanvas.getContext("2d");
 
         return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage).then(() => {
@@ -464,7 +464,7 @@ export class Drawing {
     private async scaleFinalImage(canvas: Canvas): Promise<Canvas> {
         const rawSize = this.config.rawSize;
 
-        const finalCanvas = new Canvas(rawSize, rawSize);
+        const finalCanvas = createCanvas(rawSize, rawSize);
         const finalContext = finalCanvas.getContext("2d");
         finalContext.drawImage(canvas, 0, 0, rawSize, rawSize);
         return finalCanvas;
@@ -667,7 +667,7 @@ export class Drawing {
 
             if (this.config.maskedDots) {
                 const size = this.config.size;
-                this.maskCanvas = new Canvas(size, size);
+                this.maskCanvas = createCanvas(size, size);
                 this.maskContext = this.maskCanvas.getContext("2d");
 
                 this.maskContext.drawImage(image,
