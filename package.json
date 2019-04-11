@@ -8,7 +8,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "nyc mocha",
-    "build": "tsc",
+    "build": "tsc && webpack",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
@@ -46,10 +46,13 @@
     "nyc": "^13.3.0",
     "prettier": "^1.16.4",
     "source-map-support": "^0.5.11",
+    "ts-loader": "^5.3.3",
     "ts-node": "^8.0.3",
     "tslint": "^5.14.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.3.4000"
+    "typescript": "^3.4.3",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0"
   },
   "files": [
     "lib/**/*"
