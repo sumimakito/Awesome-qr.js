@@ -1999,9 +1999,10 @@ require([__awesome_qr_base_path+'/gif'], function (gifEncoder) {
                 }
 
                 _oContext.restore();
+                _oContext.translate(margin,margin);
 
                 var logoSize = viewportSize * logoScale;
-                var x = 0.5 * (size - logoSize);
+                var x = 0.5 * (viewportSize - logoSize);
                 var y = x;
 
                 _oContext.fillStyle = '#FFFFFF';
