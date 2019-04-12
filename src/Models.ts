@@ -433,8 +433,8 @@ export class Drawing {
         const mainContext = mainCanvas.getContext("2d");
 
         // Leave room for margin
-        mainContext.save();
         mainContext.translate(this.config.margin, this.config.margin);
+        mainContext.save();
 
         const backgroundCanvas = createCanvas(this.config.size, this.config.size);
         const backgroundContext = backgroundCanvas.getContext("2d");
@@ -492,11 +492,10 @@ export class Drawing {
         }
         context.restore();
 
-
         const logoSize = this.config.viewportSize * logoScale;
         const coordinate = 0.5 * (this.config.size - logoSize);
 
-        context.fillStyle = '#FFFFFF';
+        context.fillStyle = '#ffffff';
         context.save();
         CanvasUtil.prepareRoundedCornerClip(context, coordinate - logoMargin, coordinate - logoMargin, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
         context.clip();
@@ -504,9 +503,9 @@ export class Drawing {
         context.restore();
 
         context.save();
-        CanvasUtil.prepareRoundedCornerClip(context, coordinate, coordinate, logoSize, logoSize, logoCornerRadius);
 
         return loadImage(this.config.logoImage!).then(image => {
+            CanvasUtil.prepareRoundedCornerClip(context, coordinate, coordinate, logoSize, logoSize, logoCornerRadius);
             context.clip();
             context.drawImage(image, coordinate, coordinate, logoSize, logoSize);
             context.restore();
