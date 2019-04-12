@@ -1,10 +1,9 @@
-/* globals document*/
+/* globals document */
 
 import { QRMode, QRErrorCorrectLevel } from './Enums';
 import * as constants from './Constants';
 import { BCH, QRMath, Util, CanvasUtil } from './Common';
-import { isNode } from "./Util";
-import { Image as ImageCanvas } from "canvas";
+import { loadImage } from "./Util";
 import { Canvas, CanvasRenderingContext2D, createCanvas } from 'canvas';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 
@@ -491,8 +490,8 @@ export class Drawing {
         if (logoCornerRadius < 0) {
             logoCornerRadius = 0;
         }
-
         context.restore();
+
 
         const logoSize = this.config.viewportSize * logoScale;
         const coordinate = 0.5 * (this.config.size - logoSize);
@@ -507,35 +506,10 @@ export class Drawing {
         context.save();
         CanvasUtil.prepareRoundedCornerClip(context, coordinate, coordinate, logoSize, logoSize, logoCornerRadius);
 
-        let image: any;
-        if (isNode) {
-            image = new ImageCanvas();
-        }
-        else {
-            image = document.createElement("img");
-            image.crossOrigin = 'Anonymous';
-        }
-
-        return new Promise((resolve, reject) => {
-            function cleanup () {
-                image.onload = null;
-                image.onerror = null;
-            }
-
-            image.onerror = (err: any) => {
-                cleanup();
-                reject(err);
-            };
-
-            image.onload = () => {
-                cleanup();
-                context.clip();
-                context.drawImage(image, coordinate, coordinate, logoSize, logoSize);
-                context.restore();
-                resolve();
-            };
-
-            image.src = this.config.logoImage!;
+        return loadImage(this.config.logoImage!).then(image => {
+            context.clip();
+            context.drawImage(image, coordinate, coordinate, logoSize, logoSize);
+            context.restore();
         });
     }
 
@@ -689,57 +663,31 @@ export class Drawing {
     }
 
     private async addBackgroundImage(context: CanvasRenderingContext2D, size: number, backgroundImage: string) {
-        let image: any;
-        if (isNode) {
-            image = new ImageCanvas();
-        }
-        else {
-            image = document.createElement("img");
-            image.crossOrigin = 'Anonymous';
-        }
-
-        return new Promise((resolve, reject) => {
-            function cleanup () {
-                image.onload = null;
-                image.onerror = null;
+        return loadImage(backgroundImage).then(image => {
+            if (this.config.autoColor) {
+                // @ts-ignore
+                const avgRGB = CanvasUtil.getAverageRGB(image, size);
+                this.config.colorDark = "rgb(" + avgRGB.r + ", " + avgRGB.g + ", " + avgRGB.b + ")";
             }
 
-            image.onerror = (err: any) => {
-                cleanup();
-                reject(err);
-            };
+            if (this.config.maskedDots) {
+                const size = this.config.size;
+                this.maskCanvas = createCanvas(size, size);
+                this.maskContext = this.maskCanvas.getContext("2d");
 
-            image.onload = () => {
-                cleanup();
-                if (this.config.autoColor) {
-                    const avgRGB = CanvasUtil.getAverageRGB(image, size);
-                    this.config.colorDark = "rgb(" + avgRGB.r + ", " + avgRGB.g + ", " + avgRGB.b + ")";
-                }
+                // @ts-ignore
+                this.maskContext.drawImage(image, 0, 0, image.width, image.height, 0, 0, size, size);
 
-                if (this.config.maskedDots) {
-                    const size = this.config.size;
-                    this.maskCanvas = createCanvas(size, size);
-                    this.maskContext = this.maskCanvas.getContext("2d");
-
-                    this.maskContext.drawImage(image,
-                        0, 0, image.width, image.height,
-                        0, 0, size, size);
-
-                    this.maskContext.rect(0, 0, size, size);
-                    this.maskContext.fillStyle = "#ffffff";
-                    this.maskContext.fill();
-                } else {
-                    context.drawImage(image,
-                        0, 0, image.width, image.height,
-                        0, 0, size, size);
-                    context.rect(0, 0, size, size);
-                    context.fillStyle = this.config.backgroundDimming;
-                    context.fill();
-                }
-                resolve();
-            };
-
-            image.src = backgroundImage;
+                this.maskContext.rect(0, 0, size, size);
+                this.maskContext.fillStyle = "#ffffff";
+                this.maskContext.fill();
+            } else {
+                // @ts-ignore
+                context.drawImage(image, 0, 0, image.width, image.height, 0, 0, size, size);
+                context.rect(0, 0, size, size);
+                context.fillStyle = this.config.backgroundDimming;
+                context.fill();
+            }
         });
     }
 }
