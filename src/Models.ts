@@ -493,11 +493,14 @@ export class Drawing {
         context.restore();
 
         const logoSize = this.config.viewportSize * logoScale;
+
+        const mainMargin = this.config.margin;
         const coordinate = 0.5 * (this.config.size - logoSize);
+        const centreCoordinate = coordinate - logoMargin - mainMargin;
 
         context.fillStyle = '#ffffff';
         context.save();
-        CanvasUtil.prepareRoundedCornerClip(context, coordinate - logoMargin, coordinate - logoMargin, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
+        CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate, centreCoordinate, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
         context.clip();
         context.fill();
         context.restore();
@@ -505,9 +508,9 @@ export class Drawing {
         context.save();
 
         return loadImage(this.config.logoImage!).then(image => {
-            CanvasUtil.prepareRoundedCornerClip(context, coordinate, coordinate, logoSize, logoSize, logoCornerRadius);
+            CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate + logoMargin, centreCoordinate + logoMargin, logoSize, logoSize, logoCornerRadius);
             context.clip();
-            context.drawImage(image, coordinate, coordinate, logoSize, logoSize);
+            context.drawImage(image, centreCoordinate + logoMargin, centreCoordinate + logoMargin, logoSize, logoSize);
             context.restore();
         });
     }
