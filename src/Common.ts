@@ -1,7 +1,7 @@
 import * as constants from "./Constants"
-import { QRMaskPattern, QRMode } from './Enums';
-import { QRCode, QRPolynomial } from './Models';
-import { Canvas, Image, CanvasRenderingContext2D } from 'canvas';
+import {QRMaskPattern, QRMode} from './Enums';
+import {QRCode, QRPolynomial} from './Models';
+import {Canvas, Image, CanvasRenderingContext2D} from 'canvas';
 
 export const BCH = {
     digit(data: number) {
@@ -118,7 +118,7 @@ export const CanvasUtil = {
         return rgb;
     },
 
-    prepareRoundedCornerClip(ctx: CanvasRenderingContext2D, x: number, y:number, w: number, h: number, r: number) {
+    prepareRoundedCornerClip(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
         ctx.beginPath();
         ctx.moveTo(x, y);
         ctx.arcTo(x + w, y, x + w, y + h, r);

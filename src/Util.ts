@@ -8,14 +8,13 @@ export const loadImage = (src: string) => {
     let image: any;
     if (isNode) {
         image = new ImageCanvas();
-    }
-    else {
+    } else {
         image = document.createElement("img");
         image.crossOrigin = 'Anonymous';
     }
 
     return new Promise((resolve, reject) => {
-        function cleanup () {
+        function cleanup() {
             image.onload = null;
             image.onerror = null;
         }

@@ -1,16 +1,14 @@
-/* globals document */
-
-import { QRMode, QRErrorCorrectLevel } from './Enums';
+import {QRMode, QRErrorCorrectLevel} from './Enums';
 import * as constants from './Constants';
-import { BCH, QRMath, Util, CanvasUtil } from './Common';
-import { loadImage } from "./Util";
-import { Canvas, CanvasRenderingContext2D, createCanvas } from 'canvas';
-import { QRCodeConfig, QRDrawingConfig } from './Types';
+import {BCH, QRMath, Util, CanvasUtil} from './Common';
+import {loadImage} from "./Util";
+import {Canvas, CanvasRenderingContext2D, createCanvas} from 'canvas';
+import {QRCodeConfig, QRDrawingConfig} from './Types';
 
 export class QRPolynomial {
     num: Array<number>;
 
-    constructor (num: Array<number>, shift: number) {
+    constructor(num: Array<number>, shift: number) {
         let offset = 0;
         while (offset < num.length && num[offset] === 0) {
             offset++
@@ -148,7 +146,7 @@ export class QRCode {
 
     typeNumber: number;
     errorCorrectLevel: QRErrorCorrectLevel;
-    modules: Array<Array<boolean|null>> = [[]];
+    modules: Array<Array<boolean | null>> = [[]];
     moduleCount: number = 0;
     dataCache?: Array<any>;
     dataList: Array<QR8bitByte> = [];
@@ -255,7 +253,7 @@ export class QRCode {
         return pattern
     }
 
-    setupTimingPattern(){
+    setupTimingPattern() {
         for (let r = 8; r < this.moduleCount - 8; r++) {
             if (this.modules[r][6] != null) {
                 continue
@@ -375,7 +373,7 @@ export class Drawing {
 
     qrCode: QRCode;
     config: QRDrawingConfig;
-    isPainted :boolean;
+    isPainted: boolean;
     canvas: Canvas;
     context: any;
 
@@ -583,9 +581,9 @@ export class Drawing {
             for (let j = 0; j < patternPosition.length; j++) {
                 let agnX = patternPosition[j];
                 let agnY = patternPosition[i];
-                if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {}
-                else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {}
-                else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
+                if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
+                } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
+                } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
                     CanvasUtil.drawAlignProtector(context, agnX, agnY, moduleSize, moduleSize);
                 } else {
                     CanvasUtil.drawAlignProtector(context, agnX, agnY, moduleSize, moduleSize);

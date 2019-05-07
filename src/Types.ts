@@ -1,4 +1,4 @@
-import { QRErrorCorrectLevel } from './Enums';
+import {QRErrorCorrectLevel} from './Enums';
 
 export type QRCodeConfig = {
     binarizeThreshold?: string;
