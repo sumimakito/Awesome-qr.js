@@ -9,7 +9,7 @@ describe("QR code tests", () => {
             logoImage: __dirname + "/pokemon.png",
             canvasType: 'svg'
         });
-        qrCodeGenerator.build().then(canvas => {
+        qrCodeGenerator.build('svg').then(canvas => {
             console.log(canvas.toDataURL());
             const fs = require('fs');
             // const out = fs.createWriteStream(__dirname + '/test.png');

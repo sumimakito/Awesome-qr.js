@@ -114,7 +114,8 @@ export class QRCodeBuilder {
         return this;
     }
 
-    public build(): Promise<Canvas | never> {
+    public build(format?: 'pdf' | 'svg'): Promise<Canvas | never> {
+        this.config.canvasType = format;
         if (!this.config.text) {
             return Promise.reject('Setting text is necessary to generate the QRCode');
         }

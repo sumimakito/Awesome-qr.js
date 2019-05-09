@@ -692,7 +692,7 @@ export class Drawing {
     }
 }
 
-class QRRSBlock {
+export class QRRSBlock {
     static RS_BLOCK_TABLE = [
         [1, 26, 19],
         [1, 26, 16],
