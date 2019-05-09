@@ -20,6 +20,7 @@ export type QRCodeConfig = {
     autoColor?: boolean,
     text: string,
     maskedDots: boolean,
+    canvasType?: 'pdf' | 'svg'
     [key: string]: any;
 }
 
@@ -43,4 +44,5 @@ export type QRDrawingConfig = {
     logoMargin: number,
     logoCornerRadius: number,
     maskedDots: boolean,
+    canvasType?: 'pdf' | 'svg'
 }
