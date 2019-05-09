@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import 'mocha';
 import { QRErrorCorrectLevel } from '../Enums';
 import { QR8bitByte, QRCode, QRPolynomial } from '../Models';
+import { QRCodeConfig } from '../Types';
 
 
 describe('QR8bitByte class tests', () => {
@@ -50,9 +51,22 @@ describe('QRPolynomial class tests', () => {
 
 describe('QRCode class tests', () => {
     it('Main test', () => {
-        const qrCode = new QRCode(-1, QRErrorCorrectLevel.M);
-        qrCode.addData('test');
-        qrCode.make();
+        const defaultConfig: QRCodeConfig = {
+            size: 800,
+            margin: 20,
+            typeNumber: 4,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRErrorCorrectLevel.M,
+            backgroundDimming: 'rgba(0,0,0,0)',
+            logoScale: 0.2,
+            logoMargin: 6,
+            logoCornerRadius: 8,
+            dotScale: 0.35,
+            text: 'test',
+            maskedDots: false,
+        };
+        const qrCode = new QRCode(-1, defaultConfig);
         expect(qrCode.modules[0]).to.eql([true, true, true, true, true, true, true, false, true, true, false, false, false, false, true, true, true, true, true, true, true]);
         expect(qrCode.modules[1]).to.eql([true, false, false, false, false, false, true, false, true, true, true, false, true, false, true, false, false, false, false, false, true]);
         expect(qrCode.modules[2]).to.eql([true, false, true, true, true, false, true, false, false, false, false, true, true, false, true, false, true, true, true, false, true]);

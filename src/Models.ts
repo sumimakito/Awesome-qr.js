@@ -150,10 +150,14 @@ export class QRCode {
     public moduleCount: number = 0;
     public dataCache?: any[];
     public dataList: QR8bitByte[] = [];
+    public drawing: Drawing;
 
-    constructor(typeNumber: number, errorCorrectLevel: QRErrorCorrectLevel) {
+    constructor(typeNumber: number, config: QRCodeConfig) {
         this.typeNumber = typeNumber;
-        this.errorCorrectLevel = errorCorrectLevel;
+        this.errorCorrectLevel = config.correctLevel;
+        this.addData(config.text);
+        this.make();
+        this.drawing = new Drawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
     }
 
     get patternPosition() {
@@ -412,7 +416,6 @@ export class Drawing {
         return Object.assign(config, drawingConfig);
     }
 
-    public qrCode: QRCode;
     public config: QRDrawingConfig;
     public isPainted: boolean;
     public canvas: Canvas;
@@ -421,19 +424,24 @@ export class Drawing {
     public maskCanvas?: Canvas;
     public maskContext?: CanvasRenderingContext2D;
 
-    constructor(qrCode: QRCode, config: QRCodeConfig) {
-        this.qrCode = qrCode;
-        this.qrCode.addData(config.text);
-        this.qrCode.make();
+    private patternPosition: number[];
+    private moduleCount: number;
+    private isDark: any;
+    // noinspection JSMismatchedCollectionQueryUpdate
+    private modules: Array<Array<boolean | null>>;
 
-        this.config = Drawing.generateDrawingConfig(config, qrCode.moduleCount);
+    constructor(moduleCount: number, patternPosition: number[], config: QRCodeConfig, isDark: any, modules: Array<Array<boolean | null>>) {
+        this.moduleCount = moduleCount;
+        this.patternPosition = patternPosition;
+        this.isDark = isDark;
+        this.modules = modules;
+        this.config = Drawing.generateDrawingConfig(config, moduleCount);
         this.isPainted = false;
         this.canvas = createCanvas(config.size, config.size, this.config.canvasType);
         this.context = this.canvas.getContext('2d');
     }
 
     public draw(): Promise<Canvas> {
-
         const mainCanvas = createCanvas(this.config.size, this.config.size, this.config.canvasType);
         const mainContext = mainCanvas.getContext('2d');
 
@@ -538,7 +546,7 @@ export class Drawing {
         context.fillStyle = this.config.colorDark;
 
         const moduleSize = this.config.moduleSize;
-        const moduleCount = this.qrCode.moduleCount;
+        const moduleCount = this.moduleCount;
         context.fillRect(0, 0, 7 * moduleSize, moduleSize);
         context.fillRect((moduleCount - 7) * moduleSize, 0, 7 * moduleSize, moduleSize);
         context.fillRect(0, 6 * moduleSize, 7 * moduleSize, moduleSize);
@@ -561,7 +569,7 @@ export class Drawing {
             context.fillRect(6 * moduleSize, (8 + i) * moduleSize, moduleSize, moduleSize);
         }
 
-        const patternPosition = this.qrCode.patternPosition;
+        const patternPosition = this.patternPosition;
         const edgeCenter = patternPosition[patternPosition.length - 1];
         for (let i = 0; i < patternPosition.length; i++) {
             for (let j = 0; j < patternPosition.length; j++) {
@@ -581,7 +589,7 @@ export class Drawing {
     }
 
     private drawAlignProtectors(context: CanvasRenderingContext2D) {
-        const patternPosition = this.qrCode.patternPosition;
+        const patternPosition = this.patternPosition;
         const moduleSize = this.config.moduleSize;
         const edgeCenter = patternPosition[patternPosition.length - 1];
         for (let i = 0; i < patternPosition.length; i++) {
@@ -602,7 +610,7 @@ export class Drawing {
     private drawPositionProtectors(context: CanvasRenderingContext2D) {
         context.fillStyle = 'rgba(255, 255, 255, 0.6)';
         const size = this.config.moduleSize;
-        const moduleCount = this.qrCode.moduleCount;
+        const moduleCount = this.moduleCount;
         context.fillRect(0, 0, 8 * size, 8 * size);
         context.fillRect(0, (moduleCount - 8) * size, 8 * size, 8 * size);
         context.fillRect((moduleCount - 8) * size, 0, 8 * size, 8 * size);
@@ -611,17 +619,17 @@ export class Drawing {
     }
 
     private drawAlignPatterns(context: CanvasRenderingContext2D) {
-        const moduleCount = this.qrCode.moduleCount;
+        const moduleCount = this.moduleCount;
         const xyOffset = (1 - this.config.dotScale) * 0.5;
 
         for (let row = 0; row < moduleCount; row++) {
             for (let col = 0; col < moduleCount; col++) {
-                const bIsDark = this.qrCode.isDark(row, col) || false;
+                const bIsDark = this.isDark.bind(this)(row, col) || false;
 
                 const isBlkPosCtr = ((col < 8 && (row < 8 || row >= moduleCount - 8)) || (col >= moduleCount - 8 && row < 8));
                 let bProtected = (row === 6 || col === 6 || isBlkPosCtr);
 
-                const patternPosition = this.qrCode.patternPosition;
+                const patternPosition = this.patternPosition;
                 for (let i = 0; i < patternPosition.length - 1; i++) {
                     bProtected = bProtected || (row >= patternPosition[i] - 2 && row <= patternPosition[i] + 2 &&
                         col >= patternPosition[i] - 2 && col <= patternPosition[i] + 2);
