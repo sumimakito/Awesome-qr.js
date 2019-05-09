@@ -1,29 +1,29 @@
-import {QRErrorCorrectLevel} from './Enums';
-import {Drawing, QRCode} from './Models';
-import {QRCodeConfig} from './Types';
-import {Canvas} from "canvas";
+import { Canvas } from 'canvas';
+import { CanvasType, QRErrorCorrectLevel } from './Enums';
+import { Drawing, QRCode } from './Models';
+import { QRCodeConfig } from './Types';
 
 
 export class QRCodeBuilder {
-    config: QRCodeConfig;
-    qrCode: QRCode;
-    drawing?: Drawing;
+    private config: QRCodeConfig;
+    private qrCode: QRCode;
+    private drawing?: Drawing;
 
     public constructor(config?: Partial<QRCodeConfig>) {
         const defaultConfig: QRCodeConfig = {
             size: 800,
             margin: 20,
             typeNumber: 4,
-            colorDark: "#000000",
-            colorLight: "#ffffff",
+            colorDark: '#000000',
+            colorLight: '#ffffff',
             correctLevel: QRErrorCorrectLevel.M,
-            backgroundDimming: "rgba(0,0,0,0)",
+            backgroundDimming: 'rgba(0,0,0,0)',
             logoScale: 0.2,
             logoMargin: 6,
             logoCornerRadius: 8,
             dotScale: 0.35,
             text: '',
-            maskedDots: false
+            maskedDots: false,
         };
         this.config = Object.assign({}, defaultConfig, config);
         this.qrCode = new QRCode(-1, this.config.correctLevel);
@@ -114,7 +114,7 @@ export class QRCodeBuilder {
         return this;
     }
 
-    public build(format?: 'pdf' | 'svg'): Promise<Canvas | never> {
+    public build(format?: CanvasType): Promise<Canvas | never> {
         this.config.canvasType = format;
         if (!this.config.text) {
             return Promise.reject('Setting text is necessary to generate the QRCode');

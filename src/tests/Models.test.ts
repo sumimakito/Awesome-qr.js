@@ -1,10 +1,10 @@
-import { QR8bitByte, QRCode, QRPolynomial } from '../Models';
-import { QRErrorCorrectLevel } from '../Enums';
 import { expect } from 'chai';
 import 'mocha';
+import { QRErrorCorrectLevel } from '../Enums';
+import { QR8bitByte, QRCode, QRPolynomial } from '../Models';
 
 
-describe("QR8bitByte class tests", () => {
+describe('QR8bitByte class tests', () => {
     it('QR8bitByte.getLength for non utf-8 chars', () => {
         const bitByte = new QR8bitByte('test');
         expect(bitByte.getLength()).to.equals(4);
@@ -16,40 +16,40 @@ describe("QR8bitByte class tests", () => {
     });
 });
 
-describe("QRPolynomial class tests", () => {
-    it("Get length without leading 0 array", () => {
-        const polynomial = new QRPolynomial([1,2,3], 2);
+describe('QRPolynomial class tests', () => {
+    it('Get length without leading 0 array', () => {
+        const polynomial = new QRPolynomial([1, 2, 3], 2);
         expect(polynomial.getLength()).to.equals(5);
     });
 
-    it("Get length with leading 0 array", () => {
-        const polynomial = new QRPolynomial([0,0,1,2,3], 2);
+    it('Get length with leading 0 array', () => {
+        const polynomial = new QRPolynomial([0, 0, 1, 2, 3], 2);
         expect(polynomial.getLength()).to.equals(5);
     });
 
-    it("get() test", () => {
-        const polynomial = new QRPolynomial([0,0,1,2,3], 2);
+    it('get() test', () => {
+        const polynomial = new QRPolynomial([0, 0, 1, 2, 3], 2);
         expect(polynomial.get(0)).to.equals(1);
     });
 
-    it("multiply", () => {
-        const qrPolynomial1 = new QRPolynomial([1,2,3], 2);
-        const qrPolynomial2 = new QRPolynomial([4,5,6], 2);
+    it('multiply', () => {
+        const qrPolynomial1 = new QRPolynomial([1, 2, 3], 2);
+        const qrPolynomial2 = new QRPolynomial([4, 5, 6], 2);
         const newPoly = qrPolynomial1.multiply(qrPolynomial2);
-        expect(newPoly.num).to.eql([4, 13, 0, 3, 10, 0, 0, 0, 0])
+        expect(newPoly.num).to.eql([4, 13, 0, 3, 10, 0, 0, 0, 0]);
     });
 
-    it("mod", () => {
-        const qrPolynomial1 = new QRPolynomial([1,2,3], 2);
-        const qrPolynomial2 = new QRPolynomial([4,5,6], 2);
+    it('mod', () => {
+        const qrPolynomial1 = new QRPolynomial([1, 2, 3], 2);
+        const qrPolynomial2 = new QRPolynomial([4, 5, 6], 2);
         const newPoly = qrPolynomial1.mod(qrPolynomial2);
-        expect(newPoly.num).to.eql([68, 140, 0, 0])
+        expect(newPoly.num).to.eql([68, 140, 0, 0]);
     });
 
 });
 
 describe('QRCode class tests', () => {
-    it("Main test", () => {
+    it('Main test', () => {
         const qrCode = new QRCode(-1, QRErrorCorrectLevel.M);
         qrCode.addData('test');
         qrCode.make();
