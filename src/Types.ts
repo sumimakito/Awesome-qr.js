@@ -1,6 +1,6 @@
-import {QRErrorCorrectLevel} from './Enums';
+import { CanvasType, QRErrorCorrectLevel } from './Enums';
 
-export type QRCodeConfig = {
+export interface QRCodeConfig {
     binarizeThreshold?: string;
     binarize?: boolean,
     size: number,
@@ -20,11 +20,12 @@ export type QRCodeConfig = {
     autoColor?: boolean,
     text: string,
     maskedDots: boolean,
-    canvasType?: 'pdf' | 'svg'
+    canvasType?: CanvasType,
+
     [key: string]: any;
 }
 
-export type QRDrawingConfig = {
+export interface QRDrawingConfig {
     size: number,
     text: string,
     nSize: number,
@@ -44,5 +45,5 @@ export type QRDrawingConfig = {
     logoMargin: number,
     logoCornerRadius: number,
     maskedDots: boolean,
-    canvasType?: 'pdf' | 'svg'
+    canvasType?: CanvasType
 }

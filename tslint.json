@@ -1,3 +1,23 @@
 {
-  "extends": ["tslint:recommended", "tslint-config-prettier"]
+  "extends": [
+    "tslint:recommended",
+    "tslint-config-prettier"
+  ],
+  "rules": {
+    "interface-name": [
+      true,
+      "never-prefix"
+    ],
+    "object-literal-sort-keys": [
+      true,
+      "match-declaration-order"
+    ],
+    "no-bitwise": false,
+    "class-name": false,
+    "one-variable-per-declaration": false,
+    "no-conditional-assignment": false,
+    "prefer-for-of": false,
+    "no-empty": false,
+    "max-classes-per-file": false
+  }
 }

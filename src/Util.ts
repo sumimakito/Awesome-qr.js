@@ -1,6 +1,6 @@
 /* global document */
 
-import {Image as ImageCanvas} from "canvas";
+import { Image as ImageCanvas } from 'canvas';
 
 const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 
@@ -9,7 +9,7 @@ export const loadImage = (src: string) => {
     if (isNode) {
         image = new ImageCanvas();
     } else {
-        image = document.createElement("img");
+        image = document.createElement('img');
         image.crossOrigin = 'Anonymous';
     }
 

@@ -1,16 +1,17 @@
-import { QRCodeBuilder } from '../index';
 import 'mocha';
+import { CanvasType } from '../Enums';
+import { QRCodeBuilder } from '../index';
 
-describe("QR code tests", () => {
-    it("Main test", (done) => {
+describe('QR code tests', () => {
+    it('Main test', (done) => {
         const qrCodeGenerator = new QRCodeBuilder({
             text: 'http://www.beaconstac.com/',
-            backgroundImage: "https://image.flaticon.com/teams/slug/google.jpg",
-            logoImage: __dirname + "/pokemon.png",
-            canvasType: 'svg'
+            backgroundImage: 'https://image.flaticon.com/teams/slug/google.jpg',
+            logoImage: __dirname + '/pokemon.png',
+            canvasType: CanvasType.SVG,
         });
-        qrCodeGenerator.build('svg').then(canvas => {
-            console.log(canvas.toDataURL());
+        qrCodeGenerator.build(CanvasType.SVG).then(canvas => {
+            // console.log(canvas.toDataURL());
             const fs = require('fs');
             // const out = fs.createWriteStream(__dirname + '/test.png');
             // const stream = canvas.createPDFStream();
@@ -18,9 +19,8 @@ describe("QR code tests", () => {
             // return out.on('finish', () => {
             //     return;
             // });
-            fs.writeFileSync(__dirname + '/test.svg', canvas.toBuffer())
-
-        }).finally(done);
-
+            fs.writeFileSync(__dirname + '/test.svg', canvas.toBuffer());
+            done()
+        });
     });
 });

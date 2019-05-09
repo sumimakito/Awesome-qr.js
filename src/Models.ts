@@ -1,43 +1,43 @@
-import {QRMode, QRErrorCorrectLevel} from './Enums';
+import { Canvas, CanvasRenderingContext2D, createCanvas } from 'canvas';
+import { BCH, CanvasUtil, QRMath, Util } from './Common';
 import * as constants from './Constants';
-import {BCH, QRMath, Util, CanvasUtil} from './Common';
-import {loadImage} from "./Util";
-import {Canvas, CanvasRenderingContext2D, createCanvas} from 'canvas';
-import {QRCodeConfig, QRDrawingConfig} from './Types';
+import { QRErrorCorrectLevel, QRMode } from './Enums';
+import { QRCodeConfig, QRDrawingConfig } from './Types';
+import { loadImage } from './Util';
 
 export class QRPolynomial {
-    num: Array<number>;
+    public num: number[];
 
-    constructor(num: Array<number>, shift: number) {
+    constructor(num: number[], shift: number) {
         let offset = 0;
         while (offset < num.length && num[offset] === 0) {
-            offset++
+            offset++;
         }
         this.num = new Array(num.length - offset + shift);
         for (let i = 0; i < num.length - offset; i++) {
-            this.num[i] = num[i + offset]
+            this.num[i] = num[i + offset];
         }
     }
 
-    get(index: number) {
-        return this.num[index]
+    public get(index: number) {
+        return this.num[index];
     }
 
-    getLength() {
-        return this.num.length
+    public getLength() {
+        return this.num.length;
     }
 
-    multiply(e: QRPolynomial): QRPolynomial {
+    public multiply(e: QRPolynomial): QRPolynomial {
         const num = new Array(this.getLength() + e.getLength() - 1);
         for (let i = 0; i < this.getLength(); i++) {
             for (let j = 0; j < e.getLength(); j++) {
-                num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i)) + QRMath.glog(e.get(j)))
+                num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i)) + QRMath.glog(e.get(j)));
             }
         }
-        return new QRPolynomial(num, 0)
+        return new QRPolynomial(num, 0);
     }
 
-    mod(e: QRPolynomial): QRPolynomial {
+    public mod(e: QRPolynomial): QRPolynomial {
         let i;
         if (this.getLength() - e.getLength() < 0) {
             return this;
@@ -50,15 +50,15 @@ export class QRPolynomial {
         for (i = 0; i < e.getLength(); i++) {
             num[i] ^= QRMath.gexp(QRMath.glog(e.get(i)) + ratio);
         }
-        return new QRPolynomial(num, 0).mod(e)
+        return new QRPolynomial(num, 0).mod(e);
     }
 }
 
 export class QRCode {
-    static PAD0 = 0xEC;
-    static PAD1 = 0x11;
+    public static PAD0 = 0xEC;
+    public static PAD1 = 0x11;
 
-    static createData(typeNumber: number, errorCorrectLevel: number, dataList: Array<any>) {
+    public static createData(typeNumber: number, errorCorrectLevel: number, dataList: any[]) {
         let i;
         const rsBlocks = QRRSBlock.getQRSBlocks(typeNumber, errorCorrectLevel);
         const buffer = new QRBitBuffer();
@@ -66,35 +66,35 @@ export class QRCode {
             const data = dataList[i];
             buffer.put(data.mode, 4);
             buffer.put(data.getLength(), Util.getLengthInBits(data.mode, typeNumber));
-            data.write(buffer)
+            data.write(buffer);
         }
         let totalDataCount = 0;
         for (i = 0; i < rsBlocks.length; i++) {
-            totalDataCount += rsBlocks[i].dataCount
+            totalDataCount += rsBlocks[i].dataCount;
         }
         if (buffer.getLengthInBits() > totalDataCount * 8) {
-            throw new Error("code length overflow. (" + buffer.getLengthInBits() + ">" + totalDataCount * 8 + ")")
+            throw new Error('code length overflow. (' + buffer.getLengthInBits() + '>' + totalDataCount * 8 + ')');
         }
         if (buffer.getLengthInBits() + 4 <= totalDataCount * 8) {
-            buffer.put(0, 4)
+            buffer.put(0, 4);
         }
         while (buffer.getLengthInBits() % 8 !== 0) {
-            buffer.putBit(!1)
+            buffer.putBit(!1);
         }
         while (!0) {
             if (buffer.getLengthInBits() >= totalDataCount * 8) {
-                break
+                break;
             }
             buffer.put(QRCode.PAD0, 8);
             if (buffer.getLengthInBits() >= totalDataCount * 8) {
-                break
+                break;
             }
-            buffer.put(QRCode.PAD1, 8)
+            buffer.put(QRCode.PAD1, 8);
         }
-        return QRCode.createBytes(buffer, rsBlocks)
+        return QRCode.createBytes(buffer, rsBlocks);
     }
 
-    static createBytes(buffer: QRBitBuffer, rsBlocks: Array<QRRSBlock>) {
+    public static createBytes(buffer: QRBitBuffer, rsBlocks: QRRSBlock[]) {
         let i;
         let r;
         let offset = 0;
@@ -109,7 +109,7 @@ export class QRCode {
             maxEcCount = Math.max(maxEcCount, ecCount);
             dcdata[r] = new Array(dcCount);
             for (i = 0; i < dcdata[r].length; i++) {
-                dcdata[r][i] = 0xff & buffer.buffer[i + offset]
+                dcdata[r][i] = 0xff & buffer.buffer[i + offset];
             }
             offset += dcCount;
             const rsPoly = Util.getErrorCorrectPolynomial(ecCount);
@@ -118,38 +118,38 @@ export class QRCode {
             ecdata[r] = new Array(rsPoly.getLength() - 1);
             for (i = 0; i < ecdata[r].length; i++) {
                 const modIndex = i + modPoly.getLength() - ecdata[r].length;
-                ecdata[r][i] = (modIndex >= 0) ? modPoly.get(modIndex) : 0
+                ecdata[r][i] = (modIndex >= 0) ? modPoly.get(modIndex) : 0;
             }
         }
         let totalCodeCount = 0;
         for (i = 0; i < rsBlocks.length; i++) {
-            totalCodeCount += rsBlocks[i].totalCount
+            totalCodeCount += rsBlocks[i].totalCount;
         }
         const data = new Array(totalCodeCount);
         let index = 0;
         for (i = 0; i < maxDcCount; i++) {
             for (r = 0; r < rsBlocks.length; r++) {
                 if (i < dcdata[r].length) {
-                    data[index++] = dcdata[r][i]
+                    data[index++] = dcdata[r][i];
                 }
             }
         }
         for (i = 0; i < maxEcCount; i++) {
             for (r = 0; r < rsBlocks.length; r++) {
                 if (i < ecdata[r].length) {
-                    data[index++] = ecdata[r][i]
+                    data[index++] = ecdata[r][i];
                 }
             }
         }
-        return data
+        return data;
     }
 
-    typeNumber: number;
-    errorCorrectLevel: QRErrorCorrectLevel;
-    modules: Array<Array<boolean | null>> = [[]];
-    moduleCount: number = 0;
-    dataCache?: Array<any>;
-    dataList: Array<QR8bitByte> = [];
+    public typeNumber: number;
+    public errorCorrectLevel: QRErrorCorrectLevel;
+    public modules: Array<Array<boolean | null>> = [[]];
+    public moduleCount: number = 0;
+    public dataCache?: any[];
+    public dataList: QR8bitByte[] = [];
 
     constructor(typeNumber: number, errorCorrectLevel: QRErrorCorrectLevel) {
         this.typeNumber = typeNumber;
@@ -157,23 +157,23 @@ export class QRCode {
     }
 
     get patternPosition() {
-        return constants.PATTERN_POSITION_TABLE[this.typeNumber - 1]
+        return constants.PATTERN_POSITION_TABLE[this.typeNumber - 1];
     }
 
-    addData(data: string) {
+    public addData(data: string) {
         const newData = new QR8bitByte(data);
         this.dataList.push(newData);
         this.dataCache = undefined;
     }
 
-    isDark(row: number, col: number) {
+    public isDark(row: number, col: number) {
         if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
-            throw new Error(row + "," + col)
+            throw new Error(row + ',' + col);
         }
         return this.modules[row][col];
     }
 
-    make() {
+    public make() {
         if (this.typeNumber < 1) {
             let typeNumber;
             for (typeNumber = 1; typeNumber < 40; typeNumber++) {
@@ -192,21 +192,22 @@ export class QRCode {
                     buffer.put(data.getLength(), Util.getLengthInBits(data.mode, typeNumber));
                     data.write(buffer);
                 }
-                if (buffer.getLengthInBits() <= totalDataCount * 8)
+                if (buffer.getLengthInBits() <= totalDataCount * 8) {
                     break;
+                }
             }
             this.typeNumber = typeNumber;
         }
-        this.makeImpl(!1, this.getBestMaskPattern())
+        this.makeImpl(!1, this.getBestMaskPattern());
     }
 
-    makeImpl(test: boolean, maskPattern: number) {
+    public makeImpl(test: boolean, maskPattern: number) {
         this.moduleCount = this.typeNumber * 4 + 17;
         this.modules = new Array(this.moduleCount);
         for (let row = 0; row < this.moduleCount; row++) {
             this.modules[row] = new Array(this.moduleCount);
             for (let col = 0; col < this.moduleCount; col++) {
-                this.modules[row][col] = null
+                this.modules[row][col] = null;
             }
         }
         this.setupPositionProbePattern(0, 0);
@@ -216,30 +217,34 @@ export class QRCode {
         this.setupTimingPattern();
         this.setupTypeInfo(test, maskPattern);
         if (this.typeNumber >= 7) {
-            this.setupTypeNumber(test)
+            this.setupTypeNumber(test);
         }
         if (this.dataCache == null) {
-            this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList)
+            this.dataCache = QRCode.createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
         }
-        this.mapData(this.dataCache, maskPattern)
+        this.mapData(this.dataCache, maskPattern);
     }
 
-    setupPositionProbePattern(row: number, col: number) {
+    public setupPositionProbePattern(row: number, col: number) {
         for (let r = -1; r <= 7; r++) {
-            if (row + r <= -1 || this.moduleCount <= row + r) continue;
+            if (row + r <= -1 || this.moduleCount <= row + r) {
+                continue;
+            }
             for (let c = -1; c <= 7; c++) {
-                if (col + c <= -1 || this.moduleCount <= col + c) continue;
+                if (col + c <= -1 || this.moduleCount <= col + c) {
+                    continue;
+                }
                 if ((0 <= r && r <= 6 && (c === 0 || c === 6)) || (0 <= c && c <= 6 && (r === 0 || r === 6)) ||
                     (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
-                    this.modules[row + r][col + c] = !0
+                    this.modules[row + r][col + c] = !0;
                 } else {
-                    this.modules[row + r][col + c] = !1
+                    this.modules[row + r][col + c] = !1;
                 }
             }
         }
     }
 
-    getBestMaskPattern() {
+    public getBestMaskPattern() {
         let minLostPoint = 0;
         let pattern = 0;
         for (let i = 0; i < 8; i++) {
@@ -247,42 +252,42 @@ export class QRCode {
             const lostPoint = Util.getLostPoint(this);
             if (i === 0 || minLostPoint > lostPoint) {
                 minLostPoint = lostPoint;
-                pattern = i
+                pattern = i;
             }
         }
-        return pattern
+        return pattern;
     }
 
-    setupTimingPattern() {
+    public setupTimingPattern() {
         for (let r = 8; r < this.moduleCount - 8; r++) {
             if (this.modules[r][6] != null) {
-                continue
+                continue;
             }
-            this.modules[r][6] = (r % 2 === 0)
+            this.modules[r][6] = (r % 2 === 0);
         }
         for (let c = 8; c < this.moduleCount - 8; c++) {
             if (this.modules[6][c] != null) {
-                continue
+                continue;
             }
-            this.modules[6][c] = (c % 2 === 0)
+            this.modules[6][c] = (c % 2 === 0);
         }
     }
 
-    setupPositionAdjustPattern() {
+    public setupPositionAdjustPattern() {
         const pos = this.patternPosition;
         for (let i = 0; i < pos.length; i++) {
             for (let j = 0; j < pos.length; j++) {
                 const row = pos[i];
                 const col = pos[j];
                 if (this.modules[row][col] != null) {
-                    continue
+                    continue;
                 }
                 for (let r = -2; r <= 2; r++) {
                     for (let c = -2; c <= 2; c++) {
                         if (r === -2 || r === 2 || c === -2 || c === 2 || (r === 0 && c === 0)) {
-                            this.modules[row + r][col + c] = !0
+                            this.modules[row + r][col + c] = !0;
                         } else {
-                            this.modules[row + r][col + c] = !1
+                            this.modules[row + r][col + c] = !1;
                         }
                     }
                 }
@@ -290,21 +295,21 @@ export class QRCode {
         }
     }
 
-    setupTypeNumber(test: boolean) {
+    public setupTypeNumber(test: boolean) {
         let i;
         let mod;
         const bits = BCH.typeNumber(this.typeNumber);
         for (i = 0; i < 18; i++) {
             mod = (!test && ((bits >> i) & 1) === 1);
-            this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod
+            this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
         }
         for (i = 0; i < 18; i++) {
             mod = (!test && ((bits >> i) & 1) === 1);
-            this.modules[i % 3 + this.moduleCount - 8 - 3][Math.floor(i / 3)] = mod
+            this.modules[i % 3 + this.moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
         }
     }
 
-    setupTypeInfo(test: boolean, maskPattern: number) {
+    public setupTypeInfo(test: boolean, maskPattern: number) {
         let i;
         let mod;
         const data = (this.errorCorrectLevel << 3) | maskPattern;
@@ -312,49 +317,51 @@ export class QRCode {
         for (i = 0; i < 15; i++) {
             mod = (!test && ((bits >> i) & 1) === 1);
             if (i < 6) {
-                this.modules[i][8] = mod
+                this.modules[i][8] = mod;
             } else if (i < 8) {
-                this.modules[i + 1][8] = mod
+                this.modules[i + 1][8] = mod;
             } else {
-                this.modules[this.moduleCount - 15 + i][8] = mod
+                this.modules[this.moduleCount - 15 + i][8] = mod;
             }
         }
         for (i = 0; i < 15; i++) {
             mod = (!test && ((bits >> i) & 1) === 1);
             if (i < 8) {
-                this.modules[8][this.moduleCount - i - 1] = mod
+                this.modules[8][this.moduleCount - i - 1] = mod;
             } else if (i < 9) {
-                this.modules[8][15 - i - 1 + 1] = mod
+                this.modules[8][15 - i - 1 + 1] = mod;
             } else {
-                this.modules[8][15 - i - 1] = mod
+                this.modules[8][15 - i - 1] = mod;
             }
         }
-        this.modules[this.moduleCount - 8][8] = (!test)
+        this.modules[this.moduleCount - 8][8] = (!test);
     }
 
-    mapData(data: Array<any>, maskPattern: number) {
+    public mapData(data: any[], maskPattern: number) {
         let inc = -1;
         let row = this.moduleCount - 1;
         let bitIndex = 7;
         let byteIndex = 0;
         for (let col = this.moduleCount - 1; col > 0; col -= 2) {
-            if (col === 6) col--;
+            if (col === 6) {
+                col--;
+            }
             while (!0) {
                 for (let c = 0; c < 2; c++) {
                     if (this.modules[row][col - c] == null) {
                         let dark = !1;
                         if (byteIndex < data.length) {
-                            dark = (((data[byteIndex] >>> bitIndex) & 1) === 1)
+                            dark = (((data[byteIndex] >>> bitIndex) & 1) === 1);
                         }
                         const mask = Util.hasMask(maskPattern, row, col - c);
                         if (mask) {
-                            dark = !dark
+                            dark = !dark;
                         }
                         this.modules[row][col - c] = dark;
                         bitIndex--;
                         if (bitIndex === -1) {
                             byteIndex++;
-                            bitIndex = 7
+                            bitIndex = 7;
                         }
                     }
                 }
@@ -362,7 +369,7 @@ export class QRCode {
                 if (row < 0 || this.moduleCount <= row) {
                     row -= inc;
                     inc = -inc;
-                    break
+                    break;
                 }
             }
         }
@@ -371,31 +378,11 @@ export class QRCode {
 
 export class Drawing {
 
-    qrCode: QRCode;
-    config: QRDrawingConfig;
-    isPainted: boolean;
-    canvas: Canvas;
-    context: any;
-
-    maskCanvas?: Canvas;
-    maskContext?: CanvasRenderingContext2D;
-
-    constructor(qrCode: QRCode, config: QRCodeConfig) {
-        this.qrCode = qrCode;
-        this.qrCode.addData(config.text);
-        this.qrCode.make();
-
-        this.config = Drawing.generateDrawingConfig(config, qrCode.moduleCount);
-        this.isPainted = false;
-        this.canvas = createCanvas(config.size, config.size, this.config.canvasType);
-        this.context = this.canvas.getContext('2d');
-    }
-
     private static generateDrawingConfig(config: QRCodeConfig, qrModuleCount: number): QRDrawingConfig {
         const dotScale = config.dotScale;
 
         if (dotScale <= 0 || dotScale > 1) {
-            throw new Error("Scale should be in range (0, 1].")
+            throw new Error('Scale should be in range (0, 1].');
         }
 
         const rawSize = config.size;
@@ -412,12 +399,12 @@ export class Drawing {
         const size = viewportSize + 2 * margin;
 
         const drawingConfig: Partial<QRDrawingConfig> = {
-            size: size,
-            nSize: nSize,
+            size,
+            nSize,
             rawSize: config.size,
-            viewportSize: viewportSize,
-            margin: margin,
-            dotScale: dotScale,
+            viewportSize,
+            margin,
+            dotScale,
             moduleSize: nSize,
         };
 
@@ -425,17 +412,37 @@ export class Drawing {
         return Object.assign(config, drawingConfig);
     }
 
+    public qrCode: QRCode;
+    public config: QRDrawingConfig;
+    public isPainted: boolean;
+    public canvas: Canvas;
+    public context: any;
+
+    public maskCanvas?: Canvas;
+    public maskContext?: CanvasRenderingContext2D;
+
+    constructor(qrCode: QRCode, config: QRCodeConfig) {
+        this.qrCode = qrCode;
+        this.qrCode.addData(config.text);
+        this.qrCode.make();
+
+        this.config = Drawing.generateDrawingConfig(config, qrCode.moduleCount);
+        this.isPainted = false;
+        this.canvas = createCanvas(config.size, config.size, this.config.canvasType);
+        this.context = this.canvas.getContext('2d');
+    }
+
     public draw(): Promise<Canvas> {
 
         const mainCanvas = createCanvas(this.config.size, this.config.size, this.config.canvasType);
-        const mainContext = mainCanvas.getContext("2d");
+        const mainContext = mainCanvas.getContext('2d');
 
         // Leave room for margin
         mainContext.translate(this.config.margin, this.config.margin);
         mainContext.save();
 
         const backgroundCanvas = createCanvas(this.config.size, this.config.size, this.config.canvasType);
-        const backgroundContext = backgroundCanvas.getContext("2d");
+        const backgroundContext = backgroundCanvas.getContext('2d');
 
         return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage).then(() => {
             return this.drawAlignPatterns(mainContext);
@@ -466,7 +473,7 @@ export class Drawing {
         const rawSize = this.config.rawSize;
 
         const finalCanvas = createCanvas(rawSize, rawSize, this.config.canvasType);
-        const finalContext = finalCanvas.getContext("2d");
+        const finalContext = finalCanvas.getContext('2d');
         finalContext.drawImage(canvas, 0, 0, rawSize, rawSize);
         return finalCanvas;
     }
@@ -558,12 +565,12 @@ export class Drawing {
         const edgeCenter = patternPosition[patternPosition.length - 1];
         for (let i = 0; i < patternPosition.length; i++) {
             for (let j = 0; j < patternPosition.length; j++) {
-                let agnX = patternPosition[j];
-                let agnY = patternPosition[i];
+                const agnX = patternPosition[j];
+                const agnY = patternPosition[i];
                 if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-                    context.fillStyle = "rgba(0, 0, 0, .2)";
+                    context.fillStyle = 'rgba(0, 0, 0, .2)';
                     CanvasUtil.drawAlign(context, agnX, agnY, moduleSize, moduleSize);
                 } else {
                     context.fillStyle = this.config.colorDark;
@@ -579,8 +586,8 @@ export class Drawing {
         const edgeCenter = patternPosition[patternPosition.length - 1];
         for (let i = 0; i < patternPosition.length; i++) {
             for (let j = 0; j < patternPosition.length; j++) {
-                let agnX = patternPosition[j];
-                let agnY = patternPosition[i];
+                const agnX = patternPosition[j];
+                const agnY = patternPosition[i];
                 if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
@@ -593,7 +600,7 @@ export class Drawing {
     }
 
     private drawPositionProtectors(context: CanvasRenderingContext2D) {
-        context.fillStyle = "rgba(255, 255, 255, 0.6)";
+        context.fillStyle = 'rgba(255, 255, 255, 0.6)';
         const size = this.config.moduleSize;
         const moduleCount = this.qrCode.moduleCount;
         context.fillRect(0, 0, 8 * size, 8 * size);
@@ -622,18 +629,20 @@ export class Drawing {
 
                 context.strokeStyle = bIsDark ? this.config.colorDark : this.config.colorLight;
                 context.lineWidth = 0.5;
-                context.fillStyle = bIsDark ? this.config.colorDark : "rgba(255, 255, 255, 0.6)";
+                context.fillStyle = bIsDark ? this.config.colorDark : 'rgba(255, 255, 255, 0.6)';
 
                 const nLeft = col * this.config.nSize + (bProtected ? 0 : (xyOffset * this.config.nSize));
                 const nTop = row * this.config.nSize + (bProtected ? 0 : (xyOffset * this.config.nSize));
                 if (patternPosition.length === 0) {
                     // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
-                    if (!bProtected)
+                    if (!bProtected) {
                         this.fillRectWithMask(context, nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize, (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize, bIsDark);
+                    }
                 } else {
                     const inAgnRange = ((col < moduleCount - 4 && col >= moduleCount - 4 - 5 && row < moduleCount - 4 && row >= moduleCount - 4 - 5));
-                    if (!bProtected && !inAgnRange)
+                    if (!bProtected && !inAgnRange) {
                         this.fillRectWithMask(context, nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize, (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize, bIsDark);
+                    }
                 }
             }
         }
@@ -645,7 +654,7 @@ export class Drawing {
         } else {
             canvas.drawImage(this.maskCanvas, x, y, w, h, x, y, w, h);
             const fill = canvas.fillStyle;
-            canvas.fillStyle = bIsDark ? "rgba(0, 0, 0, .5)" : "rgba(255, 255, 255, .7)";
+            canvas.fillStyle = bIsDark ? 'rgba(0, 0, 0, .5)' : 'rgba(255, 255, 255, .7)';
             canvas.fillRect(x, y, w, h);
             canvas.fillStyle = fill;
         }
@@ -654,7 +663,7 @@ export class Drawing {
     private async addBackground(context: CanvasRenderingContext2D, size: number, backgroundImage?: string) {
         if (!backgroundImage) {
             context.rect(0, 0, size, size);
-            context.fillStyle = "#ffffff";
+            context.fillStyle = '#ffffff';
             context.fill();
             return;
         }
@@ -667,19 +676,20 @@ export class Drawing {
             if (this.config.autoColor) {
                 // @ts-ignore
                 const avgRGB = CanvasUtil.getAverageRGB(image, size);
-                this.config.colorDark = "rgb(" + avgRGB.r + ", " + avgRGB.g + ", " + avgRGB.b + ")";
+                this.config.colorDark = 'rgb(' + avgRGB.r + ', ' + avgRGB.g + ', ' + avgRGB.b + ')';
             }
 
             if (this.config.maskedDots) {
+                // tslint:disable-next-line
                 const size = this.config.size;
                 this.maskCanvas = createCanvas(size, size, this.config.canvasType);
-                this.maskContext = this.maskCanvas.getContext("2d");
+                this.maskContext = this.maskCanvas.getContext('2d');
 
                 // @ts-ignore
                 this.maskContext.drawImage(image, 0, 0, image.width, image.height, 0, 0, size, size);
 
                 this.maskContext.rect(0, 0, size, size);
-                this.maskContext.fillStyle = "#ffffff";
+                this.maskContext.fillStyle = '#ffffff';
                 this.maskContext.fill();
             } else {
                 // @ts-ignore
@@ -693,7 +703,7 @@ export class Drawing {
 }
 
 export class QRRSBlock {
-    static RS_BLOCK_TABLE = [
+    public static RS_BLOCK_TABLE = [
         [1, 26, 19],
         [1, 26, 16],
         [1, 26, 13],
@@ -853,21 +863,13 @@ export class QRRSBlock {
         [19, 148, 118, 6, 149, 119],
         [18, 75, 47, 31, 76, 48],
         [34, 54, 24, 34, 55, 25],
-        [20, 45, 15, 61, 46, 16]
+        [20, 45, 15, 61, 46, 16],
     ];
 
-    totalCount: number;
-    dataCount: number;
-
-    constructor(totalCount: number, dataCount: number) {
-        this.totalCount = totalCount;
-        this.dataCount = dataCount;
-    }
-
-    static getQRSBlocks(typeNumber: number, errorCorrectLevel: number) {
+    public static getQRSBlocks(typeNumber: number, errorCorrectLevel: number) {
         const rsBlock = QRRSBlock.getQRSBlockTable(typeNumber, errorCorrectLevel);
         if (rsBlock === undefined) {
-            throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel)
+            throw new Error('bad rs block @ typeNumber:' + typeNumber + '/errorCorrectLevel:' + errorCorrectLevel);
         }
         const length = rsBlock.length / 3;
         const list = [];
@@ -876,13 +878,13 @@ export class QRRSBlock {
             const totalCount = rsBlock[i * 3 + 1];
             const dataCount = rsBlock[i * 3 + 2];
             for (let j = 0; j < count; j++) {
-                list.push(new QRRSBlock(totalCount, dataCount))
+                list.push(new QRRSBlock(totalCount, dataCount));
             }
         }
-        return list
+        return list;
     }
 
-    static getQRSBlockTable(typeNumber: number, errorCorrectLevel: number) {
+    public static getQRSBlockTable(typeNumber: number, errorCorrectLevel: number) {
         switch (errorCorrectLevel) {
             case QRErrorCorrectLevel.L:
                 return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4];
@@ -893,47 +895,55 @@ export class QRRSBlock {
             case QRErrorCorrectLevel.H:
                 return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 3];
             default:
-                return undefined
+                return undefined;
         }
+    }
+
+    public totalCount: number;
+    public dataCount: number;
+
+    constructor(totalCount: number, dataCount: number) {
+        this.totalCount = totalCount;
+        this.dataCount = dataCount;
     }
 }
 
 
 export class QRBitBuffer {
-    buffer: Array<any> = [];
-    length = 0;
+    public buffer: any[] = [];
+    public length = 0;
 
-    get(index: number) {
+    public get(index: number) {
         const bufIndex = Math.floor(index / 8);
-        return ((this.buffer[bufIndex] >>> (7 - index % 8)) & 1) === 1
+        return ((this.buffer[bufIndex] >>> (7 - index % 8)) & 1) === 1;
     }
 
-    put(num: number, length: number) {
+    public put(num: number, length: number) {
         for (let i = 0; i < length; i++) {
-            this.putBit(((num >>> (length - i - 1)) & 1) === 1)
+            this.putBit(((num >>> (length - i - 1)) & 1) === 1);
         }
     }
 
-    getLengthInBits() {
-        return this.length
+    public getLengthInBits() {
+        return this.length;
     }
 
-    putBit(bit: any) {
+    public putBit(bit: any) {
         const bufIndex = Math.floor(this.length / 8);
         if (this.buffer.length <= bufIndex) {
-            this.buffer.push(0)
+            this.buffer.push(0);
         }
         if (bit) {
-            this.buffer[bufIndex] |= (0x80 >>> (this.length % 8))
+            this.buffer[bufIndex] |= (0x80 >>> (this.length % 8));
         }
-        this.length++
+        this.length++;
     }
 }
 
 export class QR8bitByte {
-    data: string;
-    mode: QRMode = QRMode.MODE_8BIT_BYTE;
-    parsedData: Array<any> = [];
+    public data: string;
+    public mode: QRMode = QRMode.MODE_8BIT_BYTE;
+    public parsedData: any[] = [];
 
 
     constructor(data: string) {
@@ -941,8 +951,21 @@ export class QR8bitByte {
         this.parse();
     }
 
+    public getLength() {
+        return this.parsedData.length;
+    }
+
+    public write(buffer: QRBitBuffer) {
+        let i = 0;
+        const l = this.parsedData.length;
+        for (; i < l; i++) {
+            buffer.put(this.parsedData[i], 8);
+        }
+    }
+
     private parse() {
-        let i = 0, l = this.data.length;
+        let i = 0;
+        const l = this.data.length;
         for (; i < l; i++) {
             const byteArray = [];
             const code = this.data.charCodeAt(i);
@@ -968,17 +991,6 @@ export class QR8bitByte {
             this.parsedData.unshift(191);
             this.parsedData.unshift(187);
             this.parsedData.unshift(239);
-        }
-    }
-
-    getLength() {
-        return this.parsedData.length
-    }
-
-    write(buffer: QRBitBuffer) {
-        let i = 0, l = this.parsedData.length;
-        for (; i < l; i++) {
-            buffer.put(this.parsedData[i], 8)
         }
     }
 }
