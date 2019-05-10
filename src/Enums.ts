@@ -25,5 +25,7 @@ export enum QRMaskPattern {
 
 export enum CanvasType {
     PDF = 'pdf',
-    SVG = 'svg'
+    SVG = 'svg',
+    JPEG = 'jpeg',
+    PNG = 'png'
 }

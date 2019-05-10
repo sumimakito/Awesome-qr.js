@@ -1,4 +1,4 @@
-import { Canvas, CanvasRenderingContext2D, createCanvas } from 'canvas';
+import { Canvas, CanvasRenderingContext2D, createCanvas, JPEGStream, PDFStream, PNGStream } from 'canvas';
 import { BCH, CanvasUtil, QRMath, Util } from './Common';
 import * as constants from './Constants';
 import { CanvasType, QRErrorCorrectLevel, QRMode } from './Enums';
@@ -183,9 +183,47 @@ export class QRCode {
                 break;
             case CanvasType.SVG:
                 drawing = this.canvas.toBuffer();
+                break;
+            default:
+                throw { error: `Cannot convert to buffer for ${this.congif.canvasType}` };
         }
         return drawing;
     }
+
+
+    public createStream(config?: object): PNGStream | JPEGStream | PDFStream {
+        let stream: PNGStream | JPEGStream | PDFStream = this.canvas.createJPEGStream();
+        switch (this.congif.canvasType) {
+            case CanvasType.PDF:
+                stream = this.canvas.createPDFStream(config);
+                break;
+            case CanvasType.PNG:
+                stream = this.canvas.createPNGStream(config);
+                break;
+            case CanvasType.JPEG:
+                stream = this.canvas.createJPEGStream(config);
+                break;
+            default:
+                throw { error: `Cannot create stream for ${this.congif.canvasType}` };
+        }
+        return stream;
+    }
+
+    public toDataURL(): string {
+        let dataURL: string;
+        switch (this.congif.canvasType) {
+            case CanvasType.PNG:
+                dataURL = this.canvas.toDataURL('image/png');
+                break;
+            case CanvasType.JPEG:
+                dataURL = this.canvas.toDataURL('image/jpeg');
+                break;
+            default:
+                throw { error: `Cannot convert to dataURL for ${this.congif.canvasType}` };
+        }
+        return dataURL;
+    }
+
 
     public isDark(row: number, col: number) {
         if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
@@ -454,19 +492,19 @@ export class Drawing {
         this.modules = modules;
         this.config = Drawing.generateDrawingConfig(config, moduleCount);
         this.isPainted = false;
-        this.canvas = createCanvas(config.size, config.size, this.config.canvasType);
+        this.canvas = createCanvas(config.size, config.size, this.canvasType);
         this.context = this.canvas.getContext('2d');
     }
 
     public draw(): Promise<Canvas> {
-        const mainCanvas = createCanvas(this.config.size, this.config.size, this.config.canvasType);
+        const mainCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
         const mainContext = mainCanvas.getContext('2d');
 
         // Leave room for margin
         mainContext.translate(this.config.margin, this.config.margin);
         mainContext.save();
 
-        const backgroundCanvas = createCanvas(this.config.size, this.config.size, this.config.canvasType);
+        const backgroundCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
         const backgroundContext = backgroundCanvas.getContext('2d');
 
         return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage).then(() => {
@@ -497,10 +535,21 @@ export class Drawing {
     private async scaleFinalImage(canvas: Canvas): Promise<Canvas> {
         const rawSize = this.config.rawSize;
 
-        const finalCanvas = createCanvas(rawSize, rawSize, this.config.canvasType);
+        const finalCanvas = createCanvas(rawSize, rawSize, this.canvasType);
         const finalContext = finalCanvas.getContext('2d');
         finalContext.drawImage(canvas, 0, 0, rawSize, rawSize);
         return finalCanvas;
+    }
+
+    private get canvasType(): 'svg' | 'pdf' | undefined {
+        switch (this.config.canvasType) {
+            case CanvasType.SVG:
+                return CanvasType.SVG;
+            case CanvasType.PDF:
+                return CanvasType.PDF;
+            default:
+                return;
+        }
     }
 
     private async drawLogoImage(context: CanvasRenderingContext2D) {
@@ -707,7 +756,7 @@ export class Drawing {
             if (this.config.maskedDots) {
                 // tslint:disable-next-line
                 const size = this.config.size;
-                this.maskCanvas = createCanvas(size, size, this.config.canvasType);
+                this.maskCanvas = createCanvas(size, size, this.canvasType);
                 this.maskContext = this.maskCanvas.getContext('2d');
 
                 // @ts-ignore

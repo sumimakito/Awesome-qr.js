@@ -11,16 +11,16 @@ describe('QR code tests', () => {
             canvasType: CanvasType.SVG,
         });
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-                const fs = require('fs');
-                // const out = fs.createWriteStream(__dirname + '/test.png');
-                // const stream = canvas.createPDFStream();
-                // stream.pipe(out);
-                // return out.on('finish', () => {
-                //     return;
-                // });
-                // @ts-ignore
-                fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
-                done();
+            const fs = require('fs');
+            // const out = fs.createWriteStream(__dirname + '/test.png');
+            // const stream = canvas.createPDFStream();
+            // stream.pipe(out);
+            // return out.on('finish', () => {
+            //     return;
+            // });
+            // @ts-ignore
+            fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
         });
     });
 });
