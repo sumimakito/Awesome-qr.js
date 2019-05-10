@@ -1,7 +1,7 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas } from 'canvas';
 import { BCH, CanvasUtil, QRMath, Util } from './Common';
 import * as constants from './Constants';
-import { QRErrorCorrectLevel, QRMode } from './Enums';
+import { CanvasType, QRErrorCorrectLevel, QRMode } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { loadImage } from './Util';
 
@@ -151,9 +151,14 @@ export class QRCode {
     public dataCache?: any[];
     public dataList: QR8bitByte[] = [];
     public drawing: Drawing;
+    // @ts-ignore
+    public canvas: Canvas;
+
+    private congif: QRCodeConfig;
 
     constructor(typeNumber: number, config: QRCodeConfig) {
         this.typeNumber = typeNumber;
+        this.congif = config;
         this.errorCorrectLevel = config.correctLevel;
         this.addData(config.text);
         this.make();
@@ -168,6 +173,18 @@ export class QRCode {
         const newData = new QR8bitByte(data);
         this.dataList.push(newData);
         this.dataCache = undefined;
+    }
+
+    public toBuffer(): Buffer {
+        let drawing = this.canvas.toBuffer();
+        switch (this.congif.canvasType) {
+            case CanvasType.PDF:
+                drawing = this.canvas.toBuffer('application/pdf');
+                break;
+            case CanvasType.SVG:
+                drawing = this.canvas.toBuffer();
+        }
+        return drawing;
     }
 
     public isDark(row: number, col: number) {
@@ -205,7 +222,7 @@ export class QRCode {
         this.makeImpl(!1, this.getBestMaskPattern());
     }
 
-    public makeImpl(test: boolean, maskPattern: number) {
+    private makeImpl(test: boolean, maskPattern: number) {
         this.moduleCount = this.typeNumber * 4 + 17;
         this.modules = new Array(this.moduleCount);
         for (let row = 0; row < this.moduleCount; row++) {
@@ -229,7 +246,7 @@ export class QRCode {
         this.mapData(this.dataCache, maskPattern);
     }
 
-    public setupPositionProbePattern(row: number, col: number) {
+    private setupPositionProbePattern(row: number, col: number) {
         for (let r = -1; r <= 7; r++) {
             if (row + r <= -1 || this.moduleCount <= row + r) {
                 continue;
@@ -248,7 +265,7 @@ export class QRCode {
         }
     }
 
-    public getBestMaskPattern() {
+    private getBestMaskPattern() {
         let minLostPoint = 0;
         let pattern = 0;
         for (let i = 0; i < 8; i++) {
@@ -262,7 +279,7 @@ export class QRCode {
         return pattern;
     }
 
-    public setupTimingPattern() {
+    private setupTimingPattern() {
         for (let r = 8; r < this.moduleCount - 8; r++) {
             if (this.modules[r][6] != null) {
                 continue;
@@ -277,7 +294,7 @@ export class QRCode {
         }
     }
 
-    public setupPositionAdjustPattern() {
+    private setupPositionAdjustPattern() {
         const pos = this.patternPosition;
         for (let i = 0; i < pos.length; i++) {
             for (let j = 0; j < pos.length; j++) {
@@ -299,7 +316,7 @@ export class QRCode {
         }
     }
 
-    public setupTypeNumber(test: boolean) {
+    private setupTypeNumber(test: boolean) {
         let i;
         let mod;
         const bits = BCH.typeNumber(this.typeNumber);
@@ -313,7 +330,7 @@ export class QRCode {
         }
     }
 
-    public setupTypeInfo(test: boolean, maskPattern: number) {
+    private setupTypeInfo(test: boolean, maskPattern: number) {
         let i;
         let mod;
         const data = (this.errorCorrectLevel << 3) | maskPattern;
@@ -341,7 +358,7 @@ export class QRCode {
         this.modules[this.moduleCount - 8][8] = (!test);
     }
 
-    public mapData(data: any[], maskPattern: number) {
+    private mapData(data: any[], maskPattern: number) {
         let inc = -1;
         let row = this.moduleCount - 1;
         let bitIndex = 7;
