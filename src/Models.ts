@@ -154,11 +154,11 @@ export class QRCode {
     // @ts-ignore
     public canvas: Canvas;
 
-    private congif: QRCodeConfig;
+    private config: QRCodeConfig;
 
     constructor(typeNumber: number, config: QRCodeConfig) {
         this.typeNumber = typeNumber;
-        this.congif = config;
+        this.config = config;
         this.errorCorrectLevel = config.correctLevel;
         this.addData(config.text);
         this.make();
@@ -177,7 +177,7 @@ export class QRCode {
 
     public toBuffer(): Buffer {
         let drawing = this.canvas.toBuffer();
-        switch (this.congif.canvasType) {
+        switch (this.config.canvasType) {
             case CanvasType.PDF:
                 drawing = this.canvas.toBuffer('application/pdf');
                 break;
@@ -185,43 +185,34 @@ export class QRCode {
                 drawing = this.canvas.toBuffer();
                 break;
             default:
-                throw { error: `Cannot convert to buffer for ${this.congif.canvasType}` };
+                throw { error: `Cannot convert to buffer for ${this.config.canvasType}` };
         }
         return drawing;
     }
 
 
     public createStream(config?: object): PNGStream | JPEGStream | PDFStream {
-        let stream: PNGStream | JPEGStream | PDFStream = this.canvas.createJPEGStream();
-        switch (this.congif.canvasType) {
+        switch (this.config.canvasType) {
             case CanvasType.PDF:
-                stream = this.canvas.createPDFStream(config);
-                break;
+                return this.canvas.createPDFStream(config);
             case CanvasType.PNG:
-                stream = this.canvas.createPNGStream(config);
-                break;
+                return this.canvas.createPNGStream(config);
             case CanvasType.JPEG:
-                stream = this.canvas.createJPEGStream(config);
-                break;
+                return this.canvas.createJPEGStream(config);
             default:
-                throw { error: `Cannot create stream for ${this.congif.canvasType}` };
+                throw { error: `Cannot create stream for ${this.config.canvasType}` };
         }
-        return stream;
     }
 
     public toDataURL(): string {
-        let dataURL: string;
-        switch (this.congif.canvasType) {
+        switch (this.config.canvasType) {
             case CanvasType.PNG:
-                dataURL = this.canvas.toDataURL('image/png');
-                break;
+                return this.canvas.toDataURL('image/png');
             case CanvasType.JPEG:
-                dataURL = this.canvas.toDataURL('image/jpeg');
-                break;
+                return this.canvas.toDataURL('image/jpeg');
             default:
-                throw { error: `Cannot convert to dataURL for ${this.congif.canvasType}` };
+                throw { error: `Cannot convert to dataURL for ${this.config.canvasType}` };
         }
-        return dataURL;
     }
 
 

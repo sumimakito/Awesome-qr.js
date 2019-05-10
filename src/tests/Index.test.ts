@@ -18,7 +18,6 @@ describe('QR code tests', () => {
             // return out.on('finish', () => {
             //     return;
             // });
-            // @ts-ignore
             fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         });
