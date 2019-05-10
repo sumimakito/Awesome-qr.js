@@ -1,7 +1,7 @@
-import { Canvas, CanvasRenderingContext2D, createCanvas } from 'canvas';
+import { Canvas, CanvasRenderingContext2D, createCanvas, JPEGStream, PDFStream, PNGStream } from 'canvas';
 import { BCH, CanvasUtil, QRMath, Util } from './Common';
 import * as constants from './Constants';
-import { QRErrorCorrectLevel, QRMode } from './Enums';
+import { CanvasType, QRErrorCorrectLevel, QRMode } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { loadImage } from './Util';
 
@@ -150,10 +150,19 @@ export class QRCode {
     public moduleCount: number = 0;
     public dataCache?: any[];
     public dataList: QR8bitByte[] = [];
+    public drawing: Drawing;
+    // @ts-ignore
+    public canvas: Canvas;
 
-    constructor(typeNumber: number, errorCorrectLevel: QRErrorCorrectLevel) {
+    private config: QRCodeConfig;
+
+    constructor(typeNumber: number, config: QRCodeConfig) {
         this.typeNumber = typeNumber;
-        this.errorCorrectLevel = errorCorrectLevel;
+        this.config = config;
+        this.errorCorrectLevel = config.correctLevel;
+        this.addData(config.text);
+        this.make();
+        this.drawing = new Drawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
     }
 
     get patternPosition() {
@@ -165,6 +174,47 @@ export class QRCode {
         this.dataList.push(newData);
         this.dataCache = undefined;
     }
+
+    public toBuffer(): Buffer {
+        let drawing = this.canvas.toBuffer();
+        switch (this.config.canvasType) {
+            case CanvasType.PDF:
+                drawing = this.canvas.toBuffer('application/pdf');
+                break;
+            case CanvasType.SVG:
+                drawing = this.canvas.toBuffer();
+                break;
+            default:
+                throw { error: `Cannot convert to buffer for ${this.config.canvasType}` };
+        }
+        return drawing;
+    }
+
+
+    public createStream(config?: object): PNGStream | JPEGStream | PDFStream {
+        switch (this.config.canvasType) {
+            case CanvasType.PDF:
+                return this.canvas.createPDFStream(config);
+            case CanvasType.PNG:
+                return this.canvas.createPNGStream(config);
+            case CanvasType.JPEG:
+                return this.canvas.createJPEGStream(config);
+            default:
+                throw { error: `Cannot create stream for ${this.config.canvasType}` };
+        }
+    }
+
+    public toDataURL(): string {
+        switch (this.config.canvasType) {
+            case CanvasType.PNG:
+                return this.canvas.toDataURL('image/png');
+            case CanvasType.JPEG:
+                return this.canvas.toDataURL('image/jpeg');
+            default:
+                throw { error: `Cannot convert to dataURL for ${this.config.canvasType}` };
+        }
+    }
+
 
     public isDark(row: number, col: number) {
         if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
@@ -201,7 +251,7 @@ export class QRCode {
         this.makeImpl(!1, this.getBestMaskPattern());
     }
 
-    public makeImpl(test: boolean, maskPattern: number) {
+    private makeImpl(test: boolean, maskPattern: number) {
         this.moduleCount = this.typeNumber * 4 + 17;
         this.modules = new Array(this.moduleCount);
         for (let row = 0; row < this.moduleCount; row++) {
@@ -225,7 +275,7 @@ export class QRCode {
         this.mapData(this.dataCache, maskPattern);
     }
 
-    public setupPositionProbePattern(row: number, col: number) {
+    private setupPositionProbePattern(row: number, col: number) {
         for (let r = -1; r <= 7; r++) {
             if (row + r <= -1 || this.moduleCount <= row + r) {
                 continue;
@@ -244,7 +294,7 @@ export class QRCode {
         }
     }
 
-    public getBestMaskPattern() {
+    private getBestMaskPattern() {
         let minLostPoint = 0;
         let pattern = 0;
         for (let i = 0; i < 8; i++) {
@@ -258,7 +308,7 @@ export class QRCode {
         return pattern;
     }
 
-    public setupTimingPattern() {
+    private setupTimingPattern() {
         for (let r = 8; r < this.moduleCount - 8; r++) {
             if (this.modules[r][6] != null) {
                 continue;
@@ -273,7 +323,7 @@ export class QRCode {
         }
     }
 
-    public setupPositionAdjustPattern() {
+    private setupPositionAdjustPattern() {
         const pos = this.patternPosition;
         for (let i = 0; i < pos.length; i++) {
             for (let j = 0; j < pos.length; j++) {
@@ -295,7 +345,7 @@ export class QRCode {
         }
     }
 
-    public setupTypeNumber(test: boolean) {
+    private setupTypeNumber(test: boolean) {
         let i;
         let mod;
         const bits = BCH.typeNumber(this.typeNumber);
@@ -309,7 +359,7 @@ export class QRCode {
         }
     }
 
-    public setupTypeInfo(test: boolean, maskPattern: number) {
+    private setupTypeInfo(test: boolean, maskPattern: number) {
         let i;
         let mod;
         const data = (this.errorCorrectLevel << 3) | maskPattern;
@@ -337,7 +387,7 @@ export class QRCode {
         this.modules[this.moduleCount - 8][8] = (!test);
     }
 
-    public mapData(data: any[], maskPattern: number) {
+    private mapData(data: any[], maskPattern: number) {
         let inc = -1;
         let row = this.moduleCount - 1;
         let bitIndex = 7;
@@ -412,7 +462,6 @@ export class Drawing {
         return Object.assign(config, drawingConfig);
     }
 
-    public qrCode: QRCode;
     public config: QRDrawingConfig;
     public isPainted: boolean;
     public canvas: Canvas;
@@ -421,27 +470,32 @@ export class Drawing {
     public maskCanvas?: Canvas;
     public maskContext?: CanvasRenderingContext2D;
 
-    constructor(qrCode: QRCode, config: QRCodeConfig) {
-        this.qrCode = qrCode;
-        this.qrCode.addData(config.text);
-        this.qrCode.make();
+    private patternPosition: number[];
+    private moduleCount: number;
+    private isDark: any;
+    // noinspection JSMismatchedCollectionQueryUpdate
+    private modules: Array<Array<boolean | null>>;
 
-        this.config = Drawing.generateDrawingConfig(config, qrCode.moduleCount);
+    constructor(moduleCount: number, patternPosition: number[], config: QRCodeConfig, isDark: any, modules: Array<Array<boolean | null>>) {
+        this.moduleCount = moduleCount;
+        this.patternPosition = patternPosition;
+        this.isDark = isDark;
+        this.modules = modules;
+        this.config = Drawing.generateDrawingConfig(config, moduleCount);
         this.isPainted = false;
-        this.canvas = createCanvas(config.size, config.size, this.config.canvasType);
+        this.canvas = createCanvas(config.size, config.size, this.canvasType);
         this.context = this.canvas.getContext('2d');
     }
 
     public draw(): Promise<Canvas> {
-
-        const mainCanvas = createCanvas(this.config.size, this.config.size, this.config.canvasType);
+        const mainCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
         const mainContext = mainCanvas.getContext('2d');
 
         // Leave room for margin
         mainContext.translate(this.config.margin, this.config.margin);
         mainContext.save();
 
-        const backgroundCanvas = createCanvas(this.config.size, this.config.size, this.config.canvasType);
+        const backgroundCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
         const backgroundContext = backgroundCanvas.getContext('2d');
 
         return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage).then(() => {
@@ -472,10 +526,21 @@ export class Drawing {
     private async scaleFinalImage(canvas: Canvas): Promise<Canvas> {
         const rawSize = this.config.rawSize;
 
-        const finalCanvas = createCanvas(rawSize, rawSize, this.config.canvasType);
+        const finalCanvas = createCanvas(rawSize, rawSize, this.canvasType);
         const finalContext = finalCanvas.getContext('2d');
         finalContext.drawImage(canvas, 0, 0, rawSize, rawSize);
         return finalCanvas;
+    }
+
+    private get canvasType(): 'svg' | 'pdf' | undefined {
+        switch (this.config.canvasType) {
+            case CanvasType.SVG:
+                return CanvasType.SVG;
+            case CanvasType.PDF:
+                return CanvasType.PDF;
+            default:
+                return;
+        }
     }
 
     private async drawLogoImage(context: CanvasRenderingContext2D) {
@@ -538,7 +603,7 @@ export class Drawing {
         context.fillStyle = this.config.colorDark;
 
         const moduleSize = this.config.moduleSize;
-        const moduleCount = this.qrCode.moduleCount;
+        const moduleCount = this.moduleCount;
         context.fillRect(0, 0, 7 * moduleSize, moduleSize);
         context.fillRect((moduleCount - 7) * moduleSize, 0, 7 * moduleSize, moduleSize);
         context.fillRect(0, 6 * moduleSize, 7 * moduleSize, moduleSize);
@@ -561,7 +626,7 @@ export class Drawing {
             context.fillRect(6 * moduleSize, (8 + i) * moduleSize, moduleSize, moduleSize);
         }
 
-        const patternPosition = this.qrCode.patternPosition;
+        const patternPosition = this.patternPosition;
         const edgeCenter = patternPosition[patternPosition.length - 1];
         for (let i = 0; i < patternPosition.length; i++) {
             for (let j = 0; j < patternPosition.length; j++) {
@@ -581,7 +646,7 @@ export class Drawing {
     }
 
     private drawAlignProtectors(context: CanvasRenderingContext2D) {
-        const patternPosition = this.qrCode.patternPosition;
+        const patternPosition = this.patternPosition;
         const moduleSize = this.config.moduleSize;
         const edgeCenter = patternPosition[patternPosition.length - 1];
         for (let i = 0; i < patternPosition.length; i++) {
@@ -602,7 +667,7 @@ export class Drawing {
     private drawPositionProtectors(context: CanvasRenderingContext2D) {
         context.fillStyle = 'rgba(255, 255, 255, 0.6)';
         const size = this.config.moduleSize;
-        const moduleCount = this.qrCode.moduleCount;
+        const moduleCount = this.moduleCount;
         context.fillRect(0, 0, 8 * size, 8 * size);
         context.fillRect(0, (moduleCount - 8) * size, 8 * size, 8 * size);
         context.fillRect((moduleCount - 8) * size, 0, 8 * size, 8 * size);
@@ -611,17 +676,17 @@ export class Drawing {
     }
 
     private drawAlignPatterns(context: CanvasRenderingContext2D) {
-        const moduleCount = this.qrCode.moduleCount;
+        const moduleCount = this.moduleCount;
         const xyOffset = (1 - this.config.dotScale) * 0.5;
 
         for (let row = 0; row < moduleCount; row++) {
             for (let col = 0; col < moduleCount; col++) {
-                const bIsDark = this.qrCode.isDark(row, col) || false;
+                const bIsDark = this.isDark.bind(this)(row, col) || false;
 
                 const isBlkPosCtr = ((col < 8 && (row < 8 || row >= moduleCount - 8)) || (col >= moduleCount - 8 && row < 8));
                 let bProtected = (row === 6 || col === 6 || isBlkPosCtr);
 
-                const patternPosition = this.qrCode.patternPosition;
+                const patternPosition = this.patternPosition;
                 for (let i = 0; i < patternPosition.length - 1; i++) {
                     bProtected = bProtected || (row >= patternPosition[i] - 2 && row <= patternPosition[i] + 2 &&
                         col >= patternPosition[i] - 2 && col <= patternPosition[i] + 2);
@@ -682,7 +747,7 @@ export class Drawing {
             if (this.config.maskedDots) {
                 // tslint:disable-next-line
                 const size = this.config.size;
-                this.maskCanvas = createCanvas(size, size, this.config.canvasType);
+                this.maskCanvas = createCanvas(size, size, this.canvasType);
                 this.maskContext = this.maskCanvas.getContext('2d');
 
                 // @ts-ignore

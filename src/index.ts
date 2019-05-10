@@ -1,13 +1,10 @@
-import { Canvas } from 'canvas';
 import { CanvasType, QRErrorCorrectLevel } from './Enums';
-import { Drawing, QRCode } from './Models';
+import { QRCode } from './Models';
 import { QRCodeConfig } from './Types';
 
 
 export class QRCodeBuilder {
     private config: QRCodeConfig;
-    private qrCode: QRCode;
-    private drawing?: Drawing;
 
     public constructor(config?: Partial<QRCodeConfig>) {
         const defaultConfig: QRCodeConfig = {
@@ -26,7 +23,6 @@ export class QRCodeBuilder {
             maskedDots: false,
         };
         this.config = Object.assign({}, defaultConfig, config);
-        this.qrCode = new QRCode(-1, this.config.correctLevel);
     }
 
     public setSize(size: number) {
@@ -114,12 +110,14 @@ export class QRCodeBuilder {
         return this;
     }
 
-    public build(format?: CanvasType): Promise<Canvas | never> {
+    public async build(format?: CanvasType): Promise<QRCode | never> {
         this.config.canvasType = format;
         if (!this.config.text) {
             return Promise.reject('Setting text is necessary to generate the QRCode');
         }
-        this.drawing = new Drawing(this.qrCode, this.config);
-        return this.drawing.draw();
+
+        const qrCode: QRCode = new QRCode(-1, this.config);
+        qrCode.canvas = await qrCode.drawing.draw();
+        return Promise.resolve(qrCode);
     }
 }

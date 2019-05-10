@@ -10,8 +10,7 @@ describe('QR code tests', () => {
             logoImage: __dirname + '/pokemon.png',
             canvasType: CanvasType.SVG,
         });
-        qrCodeGenerator.build(CanvasType.SVG).then(canvas => {
-            // console.log(canvas.toDataURL());
+        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
             const fs = require('fs');
             // const out = fs.createWriteStream(__dirname + '/test.png');
             // const stream = canvas.createPDFStream();
@@ -19,8 +18,8 @@ describe('QR code tests', () => {
             // return out.on('finish', () => {
             //     return;
             // });
-            fs.writeFileSync(__dirname + '/test.svg', canvas.toBuffer());
-            done()
+            fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
         });
     });
 });
