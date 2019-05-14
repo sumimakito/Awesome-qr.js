@@ -169,6 +169,10 @@ export class QRCode {
         return constants.PATTERN_POSITION_TABLE[this.typeNumber - 1];
     }
 
+    get canvasType(): CanvasType {
+        return this.config.canvasType || CanvasType.PNG;
+    }
+
     public addData(data: string) {
         const newData = new QR8bitByte(data);
         this.dataList.push(newData);
@@ -424,6 +428,7 @@ export class QRCode {
             }
         }
     }
+
 }
 
 export class Drawing {
