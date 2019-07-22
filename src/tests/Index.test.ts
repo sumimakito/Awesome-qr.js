@@ -9,8 +9,8 @@ describe('QR code tests', () => {
             backgroundImage: 'https://image.flaticon.com/teams/slug/google.jpg',
             logoImage: __dirname + '/pokemon.png',
             canvasType: CanvasType.SVG,
-            eyeFrameShape: EyeFrameShape.SQUARE,
-            eyeBallShape: EyeBallShape.SQUARE,
+            eyeFrameShape: EyeFrameShape.ROUNDED,
+            eyeBallShape: EyeBallShape.RIGHT_DIAMOND,
             eyeFrameColor: '#145e07',
             eyeBallColor: '#FF0000',
         });
