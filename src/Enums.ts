@@ -47,3 +47,12 @@ export enum EyeBallShape {
     LEFT_DIAMOND = 'left-diamond',
     RIGHT_DIAMOND = 'right-diamond',
 }
+
+export enum DataPattern {
+    SQUARE = 'square',
+    ROUNDED = 'rounded',
+    BIG_CIRCLE = 'big-circle',
+    SMALL_CIRCLE = 'small-circle',
+    DIAMOND = 'diamond',
+    STAR = 'star',
+}

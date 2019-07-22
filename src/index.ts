@@ -1,4 +1,4 @@
-import { CanvasType, QRErrorCorrectLevel, EyeBallShape, EyeFrameShape } from './Enums';
+import { CanvasType, QRErrorCorrectLevel, EyeBallShape, EyeFrameShape, DataPattern } from './Enums';
 import { QRCode } from './Models';
 import { QRCodeConfig } from './Types';
 
@@ -126,6 +126,11 @@ export class QRCodeBuilder {
 
     public setEyeBallColor(eyeBallColor: string) {
         this.config.eyeBallColor = eyeBallColor;
+        return this;
+    }
+
+    public setDataPattern(dataPattern: DataPattern) {
+        this.config.dataPattern = dataPattern;
         return this;
     }
 
