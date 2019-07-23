@@ -50,9 +50,5 @@ export enum EyeBallShape {
 
 export enum DataPattern {
     SQUARE = 'square',
-    ROUNDED = 'rounded',
-    BIG_CIRCLE = 'big-circle',
-    SMALL_CIRCLE = 'small-circle',
-    DIAMOND = 'diamond',
-    STAR = 'star',
+    CIRCLE = 'circle',
 }

@@ -1,5 +1,5 @@
 import 'mocha';
-import { CanvasType, EyeBallShape, EyeFrameShape } from '../Enums';
+import { CanvasType, EyeBallShape, EyeFrameShape, DataPattern } from '../Enums';
 import { QRCodeBuilder } from '../index';
 
 describe('QR code tests', () => {
@@ -11,8 +11,10 @@ describe('QR code tests', () => {
             canvasType: CanvasType.SVG,
             eyeFrameShape: EyeFrameShape.ROUNDED,
             eyeBallShape: EyeBallShape.RIGHT_DIAMOND,
-            eyeFrameColor: '#145e07',
-            eyeBallColor: '#FF0000',
+            eyeFrameColor: '#000000',
+            eyeBallColor: '#ad10aa',
+            dataPattern: DataPattern.CIRCLE,
+            colorDark: '#22aad4',
         });
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
             const fs = require('fs');
