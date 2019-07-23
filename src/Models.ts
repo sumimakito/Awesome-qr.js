@@ -1045,9 +1045,11 @@ export class Drawing {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
                     context.fillStyle = 'rgba(0, 0, 0, .2)';
+                    // CanvasUtil.drawAlign(context, agnX, agnY, moduleSize, moduleSize);
                     this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 } else {
                     context.fillStyle = this.config.colorDark;
+                    // CanvasUtil.drawAlign(context, agnX, agnY, moduleSize, moduleSize);
                     this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 }
             }
@@ -1067,41 +1069,46 @@ export class Drawing {
             case DataPattern.CIRCLE:
                 drawShape = this.drawCircle;
                 break;
+            case DataPattern.SQUARE:
+                drawShape = this.drawSquare;
+                break;
             default:
                 drawShape = this.drawSquare;
                 break;
         }
         let x = shape === DataPattern.CIRCLE ? (centerX - 2) * nWidth + nWidth / 2 : (centerX - 2) * nWidth;
         let y = shape === DataPattern.CIRCLE ? (centerY - 2) * nHeight + nHeight / 2 : (centerY - 2) * nHeight;
+        let height = shape === DataPattern.CIRCLE ? nHeight / 2 : nHeight;
+        let width = shape === DataPattern.CIRCLE ? nWidth / 2 : nWidth;
         for (let i = 0; i < 4; i++) {
-            drawShape(x, y, context, nWidth / 2, nHeight / 2, true);
+            drawShape(x, y, context, width, height, false);
             y += nHeight;
         }
 
         x = shape === DataPattern.CIRCLE ? (centerX + 2) * nWidth + nWidth / 2 : (centerX + 2) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY - 2 + 1) * nHeight + nHeight / 2 : (centerY - 2 + 1) * nHeight;
         for (let i = 0; i < 4; i++) {
-            drawShape(x, y, context, nWidth / 2, nHeight / 2, true);
+            drawShape(x, y, context, width, height, false);
             y += nHeight;
         }
 
         x = shape === DataPattern.CIRCLE ? (centerX - 2 + 1) * nWidth + nWidth / 2 : (centerX - 2 + 1) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY - 2) * nHeight + nHeight / 2 : (centerY - 2) * nHeight;
         for (let i = 0; i < 4; i++) {
-            drawShape(x, y, context, nWidth / 2, nHeight / 2, true);
+            drawShape(x, y, context, width, height, false);
             x += nWidth;
         }
 
         x = shape === DataPattern.CIRCLE ? (centerX - 2) * nWidth + nWidth / 2 : (centerX - 2) * nWidth;
-        y = shape === DataPattern.CIRCLE ? (centerY + 2) * nHeight + nHeight / 2 : (centerX - 2) * nWidth;
+        y = shape === DataPattern.CIRCLE ? (centerY + 2) * nHeight + nHeight / 2 : (centerY + 2) * nHeight;
         for (let i = 0; i < 4; i++) {
-            drawShape(x, y, context, nWidth / 2, nHeight / 2, true);
+            drawShape(x, y, context, width, height, false);
             x += nWidth;
         }
 
         x = shape === DataPattern.CIRCLE ? centerX * nWidth + nWidth / 2 : centerX * nWidth;
         y = shape === DataPattern.CIRCLE ? centerY * nHeight + nHeight / 2 : centerY * nHeight;
-        drawShape(x, y, context, nWidth / 2, nHeight / 2, true);
+        drawShape(x, y, context, width, height, false);
     }
 
     private drawAlignProtectors(context: CanvasRenderingContext2D) {
@@ -1211,7 +1218,7 @@ export class Drawing {
         if (!this.maskCanvas) {
             switch (shape) {
                 case DataPattern.CIRCLE:
-                    this.drawCircle(x + w / 2, y + h / 2, canvas, h * 1.5);
+                    this.drawCircle(x + w / 2, y + h / 2, canvas, h / 2);
                     break;
                 default:
                     this.drawSquare(x, y, canvas, w, h, false);
