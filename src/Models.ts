@@ -838,21 +838,21 @@ export class Drawing {
         switch (shape) {
             case EyeBallShape.LEFT_DIAMOND: {
                 context.fillStyle = color;
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, moduleSize, moduleSize, false);
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawDiamond(
                     (moduleCount - 7 + 2) * moduleSize,
                     2 * moduleSize,
                     context,
-                    moduleSize,
-                    moduleSize,
+                    3 * moduleSize,
+                    3 * moduleSize,
                     false,
                 );
                 this.drawDiamond(
                     2 * moduleSize,
                     (moduleCount - 7 + 2) * moduleSize,
                     context,
-                    moduleSize,
-                    moduleSize,
+                    3 * moduleSize,
+                    3 * moduleSize,
                     false,
                 );
                 context.fillStyle = this.config.colorDark;
@@ -860,21 +860,21 @@ export class Drawing {
             }
             case EyeBallShape.RIGHT_DIAMOND: {
                 context.fillStyle = color;
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, moduleSize, moduleSize, true);
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
                 this.drawDiamond(
                     (moduleCount - 7 + 2) * moduleSize,
                     2 * moduleSize,
                     context,
-                    moduleSize,
-                    moduleSize,
+                    3 * moduleSize,
+                    3 * moduleSize,
                     true,
                 );
                 this.drawDiamond(
                     2 * moduleSize,
                     (moduleCount - 7 + 2) * moduleSize,
                     context,
-                    moduleSize,
-                    moduleSize,
+                    3 * moduleSize,
+                    3 * moduleSize,
                     true,
                 );
                 context.fillStyle = this.config.colorDark;
@@ -890,21 +890,21 @@ export class Drawing {
             }
             case EyeBallShape.LEFT_LEAF: {
                 context.fillStyle = color;
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, moduleSize, moduleSize, false);
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawDiamond(
                     (moduleCount - 7 + 2) * moduleSize,
                     2 * moduleSize,
                     context,
-                    moduleSize,
-                    moduleSize,
+                    3 * moduleSize,
+                    3 * moduleSize,
                     false,
                 );
                 this.drawDiamond(
                     2 * moduleSize,
                     (moduleCount - 7 + 2) * moduleSize,
                     context,
-                    moduleSize,
-                    moduleSize,
+                    3 * moduleSize,
+                    3 * moduleSize,
                     false,
                 );
                 this.drawCircle(3.5 * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
@@ -915,21 +915,21 @@ export class Drawing {
             }
             case EyeBallShape.RIGHT_LEAF: {
                 context.fillStyle = color;
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, moduleSize, moduleSize, true);
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
                 this.drawDiamond(
                     (moduleCount - 7 + 2) * moduleSize,
                     2 * moduleSize,
                     context,
-                    moduleSize,
-                    moduleSize,
+                    3 * moduleSize,
+                    3 * moduleSize,
                     true,
                 );
                 this.drawDiamond(
                     2 * moduleSize,
                     (moduleCount - 7 + 2) * moduleSize,
                     context,
-                    moduleSize,
-                    moduleSize,
+                    3 * moduleSize,
+                    3 * moduleSize,
                     true,
                 );
                 this.drawCircle(3.5 * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
@@ -1003,28 +1003,28 @@ export class Drawing {
         startY: number,
         context: CanvasRenderingContext2D,
         width: number,
-        height?: number,
+        height: number,
         isRight?: boolean,
     ) {
         const moduleSize = width;
 
         if (isRight) {
             context.beginPath();
-            context.moveTo(1.5 * moduleSize + startX, startY);
-            context.lineTo(startX + 3 * moduleSize, startY);
-            context.lineTo(startX + 3 * moduleSize, startY + 1.5 * moduleSize);
-            context.lineTo(startX + 1.5 * moduleSize, startY + 3 * moduleSize);
-            context.lineTo(startX, startY + 3 * moduleSize);
-            context.lineTo(startX, startY + 1.5 * moduleSize);
+            context.moveTo(startX + width / 2, startY);
+            context.lineTo(startX + width, startY);
+            context.lineTo(startX + width, startY + height / 2);
+            context.lineTo(startX + width / 2, startY + height);
+            context.lineTo(startX, startY + height);
+            context.lineTo(startX, startY + height / 2);
             context.fill();
         } else {
             context.beginPath();
             context.moveTo(startX, startY);
-            context.lineTo(startX + 1.5 * moduleSize, startY);
-            context.lineTo(startX + 3 * moduleSize, startY + 1.5 * moduleSize);
-            context.lineTo(startX + 3 * moduleSize, startY + 3 * moduleSize);
-            context.lineTo(startX + 1.5 * moduleSize, startY + 3 * moduleSize);
-            context.lineTo(startX, startY + 1.5 * moduleSize);
+            context.lineTo(startX + width / 2, startY);
+            context.lineTo(startX + width, startY + height / 2);
+            context.lineTo(startX + width, startY + height);
+            context.lineTo(startX + width / 2, startY + height);
+            context.lineTo(startX, startY + height / 2);
             context.fill();
         }
     }
@@ -1107,6 +1107,14 @@ export class Drawing {
                     this.drawKite((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize);
                     this.drawKite(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize);
                     break;
+                case DataPattern.LEFT_DIAMOND:
+                    this.drawDiamond((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, false);
+                    this.drawDiamond(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize, false);
+                    break;
+                case DataPattern.RIGHT_DIAMOND:
+                    this.drawDiamond((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, true);
+                    this.drawDiamond(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize, true);
+                    break;
                 default:
                     this.drawSquare((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, false);
                     this.drawSquare(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize, false);
@@ -1144,6 +1152,7 @@ export class Drawing {
         shape: DataPattern,
     ) {
         let drawShape;
+        let boolFlag: boolean = false;
         switch (shape) {
             case DataPattern.CIRCLE:
                 drawShape = this.drawCircle;
@@ -1154,6 +1163,13 @@ export class Drawing {
             case DataPattern.KITE:
                 drawShape = this.drawKite;
                 break;
+            case DataPattern.LEFT_DIAMOND:
+                drawShape = this.drawDiamond;
+                break;
+            case DataPattern.RIGHT_DIAMOND:
+                drawShape = this.drawDiamond;
+                boolFlag = true;
+                break;
             default:
                 drawShape = this.drawSquare;
                 break;
@@ -1163,34 +1179,34 @@ export class Drawing {
         let height = shape === DataPattern.CIRCLE ? nHeight / 2 : nHeight;
         let width = shape === DataPattern.CIRCLE ? nWidth / 2 : nWidth;
         for (let i = 0; i < 4; i++) {
-            drawShape(x, y, context, width, height, false);
+            drawShape(x, y, context, width, height, boolFlag);
             y += nHeight;
         }
 
         x = shape === DataPattern.CIRCLE ? (centerX + 2) * nWidth + nWidth / 2 : (centerX + 2) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY - 2 + 1) * nHeight + nHeight / 2 : (centerY - 2 + 1) * nHeight;
         for (let i = 0; i < 4; i++) {
-            drawShape(x, y, context, width, height, false);
+            drawShape(x, y, context, width, height, boolFlag);
             y += nHeight;
         }
 
         x = shape === DataPattern.CIRCLE ? (centerX - 2 + 1) * nWidth + nWidth / 2 : (centerX - 2 + 1) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY - 2) * nHeight + nHeight / 2 : (centerY - 2) * nHeight;
         for (let i = 0; i < 4; i++) {
-            drawShape(x, y, context, width, height, false);
+            drawShape(x, y, context, width, height, boolFlag);
             x += nWidth;
         }
 
         x = shape === DataPattern.CIRCLE ? (centerX - 2) * nWidth + nWidth / 2 : (centerX - 2) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY + 2) * nHeight + nHeight / 2 : (centerY + 2) * nHeight;
         for (let i = 0; i < 4; i++) {
-            drawShape(x, y, context, width, height, false);
+            drawShape(x, y, context, width, height, boolFlag);
             x += nWidth;
         }
 
         x = shape === DataPattern.CIRCLE ? centerX * nWidth + nWidth / 2 : centerX * nWidth;
         y = shape === DataPattern.CIRCLE ? centerY * nHeight + nHeight / 2 : centerY * nHeight;
-        drawShape(x, y, context, width, height, false);
+        drawShape(x, y, context, width, height, boolFlag);
     }
 
     private drawAlignProtectors(context: CanvasRenderingContext2D) {
@@ -1304,6 +1320,12 @@ export class Drawing {
                     break;
                 case DataPattern.KITE:
                     this.drawKite(x, y, canvas, w, h);
+                    break;
+                case DataPattern.LEFT_DIAMOND:
+                    this.drawDiamond(x, y, canvas, w, h, false);
+                    break;
+                case DataPattern.RIGHT_DIAMOND:
+                    this.drawDiamond(x, y, canvas, w, h, true);
                     break;
                 default:
                     this.drawSquare(x, y, canvas, w, h, false);

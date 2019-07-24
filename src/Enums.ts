@@ -52,4 +52,6 @@ export enum DataPattern {
     SQUARE = 'square',
     CIRCLE = 'circle',
     KITE = 'kite',
+    LEFT_DIAMOND = 'left-diamond',
+    RIGHT_DIAMOND = 'right-diamond',
 }
