@@ -997,6 +997,22 @@ export class Drawing {
         context.fillRect(startX, startY, width, height);
     }
 
+    private drawKite(
+        startX: number,
+        startY: number,
+        context: CanvasRenderingContext2D,
+        width: number,
+        height: number,
+        isRound?: boolean,
+    ) {
+        context.beginPath();
+        context.moveTo(startX + width / 2, startY);
+        context.lineTo(startX + width, startY + height / 2);
+        context.lineTo(startX + width / 2, startY + height);
+        context.lineTo(startX, startY + height / 2);
+        context.fill();
+    }
+
     private drawPositionPatterns(context: CanvasRenderingContext2D) {
         context.fillStyle = this.config.colorDark;
 
@@ -1027,6 +1043,10 @@ export class Drawing {
                         context,
                         moduleSize / 2,
                     );
+                    break;
+                case DataPattern.KITE:
+                    this.drawKite((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, false);
+                    this.drawKite(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize, false);
                     break;
                 default:
                     this.drawSquare((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, false);
@@ -1071,6 +1091,9 @@ export class Drawing {
                 break;
             case DataPattern.SQUARE:
                 drawShape = this.drawSquare;
+                break;
+            case DataPattern.KITE:
+                drawShape = this.drawKite;
                 break;
             default:
                 drawShape = this.drawSquare;
@@ -1219,6 +1242,9 @@ export class Drawing {
             switch (shape) {
                 case DataPattern.CIRCLE:
                     this.drawCircle(x + w / 2, y + h / 2, canvas, h / 2);
+                    break;
+                case DataPattern.KITE:
+                    this.drawKite(x, y, canvas, w, h, false);
                     break;
                 default:
                     this.drawSquare(x, y, canvas, w, h, false);
