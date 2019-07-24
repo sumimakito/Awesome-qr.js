@@ -838,17 +838,45 @@ export class Drawing {
         switch (shape) {
             case EyeBallShape.LEFT_DIAMOND: {
                 context.fillStyle = color;
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 'left');
-                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 'left');
-                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 'left');
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, moduleSize, moduleSize, false);
+                this.drawDiamond(
+                    (moduleCount - 7 + 2) * moduleSize,
+                    2 * moduleSize,
+                    context,
+                    moduleSize,
+                    moduleSize,
+                    false,
+                );
+                this.drawDiamond(
+                    2 * moduleSize,
+                    (moduleCount - 7 + 2) * moduleSize,
+                    context,
+                    moduleSize,
+                    moduleSize,
+                    false,
+                );
                 context.fillStyle = this.config.colorDark;
                 break;
             }
             case EyeBallShape.RIGHT_DIAMOND: {
                 context.fillStyle = color;
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 'right');
-                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 'right');
-                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 'right');
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, moduleSize, moduleSize, true);
+                this.drawDiamond(
+                    (moduleCount - 7 + 2) * moduleSize,
+                    2 * moduleSize,
+                    context,
+                    moduleSize,
+                    moduleSize,
+                    true,
+                );
+                this.drawDiamond(
+                    2 * moduleSize,
+                    (moduleCount - 7 + 2) * moduleSize,
+                    context,
+                    moduleSize,
+                    moduleSize,
+                    true,
+                );
                 context.fillStyle = this.config.colorDark;
                 break;
             }
@@ -862,9 +890,23 @@ export class Drawing {
             }
             case EyeBallShape.LEFT_LEAF: {
                 context.fillStyle = color;
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 'left');
-                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 'left');
-                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 'left');
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, moduleSize, moduleSize, false);
+                this.drawDiamond(
+                    (moduleCount - 7 + 2) * moduleSize,
+                    2 * moduleSize,
+                    context,
+                    moduleSize,
+                    moduleSize,
+                    false,
+                );
+                this.drawDiamond(
+                    2 * moduleSize,
+                    (moduleCount - 7 + 2) * moduleSize,
+                    context,
+                    moduleSize,
+                    moduleSize,
+                    false,
+                );
                 this.drawCircle(3.5 * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
                 this.drawCircle((moduleCount - 3.5) * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
                 this.drawCircle(3.5 * moduleSize, (moduleCount - 3.5) * moduleSize, context, moduleSize * 1.5);
@@ -873,9 +915,23 @@ export class Drawing {
             }
             case EyeBallShape.RIGHT_LEAF: {
                 context.fillStyle = color;
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 'right');
-                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 'right');
-                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 'right');
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, moduleSize, moduleSize, true);
+                this.drawDiamond(
+                    (moduleCount - 7 + 2) * moduleSize,
+                    2 * moduleSize,
+                    context,
+                    moduleSize,
+                    moduleSize,
+                    true,
+                );
+                this.drawDiamond(
+                    2 * moduleSize,
+                    (moduleCount - 7 + 2) * moduleSize,
+                    context,
+                    moduleSize,
+                    moduleSize,
+                    true,
+                );
                 this.drawCircle(3.5 * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
                 this.drawCircle((moduleCount - 3.5) * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
                 this.drawCircle(3.5 * moduleSize, (moduleCount - 3.5) * moduleSize, context, moduleSize * 1.5);
@@ -942,31 +998,34 @@ export class Drawing {
         }
     }
 
-    private drawDiamond(startX: number, startY: number, context: CanvasRenderingContext2D, direction: string) {
-        const moduleSize = this.config.moduleSize;
-        switch (direction) {
-            case 'right': {
-                context.beginPath();
-                context.moveTo(1.5 * moduleSize + startX, startY);
-                context.lineTo(startX + 3 * moduleSize, startY);
-                context.lineTo(startX + 3 * moduleSize, startY + 1.5 * moduleSize);
-                context.lineTo(startX + 1.5 * moduleSize, startY + 3 * moduleSize);
-                context.lineTo(startX, startY + 3 * moduleSize);
-                context.lineTo(startX, startY + 1.5 * moduleSize);
-                context.fill();
-                break;
-            }
-            default: {
-                context.beginPath();
-                context.moveTo(startX, startY);
-                context.lineTo(startX + 1.5 * moduleSize, startY);
-                context.lineTo(startX + 3 * moduleSize, startY + 1.5 * moduleSize);
-                context.lineTo(startX + 3 * moduleSize, startY + 3 * moduleSize);
-                context.lineTo(startX + 1.5 * moduleSize, startY + 3 * moduleSize);
-                context.lineTo(startX, startY + 1.5 * moduleSize);
-                context.fill();
-                break;
-            }
+    private drawDiamond(
+        startX: number,
+        startY: number,
+        context: CanvasRenderingContext2D,
+        width: number,
+        height?: number,
+        isRight?: boolean,
+    ) {
+        const moduleSize = width;
+
+        if (isRight) {
+            context.beginPath();
+            context.moveTo(1.5 * moduleSize + startX, startY);
+            context.lineTo(startX + 3 * moduleSize, startY);
+            context.lineTo(startX + 3 * moduleSize, startY + 1.5 * moduleSize);
+            context.lineTo(startX + 1.5 * moduleSize, startY + 3 * moduleSize);
+            context.lineTo(startX, startY + 3 * moduleSize);
+            context.lineTo(startX, startY + 1.5 * moduleSize);
+            context.fill();
+        } else {
+            context.beginPath();
+            context.moveTo(startX, startY);
+            context.lineTo(startX + 1.5 * moduleSize, startY);
+            context.lineTo(startX + 3 * moduleSize, startY + 1.5 * moduleSize);
+            context.lineTo(startX + 3 * moduleSize, startY + 3 * moduleSize);
+            context.lineTo(startX + 1.5 * moduleSize, startY + 3 * moduleSize);
+            context.lineTo(startX, startY + 1.5 * moduleSize);
+            context.fill();
         }
     }
 
@@ -1045,8 +1104,8 @@ export class Drawing {
                     );
                     break;
                 case DataPattern.KITE:
-                    this.drawKite((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, false);
-                    this.drawKite(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize, false);
+                    this.drawKite((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize);
+                    this.drawKite(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize);
                     break;
                 default:
                     this.drawSquare((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, false);
@@ -1244,7 +1303,7 @@ export class Drawing {
                     this.drawCircle(x + w / 2, y + h / 2, canvas, h / 2);
                     break;
                 case DataPattern.KITE:
-                    this.drawKite(x, y, canvas, w, h, false);
+                    this.drawKite(x, y, canvas, w, h);
                     break;
                 default:
                     this.drawSquare(x, y, canvas, w, h, false);
