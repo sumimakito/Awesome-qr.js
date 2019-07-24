@@ -1,7 +1,7 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas, JPEGStream, PDFStream, PNGStream } from 'canvas';
 import { BCH, CanvasUtil, QRMath, Util } from './Common';
 import * as constants from './Constants';
-import { CanvasType, QRErrorCorrectLevel, QRMode, EyeBallShape, EyeFrameShape, DataPattern } from './Enums';
+import { CanvasType, QRErrorCorrectLevel, QRMode, EyeBallShape, EyeFrameShape, DataPattern, GradientType} from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { loadImage } from './Util';
 
@@ -501,6 +501,34 @@ export class Drawing {
         const mainCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
         const mainContext = mainCanvas.getContext('2d');
 
+        let gradient: CanvasGradient | string;
+
+        switch (this.config.gradientType) {
+            case GradientType.NONE:
+                gradient = this.config.colorDark;
+                break;
+            case GradientType.LINEAR:
+                gradient = mainContext.createLinearGradient(0, 0, this.config.moduleSize * this.moduleCount, 0);
+                gradient.addColorStop(0, this.config.colorDark);
+                gradient.addColorStop(1, this.config.colorLight);
+                break;
+            case GradientType.RADIAL:
+                gradient = mainContext.createRadialGradient(
+                    (this.config.moduleSize * this.moduleCount) / 2,
+                    (this.config.moduleSize * this.moduleCount) / 2,
+                    (this.config.moduleSize * this.moduleCount) / 8,
+                    (this.config.moduleSize * this.moduleCount) / 2,
+                    (this.config.moduleSize * this.moduleCount) / 2,
+                    (this.config.moduleSize * this.moduleCount) / 2,
+                );
+                gradient.addColorStop(0, this.config.colorLight);
+                gradient.addColorStop(1, this.config.colorDark);
+                break;
+            default:
+                gradient = this.config.colorDark;
+                break;
+        }
+
         // Leave room for margin
         mainContext.translate(this.config.margin, this.config.margin);
         mainContext.save();
@@ -510,7 +538,7 @@ export class Drawing {
 
         return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage)
             .then(() => {
-                return this.drawAlignPatterns(mainContext);
+                return this.drawAlignPatterns(mainContext, gradient);
             })
             .then(() => {
                 return this.drawPositionProtectors(mainContext);
@@ -519,7 +547,7 @@ export class Drawing {
                 return this.drawAlignProtectors(mainContext);
             })
             .then(() => {
-                return this.drawPositionPatterns(mainContext);
+                return this.drawPositionPatterns(mainContext, gradient);
             })
             .then(() => {
                 return this.fillMargin(mainContext);
@@ -1072,8 +1100,8 @@ export class Drawing {
         context.fill();
     }
 
-    private drawPositionPatterns(context: CanvasRenderingContext2D) {
-        context.fillStyle = this.config.colorDark;
+    private drawPositionPatterns(context: CanvasRenderingContext2D, gradient: CanvasGradient | string) {
+        context.fillStyle = gradient;
 
         const moduleSize = this.config.moduleSize;
         const moduleCount = this.moduleCount;
@@ -1132,11 +1160,10 @@ export class Drawing {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
                     context.fillStyle = 'rgba(0, 0, 0, .2)';
-                    // CanvasUtil.drawAlign(context, agnX, agnY, moduleSize, moduleSize);
                     this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 } else {
-                    context.fillStyle = this.config.colorDark;
-                    // CanvasUtil.drawAlign(context, agnX, agnY, moduleSize, moduleSize);
+                    // context.fillStyle = this.config.colorDark;
+                    context.fillStyle = gradient;
                     this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 }
             }
@@ -1239,7 +1266,7 @@ export class Drawing {
         context.fillRect(6 * size, 8 * size, size, (moduleCount - 8 - 8) * size);
     }
 
-    private drawAlignPatterns(context: CanvasRenderingContext2D) {
+    private drawAlignPatterns(context: CanvasRenderingContext2D, gradient: CanvasGradient | string) {
         const moduleCount = this.moduleCount;
         const xyOffset = (1 - this.config.dotScale) * 0.5;
 
@@ -1263,9 +1290,9 @@ export class Drawing {
                             col <= patternPosition[i] + 2);
                 }
 
-                context.strokeStyle = bIsDark ? this.config.colorDark : this.config.colorLight;
+                context.strokeStyle = bIsDark ? gradient : this.config.colorLight;
                 context.lineWidth = 0.5;
-                context.fillStyle = bIsDark ? this.config.colorDark : 'rgba(255, 255, 255, 0.6)';
+                context.fillStyle = bIsDark ? gradient : 'rgba(255, 255, 255, 0.6)';
 
                 const nLeft = col * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
                 const nTop = row * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
