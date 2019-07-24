@@ -1,5 +1,5 @@
 import 'mocha';
-import { CanvasType, EyeBallShape, EyeFrameShape, DataPattern } from '../Enums';
+import { CanvasType, EyeBallShape, EyeFrameShape, DataPattern, GradientType } from '../Enums';
 import { QRCodeBuilder } from '../index';
 
 describe('QR code tests', () => {
@@ -9,12 +9,15 @@ describe('QR code tests', () => {
             backgroundImage: 'https://image.flaticon.com/teams/slug/google.jpg',
             logoImage: __dirname + '/pokemon.png',
             canvasType: CanvasType.SVG,
-            eyeFrameShape: EyeFrameShape.ROUNDED,
+            eyeFrameShape: EyeFrameShape.LEFT_LEAF,
             eyeBallShape: EyeBallShape.RIGHT_DIAMOND,
-            eyeFrameColor: '#000000',
-            eyeBallColor: '#ad10aa',
-            dataPattern: DataPattern.CIRCLE,
-            colorDark: '#22aad4',
+            eyeFrameColor: '#287314',
+            eyeBallColor: '#73149c',
+            dataPattern: DataPattern.KITE,
+            colorDark: '#0b1257',
+            colorLight: '#999c14',
+            dotScale: 0.96,
+            gradientType: GradientType.RADIAL,
         });
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
             const fs = require('fs');

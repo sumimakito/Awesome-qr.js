@@ -1,7 +1,7 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas, JPEGStream, PDFStream, PNGStream } from 'canvas';
 import { BCH, CanvasUtil, QRMath, Util } from './Common';
 import * as constants from './Constants';
-import { CanvasType, QRErrorCorrectLevel, QRMode, EyeBallShape, EyeFrameShape, DataPattern, GradientType} from './Enums';
+import { CanvasType, QRErrorCorrectLevel, QRMode, EyeBallShape, EyeFrameShape, DataPattern, GradientType } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { loadImage } from './Util';
 
@@ -1115,6 +1115,7 @@ export class Drawing {
         this.drawEyeFrames(context, eyeFrameShape, eyeFrameColor);
         this.drawEyeBalls(context, eyeBallShape, eyeBallColor);
 
+        context.fillStyle = gradient;
         for (let i = 0; i < moduleCount - 15; i += 2) {
             switch (dataPattern) {
                 case DataPattern.CIRCLE:
@@ -1162,7 +1163,6 @@ export class Drawing {
                     context.fillStyle = 'rgba(0, 0, 0, .2)';
                     this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 } else {
-                    // context.fillStyle = this.config.colorDark;
                     context.fillStyle = gradient;
                     this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 }
