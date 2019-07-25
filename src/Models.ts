@@ -516,7 +516,7 @@ export class Drawing {
                 gradient = mainContext.createRadialGradient(
                     (this.config.moduleSize * this.moduleCount) / 2,
                     (this.config.moduleSize * this.moduleCount) / 2,
-                    (this.config.moduleSize * this.moduleCount) / 8,
+                    (this.config.moduleSize * this.moduleCount) / 6,
                     (this.config.moduleSize * this.moduleCount) / 2,
                     (this.config.moduleSize * this.moduleCount) / 2,
                     (this.config.moduleSize * this.moduleCount) / 2,
