@@ -27,6 +27,7 @@ export interface QRCodeConfig {
     eyeFrameColor?: string;
     dataPattern?: DataPattern;
     gradientType?: GradientType;
+    backgroundColor?: string;
 
     [key: string]: any;
 }
@@ -58,4 +59,5 @@ export interface QRDrawingConfig {
     eyeFrameColor?: string;
     dataPattern?: DataPattern;
     gradientType?: GradientType;
+    backgroundColor?: string;
 }

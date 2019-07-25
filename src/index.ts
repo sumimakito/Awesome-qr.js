@@ -139,6 +139,11 @@ export class QRCodeBuilder {
         return this;
     }
 
+    public setBackgroundColor(backgoundColor: string) {
+        this.config.backgroundColor = backgoundColor;
+        return this;
+    }
+
     public async build(format?: CanvasType): Promise<QRCode | never> {
         this.config.canvasType = format;
         if (!this.config.text) {

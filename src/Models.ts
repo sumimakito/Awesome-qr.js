@@ -536,7 +536,7 @@ export class Drawing {
         const backgroundCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
         const backgroundContext = backgroundCanvas.getContext('2d');
 
-        return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage)
+        return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage, this.config.backgroundColor)
             .then(() => {
                 return this.drawAlignPatterns(mainContext, gradient);
             })
@@ -1367,10 +1367,10 @@ export class Drawing {
         }
     }
 
-    private async addBackground(context: CanvasRenderingContext2D, size: number, backgroundImage?: string) {
+    private async addBackground(context: CanvasRenderingContext2D, size: number, backgroundImage?: string, backgroundColor?: string) {
         if (!backgroundImage) {
             context.rect(0, 0, size, size);
-            context.fillStyle = '#ffffff';
+            context.fillStyle = backgroundColor ? backgroundColor : '#ffffff';
             context.fill();
             return;
         }
