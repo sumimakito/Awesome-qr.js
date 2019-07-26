@@ -575,22 +575,70 @@ export class Drawing {
         if (!frameStyle || frameStyle === QRCodeFrame.NONE) return canvas;
         
         const color = frameColor ? frameColor : '#000000';
-        const size = 1.06 * this.config.rawSize;
+        const moduleSize = this.config.moduleSize;
+        const rawSize = this.config.rawSize;
+        const size = rawSize + moduleSize * 2;
         const text = frameText ? frameText : "";
+        let canvasWidth: number = size, canvasHeight: number = 0, borderX: number = 0, borderY: number = 0, padX: number = 0, padY: number = 0, padHeight: number = 0, spaceX: number=0, spaceY: number=0, textX: number = 0, textY: number = 0, qrX: number = 0, qrY: number = 0;
 
-        const finalCanvas = createCanvas(size, size*1.25, this.canvasType);
+        switch (frameStyle) {
+            case QRCodeFrame.BOX:
+                canvasHeight = 1.25 * size;
+                borderX = 0;
+                borderY = 0;
+                padX = 0;
+                padY = size -1;
+                padHeight = 0;
+                spaceX = moduleSize;
+                spaceY = moduleSize;
+                textX = size / 2;
+                textY = size * 1.13;
+                qrX = moduleSize;
+                qrY = moduleSize;
+                break;
+            case QRCodeFrame.BANNER_TOP:
+                canvasHeight = 1.25 * size;
+                borderX = 0;
+                borderY = size / 4;
+                padX = 0;
+                padY = 1;
+                padHeight = size / 4;
+                spaceX = moduleSize;
+                spaceY = borderY + moduleSize;
+                textX = size / 2;
+                textY = size / 6;
+                qrX = moduleSize;
+                qrY = borderY + moduleSize;
+                break;
+            case QRCodeFrame.BANNER_BOTTOM:
+                canvasHeight = 1.25 * size;
+                borderX = 0;
+                borderY = 0;
+                padX = 0;
+                padY = size - 1;
+                padHeight = size / 4;
+                spaceX = moduleSize;
+                spaceY = moduleSize;
+                textX = size / 2;
+                textY = size * 1.13;
+                qrX = moduleSize;
+                qrY = moduleSize;
+                break;
+            default:
+                return canvas;
+        }
+        const finalCanvas: Canvas = createCanvas(canvasWidth, canvasHeight, this.canvasType);
         const finalContext = finalCanvas.getContext('2d');
         finalContext.fillStyle = color;
-        finalContext.fillRect(0, 0, size, size);
-        finalContext.fillRect(0, size, size, size / 4);
+        finalContext.fillRect(borderX, borderY, size, size);
+        finalContext.fillRect(padX, padY, size, padHeight);
+        finalContext.fillStyle = '#ffffff';
+        finalContext.fillRect(spaceX, spaceY, size - moduleSize * 2, size - moduleSize * 2);
+        if (frameStyle === QRCodeFrame.BOX) finalContext.fillStyle = '#000000';
         finalContext.textAlign = 'center';
         finalContext.font = "90px arial";
-        finalContext.fillStyle = '#ffffff';
-        finalContext.fillText(text, size / 2, size * 1.13);
-        finalContext.fillStyle = '#ffffff';
-        finalContext.fillRect(10, 10, size - 20, size - 20);
-        // finalContext.clearRect(10, 10, size - 20, size - 20);
-        finalContext.drawImage(canvas, 20, 20, this.config.rawSize, this.config.rawSize);
+        finalContext.fillText(text, textX, textY);
+        finalContext.drawImage(canvas, qrX, qrY, rawSize, rawSize);
         return finalCanvas;
     }
 
