@@ -1,7 +1,7 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas, JPEGStream, PDFStream, PNGStream } from 'canvas';
 import { BCH, CanvasUtil, QRMath, Util } from './Common';
 import * as constants from './Constants';
-import { CanvasType, QRErrorCorrectLevel, QRMode, EyeBallShape, EyeFrameShape, DataPattern, GradientType } from './Enums';
+import { CanvasType, QRErrorCorrectLevel, QRMode, EyeBallShape, EyeFrameShape, DataPattern, GradientType, QRCodeFrame } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { loadImage } from './Util';
 
@@ -562,11 +562,36 @@ export class Drawing {
                 backgroundContext.drawImage(mainCanvas, 0, 0, size, size);
                 mainContext.drawImage(backgroundCanvas, -margin, -margin, size, size);
                 return this.scaleFinalImage(mainCanvas);
+            }).then((canvas: Canvas) => {
+                return this.drawFrame(canvas, this.config.frameStyle, this.config.frameColor, this.config.frameText);
             })
             .then((canvas: Canvas) => {
                 this.isPainted = true;
                 return canvas;
             });
+    }
+
+    private async drawFrame(canvas: Canvas, frameStyle: QRCodeFrame | undefined, frameColor: string | undefined, frameText: string | undefined): Promise<Canvas> {
+        if (!frameStyle || frameStyle === QRCodeFrame.NONE) return canvas;
+        
+        const color = frameColor ? frameColor : '#000000';
+        const size = 1.06 * this.config.rawSize;
+        const text = frameText ? frameText : "";
+
+        const finalCanvas = createCanvas(size, size*1.25, this.canvasType);
+        const finalContext = finalCanvas.getContext('2d');
+        finalContext.fillStyle = color;
+        finalContext.fillRect(0, 0, size, size);
+        finalContext.fillRect(0, size, size, size / 4);
+        finalContext.textAlign = 'center';
+        finalContext.font = "90px arial";
+        finalContext.fillStyle = '#ffffff';
+        finalContext.fillText(text, size / 2, size * 1.13);
+        finalContext.fillStyle = '#ffffff';
+        finalContext.fillRect(10, 10, size - 20, size - 20);
+        // finalContext.clearRect(10, 10, size - 20, size - 20);
+        finalContext.drawImage(canvas, 20, 20, this.config.rawSize, this.config.rawSize);
+        return finalCanvas;
     }
 
     private async scaleFinalImage(canvas: Canvas): Promise<Canvas> {
@@ -651,7 +676,7 @@ export class Drawing {
         const viewportSize = this.config.viewportSize;
 
         if (this.config.whiteMargin) {
-            context.fillStyle = '#FFFFFF';
+            context.fillStyle = '#ffffff';
             context.fillRect(-margin, -margin, size, margin);
             context.fillRect(-margin, viewportSize, size, margin);
             context.fillRect(viewportSize, -margin, margin, size);

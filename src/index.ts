@@ -1,4 +1,4 @@
-import { CanvasType, QRErrorCorrectLevel, EyeBallShape, EyeFrameShape, DataPattern, GradientType } from './Enums';
+import { CanvasType, QRErrorCorrectLevel, EyeBallShape, EyeFrameShape, DataPattern, GradientType, QRCodeFrame } from './Enums';
 import { QRCode } from './Models';
 import { QRCodeConfig } from './Types';
 
@@ -141,6 +141,21 @@ export class QRCodeBuilder {
 
     public setBackgroundColor(backgoundColor: string) {
         this.config.backgroundColor = backgoundColor;
+        return this;
+    }
+
+    public setFrameStyle(frameStyle: QRCodeFrame) {
+        this.config.frameStyle = frameStyle;
+        return this;
+    }
+
+    public setFrameColor(frameColor: string) {
+        this.config.frameColor = frameColor;
+        return this;
+    }
+
+    public setFrameText(frameText: string) {
+        this.config.frameText = frameText;
         return this;
     }
 
