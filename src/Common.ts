@@ -16,7 +16,7 @@ export const BCH = {
     typeInfo(data: number) {
         let d = data << 10;
         while (this.digit(d) - this.digit(constants.G15) >= 0) {
-            d ^= (constants.G15 << (this.digit(d) - this.digit(constants.G15)));
+            d ^= constants.G15 << (this.digit(d) - this.digit(constants.G15));
         }
         return ((data << 10) | d) ^ constants.G15_MASK;
     },
@@ -24,7 +24,7 @@ export const BCH = {
     typeNumber(data: number) {
         let d = data << 12;
         while (this.digit(d) - this.digit(constants.G18) >= 0) {
-            d ^= (constants.G18 << (this.digit(d) - this.digit(constants.G18)));
+            d ^= constants.G18 << (this.digit(d) - this.digit(constants.G18));
         }
         return (data << 12) | d;
     },
@@ -40,7 +40,8 @@ class _QRMath {
             this.EXP_TABLE[i] = 1 << i;
         }
         for (i = 8; i < 256; i++) {
-            this.EXP_TABLE[i] = this.EXP_TABLE[i - 4] ^ this.EXP_TABLE[i - 5] ^ this.EXP_TABLE[i - 6] ^ this.EXP_TABLE[i - 8];
+            this.EXP_TABLE[i] =
+                this.EXP_TABLE[i - 4] ^ this.EXP_TABLE[i - 5] ^ this.EXP_TABLE[i - 6] ^ this.EXP_TABLE[i - 8];
         }
         for (i = 0; i < 255; i++) {
             this.LOG_TABLE[this.EXP_TABLE[i]] = i;
@@ -77,13 +78,17 @@ export const CanvasUtil = {
             },
             canvas = createCanvas(size, size),
             context = canvas.getContext('2d'),
-
             rgb = {
                 r: 0,
                 g: 0,
                 b: 0,
             };
-        let i = -4, count = 0, data, width, height, length;
+        let i = -4,
+            count = 0,
+            data,
+            width,
+            height,
+            length;
         if (!context) {
             return defaultRGB;
         }
@@ -127,7 +132,13 @@ export const CanvasUtil = {
         ctx.closePath();
     },
 
-    drawAlignProtector(context: CanvasRenderingContext2D, centerX: number, centerY: number, nWidth: number, nHeight: number) {
+    drawAlignProtector(
+        context: CanvasRenderingContext2D,
+        centerX: number,
+        centerY: number,
+        nWidth: number,
+        nHeight: number,
+    ) {
         context.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
         context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
     },
@@ -159,11 +170,11 @@ export const Util = {
             case QRMaskPattern.PATTERN100:
                 return (Math.floor(i / 2) + Math.floor(j / 3)) % 2 === 0;
             case QRMaskPattern.PATTERN101:
-                return (i * j) % 2 + (i * j) % 3 === 0;
+                return ((i * j) % 2) + ((i * j) % 3) === 0;
             case QRMaskPattern.PATTERN110:
-                return ((i * j) % 2 + (i * j) % 3) % 2 === 0;
+                return (((i * j) % 2) + ((i * j) % 3)) % 2 === 0;
             case QRMaskPattern.PATTERN111:
-                return ((i * j) % 3 + (i + j) % 2) % 2 === 0;
+                return (((i * j) % 3) + ((i + j) % 2)) % 2 === 0;
             default:
                 throw new Error('bad maskPattern:' + maskPattern);
         }
@@ -248,7 +259,7 @@ export const Util = {
                     }
                 }
                 if (sameCount > 5) {
-                    lostPoint += (3 + sameCount - 5);
+                    lostPoint += 3 + sameCount - 5;
                 }
             }
         }
@@ -274,14 +285,30 @@ export const Util = {
         }
         for (row = 0; row < moduleCount; row++) {
             for (col = 0; col < moduleCount - 6; col++) {
-                if (qrCode.isDark(row, col) && !qrCode.isDark(row, col + 1) && qrCode.isDark(row, col + 2) && qrCode.isDark(row, col + 3) && qrCode.isDark(row, col + 4) && !qrCode.isDark(row, col + 5) && qrCode.isDark(row, col + 6)) {
+                if (
+                    qrCode.isDark(row, col) &&
+                    !qrCode.isDark(row, col + 1) &&
+                    qrCode.isDark(row, col + 2) &&
+                    qrCode.isDark(row, col + 3) &&
+                    qrCode.isDark(row, col + 4) &&
+                    !qrCode.isDark(row, col + 5) &&
+                    qrCode.isDark(row, col + 6)
+                ) {
                     lostPoint += 40;
                 }
             }
         }
         for (col = 0; col < moduleCount; col++) {
             for (row = 0; row < moduleCount - 6; row++) {
-                if (qrCode.isDark(row, col) && !qrCode.isDark(row + 1, col) && qrCode.isDark(row + 2, col) && qrCode.isDark(row + 3, col) && qrCode.isDark(row + 4, col) && !qrCode.isDark(row + 5, col) && qrCode.isDark(row + 6, col)) {
+                if (
+                    qrCode.isDark(row, col) &&
+                    !qrCode.isDark(row + 1, col) &&
+                    qrCode.isDark(row + 2, col) &&
+                    qrCode.isDark(row + 3, col) &&
+                    qrCode.isDark(row + 4, col) &&
+                    !qrCode.isDark(row + 5, col) &&
+                    qrCode.isDark(row + 6, col)
+                ) {
                     lostPoint += 40;
                 }
             }
@@ -294,7 +321,7 @@ export const Util = {
                 }
             }
         }
-        const ratio = Math.abs(100 * darkCount / moduleCount / moduleCount - 50) / 5;
+        const ratio = Math.abs((100 * darkCount) / moduleCount / moduleCount - 50) / 5;
         lostPoint += ratio * 10;
         return lostPoint;
     },

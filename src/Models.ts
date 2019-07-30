@@ -1,7 +1,7 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas, JPEGStream, PDFStream, PNGStream } from 'canvas';
 import { BCH, CanvasUtil, QRMath, Util } from './Common';
 import * as constants from './Constants';
-import { CanvasType, QRErrorCorrectLevel, QRMode } from './Enums';
+import { CanvasType, QRErrorCorrectLevel, QRMode, EyeBallShape, EyeFrameShape, DataPattern, GradientType, QRCodeFrame } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { loadImage } from './Util';
 
@@ -55,7 +55,7 @@ export class QRPolynomial {
 }
 
 export class QRCode {
-    public static PAD0 = 0xEC;
+    public static PAD0 = 0xec;
     public static PAD1 = 0x11;
 
     public static createData(typeNumber: number, errorCorrectLevel: number, dataList: any[]) {
@@ -118,7 +118,7 @@ export class QRCode {
             ecdata[r] = new Array(rsPoly.getLength() - 1);
             for (i = 0; i < ecdata[r].length; i++) {
                 const modIndex = i + modPoly.getLength() - ecdata[r].length;
-                ecdata[r][i] = (modIndex >= 0) ? modPoly.get(modIndex) : 0;
+                ecdata[r][i] = modIndex >= 0 ? modPoly.get(modIndex) : 0;
             }
         }
         let totalCodeCount = 0;
@@ -194,7 +194,6 @@ export class QRCode {
         return drawing;
     }
 
-
     public createStream(config?: object): PNGStream | JPEGStream | PDFStream {
         switch (this.config.canvasType) {
             case CanvasType.PDF:
@@ -218,7 +217,6 @@ export class QRCode {
                 throw { error: `Cannot convert to dataURL for ${this.config.canvasType}` };
         }
     }
-
 
     public isDark(row: number, col: number) {
         if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
@@ -288,8 +286,7 @@ export class QRCode {
                 if (col + c <= -1 || this.moduleCount <= col + c) {
                     continue;
                 }
-                if ((0 <= r && r <= 6 && (c === 0 || c === 6)) || (0 <= c && c <= 6 && (r === 0 || r === 6)) ||
-                    (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
+                if ((0 <= r && r <= 6 && (c === 0 || c === 6)) || (0 <= c && c <= 6 && (r === 0 || r === 6)) || (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
                     this.modules[row + r][col + c] = !0;
                 } else {
                     this.modules[row + r][col + c] = !1;
@@ -317,13 +314,13 @@ export class QRCode {
             if (this.modules[r][6] != null) {
                 continue;
             }
-            this.modules[r][6] = (r % 2 === 0);
+            this.modules[r][6] = r % 2 === 0;
         }
         for (let c = 8; c < this.moduleCount - 8; c++) {
             if (this.modules[6][c] != null) {
                 continue;
             }
-            this.modules[6][c] = (c % 2 === 0);
+            this.modules[6][c] = c % 2 === 0;
         }
     }
 
@@ -354,12 +351,12 @@ export class QRCode {
         let mod;
         const bits = BCH.typeNumber(this.typeNumber);
         for (i = 0; i < 18; i++) {
-            mod = (!test && ((bits >> i) & 1) === 1);
-            this.modules[Math.floor(i / 3)][i % 3 + this.moduleCount - 8 - 3] = mod;
+            mod = !test && ((bits >> i) & 1) === 1;
+            this.modules[Math.floor(i / 3)][(i % 3) + this.moduleCount - 8 - 3] = mod;
         }
         for (i = 0; i < 18; i++) {
-            mod = (!test && ((bits >> i) & 1) === 1);
-            this.modules[i % 3 + this.moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
+            mod = !test && ((bits >> i) & 1) === 1;
+            this.modules[(i % 3) + this.moduleCount - 8 - 3][Math.floor(i / 3)] = mod;
         }
     }
 
@@ -369,7 +366,7 @@ export class QRCode {
         const data = (this.errorCorrectLevel << 3) | maskPattern;
         const bits = BCH.typeInfo(data);
         for (i = 0; i < 15; i++) {
-            mod = (!test && ((bits >> i) & 1) === 1);
+            mod = !test && ((bits >> i) & 1) === 1;
             if (i < 6) {
                 this.modules[i][8] = mod;
             } else if (i < 8) {
@@ -379,7 +376,7 @@ export class QRCode {
             }
         }
         for (i = 0; i < 15; i++) {
-            mod = (!test && ((bits >> i) & 1) === 1);
+            mod = !test && ((bits >> i) & 1) === 1;
             if (i < 8) {
                 this.modules[8][this.moduleCount - i - 1] = mod;
             } else if (i < 9) {
@@ -388,7 +385,7 @@ export class QRCode {
                 this.modules[8][15 - i - 1] = mod;
             }
         }
-        this.modules[this.moduleCount - 8][8] = (!test);
+        this.modules[this.moduleCount - 8][8] = !test;
     }
 
     private mapData(data: any[], maskPattern: number) {
@@ -405,7 +402,7 @@ export class QRCode {
                     if (this.modules[row][col - c] == null) {
                         let dark = !1;
                         if (byteIndex < data.length) {
-                            dark = (((data[byteIndex] >>> bitIndex) & 1) === 1);
+                            dark = ((data[byteIndex] >>> bitIndex) & 1) === 1;
                         }
                         const mask = Util.hasMask(maskPattern, row, col - c);
                         if (mask) {
@@ -428,11 +425,9 @@ export class QRCode {
             }
         }
     }
-
 }
 
 export class Drawing {
-
     private static generateDrawingConfig(config: QRCodeConfig, qrModuleCount: number): QRDrawingConfig {
         const dotScale = config.dotScale;
 
@@ -496,6 +491,34 @@ export class Drawing {
         const mainCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
         const mainContext = mainCanvas.getContext('2d');
 
+        let gradient: CanvasGradient | string;
+
+        switch (this.config.gradientType) {
+            case GradientType.NONE:
+                gradient = this.config.colorDark;
+                break;
+            case GradientType.LINEAR:
+                gradient = mainContext.createLinearGradient(0, 0, this.config.moduleSize * this.moduleCount, 0);
+                gradient.addColorStop(0, this.config.colorDark);
+                gradient.addColorStop(1, this.config.colorLight);
+                break;
+            case GradientType.RADIAL:
+                gradient = mainContext.createRadialGradient(
+                    (this.config.moduleSize * this.moduleCount) / 2,
+                    (this.config.moduleSize * this.moduleCount) / 2,
+                    (this.config.moduleSize * this.moduleCount) / 6,
+                    (this.config.moduleSize * this.moduleCount) / 2,
+                    (this.config.moduleSize * this.moduleCount) / 2,
+                    (this.config.moduleSize * this.moduleCount) / 2,
+                );
+                gradient.addColorStop(0, this.config.colorLight);
+                gradient.addColorStop(1, this.config.colorDark);
+                break;
+            default:
+                gradient = this.config.colorDark;
+                break;
+        }
+
         // Leave room for margin
         mainContext.translate(this.config.margin, this.config.margin);
         mainContext.save();
@@ -503,29 +526,169 @@ export class Drawing {
         const backgroundCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
         const backgroundContext = backgroundCanvas.getContext('2d');
 
-        return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage).then(() => {
-            return this.drawAlignPatterns(mainContext);
-        }).then(() => {
-            return this.drawPositionProtectors(mainContext);
-        }).then(() => {
-            return this.drawAlignProtectors(mainContext);
-        }).then(() => {
-            return this.drawPositionPatterns(mainContext);
-        }).then(() => {
-            return this.fillMargin(mainContext);
-        }).then(() => {
-            return this.drawLogoImage(mainContext);
-        }).then(() => {
-            // Swap and merge the foreground and the background
-            const size = this.config.size;
-            const margin = this.config.margin;
-            backgroundContext.drawImage(mainCanvas, 0, 0, size, size);
-            mainContext.drawImage(backgroundCanvas, -margin, -margin, size, size);
-            return this.scaleFinalImage(mainCanvas);
-        }).then((canvas: Canvas) => {
-            this.isPainted = true;
-            return canvas;
-        });
+        return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage, this.config.backgroundColor)
+            .then(() => {
+                return this.drawAlignPatterns(mainContext, gradient);
+            })
+            .then(() => {
+                return this.drawPositionProtectors(mainContext);
+            })
+            .then(() => {
+                return this.drawAlignProtectors(mainContext);
+            })
+            .then(() => {
+                return this.drawPositionPatterns(mainContext, gradient);
+            })
+            .then(() => {
+                return this.fillMargin(mainContext);
+            })
+            .then(() => {
+                return this.drawLogoImage(mainContext);
+            })
+            .then(() => {
+                // Swap and merge the foreground and the background
+                const size = this.config.size;
+                const margin = this.config.margin;
+                backgroundContext.drawImage(mainCanvas, 0, 0, size, size);
+                mainContext.drawImage(backgroundCanvas, -margin, -margin, size, size);
+                return this.scaleFinalImage(mainCanvas);
+            })
+            .then((canvas: Canvas) => {
+                return this.drawFrame(canvas, this.config.frameStyle, this.config.frameColor, this.config.frameText);
+            })
+            .then((canvas: Canvas) => {
+                this.isPainted = true;
+                return canvas;
+            });
+    }
+
+    private async drawFrame(canvas: Canvas, frameStyle: QRCodeFrame | undefined, frameColor: string | undefined, frameText: string | undefined): Promise<Canvas> {
+        if (!frameStyle || frameStyle === QRCodeFrame.NONE) return canvas;
+
+        const color = frameColor ? frameColor : '#000000';
+        const moduleSize = this.config.moduleSize;
+        const rawSize = this.config.rawSize;
+        const size = rawSize + moduleSize * 2;
+        const text = frameText ? frameText : '';
+        let canvasWidth: number = size,
+            canvasHeight: number = 0,
+            borderX: number = 0,
+            borderY: number = 0,
+            padX: number = 0,
+            padY: number = 0,
+            padHeight: number = 0,
+            spaceX: number = 0,
+            spaceY: number = 0,
+            textX: number = 0,
+            textY: number = 0,
+            qrX: number = 0,
+            qrY: number = 0;
+
+        switch (frameStyle) {
+            case QRCodeFrame.BOX:
+                canvasHeight = 1.25 * size;
+                borderX = 0;
+                borderY = 0;
+                padX = 0;
+                padY = size - 1;
+                padHeight = 0;
+                spaceX = moduleSize;
+                spaceY = moduleSize;
+                textX = size / 2;
+                textY = size * 1.13;
+                qrX = moduleSize;
+                qrY = moduleSize;
+                break;
+            case QRCodeFrame.BANNER_TOP:
+                canvasHeight = 1.25 * size;
+                borderX = 0;
+                borderY = size / 4;
+                padX = 0;
+                padY = 1;
+                padHeight = size / 4;
+                spaceX = moduleSize;
+                spaceY = borderY + moduleSize;
+                textX = size / 2;
+                textY = size / 6;
+                qrX = moduleSize;
+                qrY = borderY + moduleSize;
+                break;
+            case QRCodeFrame.BALLOON_TOP:
+                canvasHeight = 1.25 * size;
+                borderX = 0;
+                borderY = size / 4;
+                padX = 0;
+                padY = 1;
+                padHeight = size / 4;
+                spaceX = moduleSize;
+                spaceY = borderY + moduleSize;
+                textX = size / 2;
+                textY = size / 6;
+                qrX = moduleSize;
+                qrY = borderY + moduleSize;
+                break;
+
+            case QRCodeFrame.BANNER_BOTTOM:
+                canvasHeight = 1.25 * size;
+                borderX = 0;
+                borderY = 0;
+                padX = 0;
+                padY = size - 1;
+                padHeight = size / 4;
+                spaceX = moduleSize;
+                spaceY = moduleSize;
+                textX = size / 2;
+                textY = size * 1.13;
+                qrX = moduleSize;
+                qrY = moduleSize;
+                break;
+            case QRCodeFrame.BALLOON_BOTTOM:
+                canvasHeight = 1.25 * size;
+                borderX = 0;
+                borderY = 0;
+                padX = 0;
+                padY = size - 1;
+                padHeight = size / 4;
+                spaceX = moduleSize;
+                spaceY = moduleSize;
+                textX = size / 2;
+                textY = size * 1.13;
+                qrX = moduleSize;
+                qrY = moduleSize;
+                break;
+            default:
+                return canvas;
+        }
+        const finalCanvas: Canvas = createCanvas(canvasWidth, canvasHeight, this.canvasType);
+        const finalContext = finalCanvas.getContext('2d');
+        finalContext.fillStyle = color;
+        if (frameStyle === QRCodeFrame.BALLOON_BOTTOM || frameStyle === QRCodeFrame.BALLOON_TOP)
+            finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+        finalContext.fillRect(borderX, borderY, size, size);
+        finalContext.fillStyle = color;
+        finalContext.fillRect(padX, padY, size, padHeight);
+        finalContext.fillStyle = '#ffffff';
+        finalContext.fillRect(spaceX, spaceY, size - moduleSize * 2, size - moduleSize * 2);
+        if (frameStyle === QRCodeFrame.BOX) finalContext.fillStyle = '#000000';
+        finalContext.textAlign = 'center';
+        finalContext.font = '90px arial';
+        finalContext.fillText(text, textX, textY);
+        finalContext.drawImage(canvas, qrX, qrY, rawSize, rawSize);
+        finalContext.fillStyle = frameColor ? frameColor : '#000000';
+        if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
+            finalContext.moveTo(borderX + size / 2, borderY + size);
+            finalContext.lineTo(borderX + size / 2 + moduleSize * 2, borderY + size);
+            finalContext.lineTo(borderX + size / 2, borderY + size - moduleSize * 2.5);
+            finalContext.lineTo(borderX + size / 2 - moduleSize * 2, borderY + size);
+        }
+        if (frameStyle === QRCodeFrame.BALLOON_TOP) {
+            finalContext.moveTo(borderX + size / 2, borderY);
+            finalContext.lineTo(borderX + size / 2 + moduleSize * 2, borderY);
+            finalContext.lineTo(borderX + size / 2, borderY + moduleSize * 2.5);
+            finalContext.lineTo(borderX + size / 2 - moduleSize * 2, borderY);
+        }
+        finalContext.fill();
+        return finalCanvas;
     }
 
     private async scaleFinalImage(canvas: Canvas): Promise<Canvas> {
@@ -596,7 +759,7 @@ export class Drawing {
         const viewportSize = this.config.viewportSize;
 
         if (this.config.whiteMargin) {
-            context.fillStyle = '#FFFFFF';
+            context.fillStyle = '#ffffff';
             context.fillRect(-margin, -margin, size, margin);
             context.fillRect(-margin, viewportSize, size, margin);
             context.fillRect(viewportSize, -margin, margin, size);
@@ -604,31 +767,296 @@ export class Drawing {
         }
     }
 
-    private drawPositionPatterns(context: CanvasRenderingContext2D) {
-        context.fillStyle = this.config.colorDark;
+    private drawEyeFrames(context: CanvasRenderingContext2D, shape: EyeFrameShape, color: string) {
+        const moduleSize = this.config.moduleSize;
+        const moduleCount = this.moduleCount;
+        switch (shape) {
+            case EyeFrameShape.CIRCLE: {
+                context.fillStyle = color;
+                this.drawCircularFrame(3.5 * moduleSize, 3.5 * moduleSize, context);
+                this.drawCircularFrame((moduleCount - 3.5) * moduleSize, 3.5 * moduleSize, context);
+                this.drawCircularFrame(3.5 * moduleSize, (moduleCount - 3.5) * moduleSize, context);
+
+                context.fillStyle = this.config.colorDark;
+                break;
+            }
+            case EyeFrameShape.ROUNDED: {
+                context.fillStyle = color;
+                context.strokeStyle = color;
+                const cornerRadius = moduleSize * 2;
+                context.lineJoin = 'round';
+                context.lineWidth = cornerRadius;
+
+                this.drawSquareFrame(0 + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, true);
+                this.drawSquareFrame((moduleCount - 7) * moduleSize + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, true);
+                this.drawSquareFrame(0 + cornerRadius / 4, (moduleCount - 7) * moduleSize + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, true);
+                context.fillStyle = this.config.colorDark;
+                context.strokeStyle = this.config.colorDark;
+                break;
+            }
+            case EyeFrameShape.LEFT_LEAF: {
+                context.fillStyle = color;
+                context.strokeStyle = color;
+                const cornerRadius = moduleSize * 2;
+                context.lineJoin = 'round';
+                context.lineWidth = cornerRadius;
+
+                this.drawLeafFrame(0 + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'left');
+                this.drawLeafFrame((moduleCount - 7) * moduleSize + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'left');
+                this.drawLeafFrame(0 + cornerRadius / 4, (moduleCount - 7) * moduleSize + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'left');
+                context.fillStyle = this.config.colorDark;
+                context.strokeStyle = this.config.colorDark;
+                break;
+            }
+            case EyeFrameShape.RIGHT_LEAF: {
+                context.fillStyle = color;
+                context.strokeStyle = color;
+                const cornerRadius = moduleSize * 2;
+                context.lineJoin = 'round';
+                context.lineWidth = cornerRadius;
+
+                this.drawLeafFrame(0 + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'right');
+                this.drawLeafFrame((moduleCount - 7) * moduleSize + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'right');
+                this.drawLeafFrame(0 + cornerRadius / 4, (moduleCount - 7) * moduleSize + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'right');
+                context.fillStyle = this.config.colorDark;
+                context.strokeStyle = this.config.colorDark;
+                break;
+            }
+            default: {
+                context.fillStyle = color;
+                this.drawSquareFrame(0, 0, context, 7 * moduleSize, false);
+                this.drawSquareFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, false);
+                this.drawSquareFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, false);
+                context.fillStyle = this.config.colorDark;
+                break;
+            }
+        }
+    }
+
+    private drawLeafFrame(startX: number, startY: number, context: CanvasRenderingContext2D, dimension: number, direction: string) {
+        const moduleSize = this.config.moduleSize;
+        const r = startX + dimension;
+        const b = startY + dimension;
+        const radius = moduleSize * 2;
+        context.beginPath();
+        context.lineWidth = moduleSize;
+        switch (direction) {
+            case 'right': {
+                context.moveTo(startX + radius, startY);
+                context.lineTo(r, startY);
+                context.lineTo(r, startY + dimension - radius);
+                context.quadraticCurveTo(r, b, r - radius, b);
+                context.lineTo(startX, b);
+                context.lineTo(startX, startY + radius);
+                context.quadraticCurveTo(startX, startY, startX + radius, startY);
+                context.stroke();
+                break;
+            }
+            case 'left': {
+                context.moveTo(startX, startY);
+                context.lineTo(r - radius, startY);
+                context.quadraticCurveTo(r, startY, r, startY + radius);
+                context.lineTo(r, startY + dimension);
+                context.lineTo(startX + radius, b);
+                context.quadraticCurveTo(startX, b, startX, b - radius);
+                context.lineTo(startX, startY - radius / 4);
+                context.stroke();
+            }
+        }
+    }
+
+    private drawSquareFrame(startX: number, startY: number, context: CanvasRenderingContext2D, dimension: number, isRound: boolean) {
+        const moduleSize = this.config.moduleSize;
+        if (isRound) {
+            const r = startX + dimension;
+            const b = startY + dimension;
+            const radius = moduleSize * 2;
+            context.beginPath();
+            context.lineWidth = moduleSize;
+            context.moveTo(startX + radius, startY);
+            context.lineTo(r - radius, startY);
+            context.quadraticCurveTo(r, startY, r, startY + radius);
+            context.lineTo(r, startY + dimension - radius);
+            context.quadraticCurveTo(r, b, r - radius, b);
+            context.lineTo(startX + radius, b);
+            context.quadraticCurveTo(startX, b, startX, b - radius);
+            context.lineTo(startX, startY + radius);
+            context.quadraticCurveTo(startX, startY, startX + radius, startY);
+            context.stroke();
+        } else {
+            context.fillRect(startX, startY, dimension, dimension);
+            context.clearRect(startX + 1 * moduleSize, startY + 1 * moduleSize, dimension - 2 * moduleSize, dimension - 2 * moduleSize);
+        }
+    }
+
+    private drawCircularFrame(centerX: number, centerY: number, context: CanvasRenderingContext2D) {
+        const moduleSize = this.config.moduleSize;
+        context.beginPath();
+        context.arc(centerX, centerY, moduleSize * 3.5, 0, Math.PI * 2, true);
+        context.arc(centerX, centerY, moduleSize * 2.5, 0, Math.PI * 2, true);
+        context.fill('evenodd');
+    }
+
+    private drawEyeBalls(context: CanvasRenderingContext2D, shape: EyeBallShape, color: string) {
+        const moduleSize = this.config.moduleSize;
+        const moduleCount = this.moduleCount;
+        switch (shape) {
+            case EyeBallShape.LEFT_DIAMOND: {
+                context.fillStyle = color;
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                context.fillStyle = this.config.colorDark;
+                break;
+            }
+            case EyeBallShape.RIGHT_DIAMOND: {
+                context.fillStyle = color;
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
+                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
+                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
+                context.fillStyle = this.config.colorDark;
+                break;
+            }
+            case EyeBallShape.CIRCLE: {
+                context.fillStyle = color;
+                this.drawCircle(3.5 * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
+                this.drawCircle((moduleCount - 3.5) * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
+                this.drawCircle(3.5 * moduleSize, (moduleCount - 3.5) * moduleSize, context, moduleSize * 1.5);
+                context.fillStyle = this.config.colorDark;
+                break;
+            }
+            case EyeBallShape.LEFT_LEAF: {
+                context.fillStyle = color;
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                this.drawCircle(3.5 * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
+                this.drawCircle((moduleCount - 3.5) * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
+                this.drawCircle(3.5 * moduleSize, (moduleCount - 3.5) * moduleSize, context, moduleSize * 1.5);
+                context.fillStyle = this.config.colorDark;
+                break;
+            }
+            case EyeBallShape.RIGHT_LEAF: {
+                context.fillStyle = color;
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
+                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
+                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
+                this.drawCircle(3.5 * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
+                this.drawCircle((moduleCount - 3.5) * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
+                this.drawCircle(3.5 * moduleSize, (moduleCount - 3.5) * moduleSize, context, moduleSize * 1.5);
+                context.fillStyle = this.config.colorDark;
+                break;
+            }
+            case EyeBallShape.ROUNDED: {
+                context.fillStyle = color;
+                context.strokeStyle = color;
+                const cornerRadius = moduleSize * 2;
+                context.lineJoin = 'round';
+                context.lineWidth = cornerRadius;
+
+                this.drawSquare(2 * moduleSize + cornerRadius / 2, 2 * moduleSize + cornerRadius / 2, context, 3 * moduleSize - cornerRadius, 3 * moduleSize - cornerRadius, true);
+                this.drawSquare((moduleCount - 7 + 2) * moduleSize + cornerRadius / 2, 2 * moduleSize + cornerRadius / 2, context, 3 * moduleSize - cornerRadius, 3 * moduleSize - cornerRadius, true);
+                this.drawSquare(2 * moduleSize + cornerRadius / 2, (moduleCount - 7 + 2) * moduleSize + cornerRadius / 2, context, 3 * moduleSize - cornerRadius, 3 * moduleSize - cornerRadius, true);
+                context.fillStyle = this.config.colorDark;
+                context.strokeStyle = this.config.colorDark;
+                break;
+            }
+            default: {
+                context.fillStyle = color;
+                this.drawSquare(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                this.drawSquare((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                this.drawSquare(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                context.fillStyle = this.config.colorDark;
+                break;
+            }
+        }
+    }
+
+    private drawDiamond(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRight?: boolean) {
+        const moduleSize = width;
+
+        if (isRight) {
+            context.beginPath();
+            context.moveTo(startX + width / 2, startY);
+            context.lineTo(startX + width, startY);
+            context.lineTo(startX + width, startY + height / 2);
+            context.lineTo(startX + width / 2, startY + height);
+            context.lineTo(startX, startY + height);
+            context.lineTo(startX, startY + height / 2);
+            context.fill();
+        } else {
+            context.beginPath();
+            context.moveTo(startX, startY);
+            context.lineTo(startX + width / 2, startY);
+            context.lineTo(startX + width, startY + height / 2);
+            context.lineTo(startX + width, startY + height);
+            context.lineTo(startX + width / 2, startY + height);
+            context.lineTo(startX, startY + height / 2);
+            context.fill();
+        }
+    }
+
+    private drawCircle(centerX: number, centerY: number, context: CanvasRenderingContext2D, radiusX: number, radiusY?: number, isLarge?: boolean) {
+        context.beginPath();
+        context.arc(centerX, centerY, radiusX, 0, Math.PI * 2, true);
+        context.fill();
+    }
+
+    private drawSquare(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound: boolean) {
+        if (isRound) {
+            context.strokeRect(startX, startY, width, height);
+        }
+        context.fillRect(startX, startY, width, height);
+    }
+
+    private drawKite(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound?: boolean) {
+        context.beginPath();
+        context.moveTo(startX + width / 2, startY);
+        context.lineTo(startX + width, startY + height / 2);
+        context.lineTo(startX + width / 2, startY + height);
+        context.lineTo(startX, startY + height / 2);
+        context.fill();
+    }
+
+    private drawPositionPatterns(context: CanvasRenderingContext2D, gradient: CanvasGradient | string) {
+        context.fillStyle = gradient;
 
         const moduleSize = this.config.moduleSize;
         const moduleCount = this.moduleCount;
-        context.fillRect(0, 0, 7 * moduleSize, moduleSize);
-        context.fillRect((moduleCount - 7) * moduleSize, 0, 7 * moduleSize, moduleSize);
-        context.fillRect(0, 6 * moduleSize, 7 * moduleSize, moduleSize);
-        context.fillRect((moduleCount - 7) * moduleSize, 6 * moduleSize, 7 * moduleSize, moduleSize);
-        context.fillRect(0, (moduleCount - 7) * moduleSize, 7 * moduleSize, moduleSize);
-        context.fillRect(0, (moduleCount - 7 + 6) * moduleSize, 7 * moduleSize, moduleSize);
-        context.fillRect(0, 0, moduleSize, 7 * moduleSize);
-        context.fillRect(6 * moduleSize, 0, moduleSize, 7 * moduleSize);
-        context.fillRect((moduleCount - 7) * moduleSize, 0, moduleSize, 7 * moduleSize);
-        context.fillRect((moduleCount - 7 + 6) * moduleSize, 0, moduleSize, 7 * moduleSize);
-        context.fillRect(0, (moduleCount - 7) * moduleSize, moduleSize, 7 * moduleSize);
-        context.fillRect(6 * moduleSize, (moduleCount - 7) * moduleSize, moduleSize, 7 * moduleSize);
 
-        context.fillRect(2 * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
-        context.fillRect((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
-        context.fillRect(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, 3 * moduleSize, 3 * moduleSize);
+        const eyeBallColor = this.config.eyeBallColor ? this.config.eyeBallColor : '#000000';
+        const eyeBallShape = this.config.eyeBallShape ? this.config.eyeBallShape : EyeBallShape.SQUARE;
+        const eyeFrameColor = this.config.eyeFrameColor ? this.config.eyeFrameColor : '#000000';
+        const eyeFrameShape = this.config.eyeFrameShape ? this.config.eyeFrameShape : EyeFrameShape.SQUARE;
+        const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
 
-        for (let i = 0; i < moduleCount - 8; i += 2) {
-            context.fillRect((8 + i) * moduleSize, 6 * moduleSize, moduleSize, moduleSize);
-            context.fillRect(6 * moduleSize, (8 + i) * moduleSize, moduleSize, moduleSize);
+        this.drawEyeFrames(context, eyeFrameShape, eyeFrameColor);
+        this.drawEyeBalls(context, eyeBallShape, eyeBallColor);
+
+        context.fillStyle = gradient;
+        for (let i = 0; i < moduleCount - 15; i += 2) {
+            switch (dataPattern) {
+                case DataPattern.CIRCLE:
+                    this.drawCircle((8 + i) * moduleSize + moduleSize / 2, 6 * moduleSize + moduleSize / 2, context, moduleSize / 2);
+                    this.drawCircle(6 * moduleSize + moduleSize / 2, (8 + i) * moduleSize + moduleSize / 2, context, moduleSize / 2);
+                    break;
+                case DataPattern.KITE:
+                    this.drawKite((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize);
+                    this.drawKite(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize);
+                    break;
+                case DataPattern.LEFT_DIAMOND:
+                    this.drawDiamond((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, false);
+                    this.drawDiamond(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize, false);
+                    break;
+                case DataPattern.RIGHT_DIAMOND:
+                    this.drawDiamond((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, true);
+                    this.drawDiamond(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize, true);
+                    break;
+                default:
+                    this.drawSquare((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, false);
+                    this.drawSquare(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize, false);
+                    break;
+            }
         }
 
         const patternPosition = this.patternPosition;
@@ -641,13 +1069,72 @@ export class Drawing {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
                     context.fillStyle = 'rgba(0, 0, 0, .2)';
-                    CanvasUtil.drawAlign(context, agnX, agnY, moduleSize, moduleSize);
+                    this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 } else {
-                    context.fillStyle = this.config.colorDark;
-                    CanvasUtil.drawAlign(context, agnX, agnY, moduleSize, moduleSize);
+                    context.fillStyle = gradient;
+                    this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 }
             }
         }
+    }
+
+    private drawAlign(context: CanvasRenderingContext2D, centerX: number, centerY: number, nWidth: number, nHeight: number, shape: DataPattern) {
+        let drawShape;
+        let boolFlag: boolean = false;
+        switch (shape) {
+            case DataPattern.CIRCLE:
+                drawShape = this.drawCircle;
+                break;
+            case DataPattern.SQUARE:
+                drawShape = this.drawSquare;
+                break;
+            case DataPattern.KITE:
+                drawShape = this.drawKite;
+                break;
+            case DataPattern.LEFT_DIAMOND:
+                drawShape = this.drawDiamond;
+                break;
+            case DataPattern.RIGHT_DIAMOND:
+                drawShape = this.drawDiamond;
+                boolFlag = true;
+                break;
+            default:
+                drawShape = this.drawSquare;
+                break;
+        }
+        let x = shape === DataPattern.CIRCLE ? (centerX - 2) * nWidth + nWidth / 2 : (centerX - 2) * nWidth;
+        let y = shape === DataPattern.CIRCLE ? (centerY - 2) * nHeight + nHeight / 2 : (centerY - 2) * nHeight;
+        let height = shape === DataPattern.CIRCLE ? nHeight / 2 : nHeight;
+        let width = shape === DataPattern.CIRCLE ? nWidth / 2 : nWidth;
+        for (let i = 0; i < 4; i++) {
+            drawShape(x, y, context, width, height, boolFlag);
+            y += nHeight;
+        }
+
+        x = shape === DataPattern.CIRCLE ? (centerX + 2) * nWidth + nWidth / 2 : (centerX + 2) * nWidth;
+        y = shape === DataPattern.CIRCLE ? (centerY - 2 + 1) * nHeight + nHeight / 2 : (centerY - 2 + 1) * nHeight;
+        for (let i = 0; i < 4; i++) {
+            drawShape(x, y, context, width, height, boolFlag);
+            y += nHeight;
+        }
+
+        x = shape === DataPattern.CIRCLE ? (centerX - 2 + 1) * nWidth + nWidth / 2 : (centerX - 2 + 1) * nWidth;
+        y = shape === DataPattern.CIRCLE ? (centerY - 2) * nHeight + nHeight / 2 : (centerY - 2) * nHeight;
+        for (let i = 0; i < 4; i++) {
+            drawShape(x, y, context, width, height, boolFlag);
+            x += nWidth;
+        }
+
+        x = shape === DataPattern.CIRCLE ? (centerX - 2) * nWidth + nWidth / 2 : (centerX - 2) * nWidth;
+        y = shape === DataPattern.CIRCLE ? (centerY + 2) * nHeight + nHeight / 2 : (centerY + 2) * nHeight;
+        for (let i = 0; i < 4; i++) {
+            drawShape(x, y, context, width, height, boolFlag);
+            x += nWidth;
+        }
+
+        x = shape === DataPattern.CIRCLE ? centerX * nWidth + nWidth / 2 : centerX * nWidth;
+        y = shape === DataPattern.CIRCLE ? centerY * nHeight + nHeight / 2 : centerY * nHeight;
+        drawShape(x, y, context, width, height, boolFlag);
     }
 
     private drawAlignProtectors(context: CanvasRenderingContext2D) {
@@ -680,47 +1167,80 @@ export class Drawing {
         context.fillRect(6 * size, 8 * size, size, (moduleCount - 8 - 8) * size);
     }
 
-    private drawAlignPatterns(context: CanvasRenderingContext2D) {
+    private drawAlignPatterns(context: CanvasRenderingContext2D, gradient: CanvasGradient | string) {
         const moduleCount = this.moduleCount;
         const xyOffset = (1 - this.config.dotScale) * 0.5;
+
+        const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
 
         for (let row = 0; row < moduleCount; row++) {
             for (let col = 0; col < moduleCount; col++) {
                 const bIsDark = this.isDark.bind(this)(row, col) || false;
 
-                const isBlkPosCtr = ((col < 8 && (row < 8 || row >= moduleCount - 8)) || (col >= moduleCount - 8 && row < 8));
-                let bProtected = (row === 6 || col === 6 || isBlkPosCtr);
+                const isBlkPosCtr = (col < 8 && (row < 8 || row >= moduleCount - 8)) || (col >= moduleCount - 8 && row < 8);
+                let bProtected = row === 6 || col === 6 || isBlkPosCtr;
 
                 const patternPosition = this.patternPosition;
                 for (let i = 0; i < patternPosition.length - 1; i++) {
-                    bProtected = bProtected || (row >= patternPosition[i] - 2 && row <= patternPosition[i] + 2 &&
-                        col >= patternPosition[i] - 2 && col <= patternPosition[i] + 2);
+                    bProtected = bProtected || (row >= patternPosition[i] - 2 && row <= patternPosition[i] + 2 && col >= patternPosition[i] - 2 && col <= patternPosition[i] + 2);
                 }
 
-                context.strokeStyle = bIsDark ? this.config.colorDark : this.config.colorLight;
+                context.strokeStyle = bIsDark ? gradient : this.config.colorLight;
                 context.lineWidth = 0.5;
-                context.fillStyle = bIsDark ? this.config.colorDark : 'rgba(255, 255, 255, 0.6)';
+                context.fillStyle = bIsDark ? gradient : 'rgba(255, 255, 255, 0.6)';
 
-                const nLeft = col * this.config.nSize + (bProtected ? 0 : (xyOffset * this.config.nSize));
-                const nTop = row * this.config.nSize + (bProtected ? 0 : (xyOffset * this.config.nSize));
+                const nLeft = col * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
+                const nTop = row * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
                 if (patternPosition.length === 0) {
                     // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
                     if (!bProtected) {
-                        this.fillRectWithMask(context, nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize, (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize, bIsDark);
+                        this.fillRectWithMask(
+                            context,
+                            nLeft,
+                            nTop,
+                            (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize,
+                            (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize,
+                            bIsDark,
+                            dataPattern,
+                        );
                     }
                 } else {
-                    const inAgnRange = ((col < moduleCount - 4 && col >= moduleCount - 4 - 5 && row < moduleCount - 4 && row >= moduleCount - 4 - 5));
+                    const inAgnRange = col < moduleCount - 4 && col >= moduleCount - 4 - 5 && row < moduleCount - 4 && row >= moduleCount - 4 - 5;
                     if (!bProtected && !inAgnRange) {
-                        this.fillRectWithMask(context, nLeft, nTop, (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize, (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize, bIsDark);
+                        this.fillRectWithMask(
+                            context,
+                            nLeft,
+                            nTop,
+                            (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize,
+                            (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize,
+                            bIsDark,
+                            dataPattern,
+                        );
                     }
                 }
             }
         }
     }
 
-    private fillRectWithMask(canvas: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, bIsDark: boolean) {
+    private fillRectWithMask(canvas: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
         if (!this.maskCanvas) {
-            canvas.fillRect(x, y, w, h);
+            switch (shape) {
+                case DataPattern.CIRCLE:
+                    this.drawCircle(x + w / 2, y + h / 2, canvas, h / 2);
+                    break;
+                case DataPattern.KITE:
+                    this.drawKite(x, y, canvas, w, h);
+                    break;
+                case DataPattern.LEFT_DIAMOND:
+                    this.drawDiamond(x, y, canvas, w, h, false);
+                    break;
+                case DataPattern.RIGHT_DIAMOND:
+                    this.drawDiamond(x, y, canvas, w, h, true);
+                    break;
+                default:
+                    this.drawSquare(x, y, canvas, w, h, false);
+                    break;
+            }
         } else {
             canvas.drawImage(this.maskCanvas, x, y, w, h, x, y, w, h);
             const fill = canvas.fillStyle;
@@ -730,10 +1250,10 @@ export class Drawing {
         }
     }
 
-    private async addBackground(context: CanvasRenderingContext2D, size: number, backgroundImage?: string) {
+    private async addBackground(context: CanvasRenderingContext2D, size: number, backgroundImage?: string, backgroundColor?: string) {
         if (!backgroundImage) {
             context.rect(0, 0, size, size);
-            context.fillStyle = '#ffffff';
+            context.fillStyle = backgroundColor ? backgroundColor : '#ffffff';
             context.fill();
             return;
         }
@@ -978,14 +1498,13 @@ export class QRRSBlock {
     }
 }
 
-
 export class QRBitBuffer {
     public buffer: any[] = [];
     public length = 0;
 
     public get(index: number) {
         const bufIndex = Math.floor(index / 8);
-        return ((this.buffer[bufIndex] >>> (7 - index % 8)) & 1) === 1;
+        return ((this.buffer[bufIndex] >>> (7 - (index % 8))) & 1) === 1;
     }
 
     public put(num: number, length: number) {
@@ -1004,7 +1523,7 @@ export class QRBitBuffer {
             this.buffer.push(0);
         }
         if (bit) {
-            this.buffer[bufIndex] |= (0x80 >>> (this.length % 8));
+            this.buffer[bufIndex] |= 0x80 >>> this.length % 8;
         }
         this.length++;
     }
@@ -1014,7 +1533,6 @@ export class QR8bitByte {
     public data: string;
     public mode: QRMode = QRMode.MODE_8BIT_BYTE;
     public parsedData: any[] = [];
-
 
     constructor(data: string) {
         this.data = data;
@@ -1040,17 +1558,17 @@ export class QR8bitByte {
             const byteArray = [];
             const code = this.data.charCodeAt(i);
             if (code > 0x10000) {
-                byteArray[0] = 0xF0 | ((code & 0x1C0000) >>> 18);
-                byteArray[1] = 0x80 | ((code & 0x3F000) >>> 12);
-                byteArray[2] = 0x80 | ((code & 0xFC0) >>> 6);
-                byteArray[3] = 0x80 | (code & 0x3F);
+                byteArray[0] = 0xf0 | ((code & 0x1c0000) >>> 18);
+                byteArray[1] = 0x80 | ((code & 0x3f000) >>> 12);
+                byteArray[2] = 0x80 | ((code & 0xfc0) >>> 6);
+                byteArray[3] = 0x80 | (code & 0x3f);
             } else if (code > 0x800) {
-                byteArray[0] = 0xE0 | ((code & 0xF000) >>> 12);
-                byteArray[1] = 0x80 | ((code & 0xFC0) >>> 6);
-                byteArray[2] = 0x80 | (code & 0x3F);
+                byteArray[0] = 0xe0 | ((code & 0xf000) >>> 12);
+                byteArray[1] = 0x80 | ((code & 0xfc0) >>> 6);
+                byteArray[2] = 0x80 | (code & 0x3f);
             } else if (code > 0x80) {
-                byteArray[0] = 0xC0 | ((code & 0x7C0) >>> 6);
-                byteArray[1] = 0x80 | (code & 0x3F);
+                byteArray[0] = 0xc0 | ((code & 0x7c0) >>> 6);
+                byteArray[1] = 0x80 | (code & 0x3f);
             } else {
                 byteArray[0] = code;
             }

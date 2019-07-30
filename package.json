@@ -1,64 +1,64 @@
 {
-  "name": "mobstac-awesome-qr",
-  "version": "1.1.1",
-  "description": "MobStac Awesome QR code library",
-  "homepage": "https://github.com/mobstac/mobstac-awesome-qr",
-  "bugs": "https://github.com/mobstac/mobstac-awesome-qr/issues",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "scripts": {
-    "test": "nyc mocha",
-    "build": "tsc && webpack",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "lint": "tslint -p tsconfig.json",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test",
-    "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
-  },
-  "nyc": {
-    "include": [
-      "src/**/*.ts",
-      "src/**/*.tsx"
+    "name": "mobstac-awesome-qr",
+    "version": "1.1.1",
+    "description": "MobStac Awesome QR code library",
+    "homepage": "https://github.com/mobstac/mobstac-awesome-qr",
+    "bugs": "https://github.com/mobstac/mobstac-awesome-qr/issues",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "scripts": {
+        "test": "nyc mocha",
+        "build": "tsc && webpack",
+        "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+        "lint": "tslint -p tsconfig.json",
+        "prepare": "npm run build",
+        "prepublishOnly": "npm test",
+        "version": "npm run format && git add -A src",
+        "postversion": "git push && git push --tags"
+    },
+    "nyc": {
+        "include": [
+            "src/**/*.ts",
+            "src/**/*.tsx"
+        ],
+        "extension": [
+            ".ts",
+            ".tsx"
+        ],
+        "require": [
+            "ts-node/register"
+        ],
+        "reporter": [
+            "text-summary",
+            "html"
+        ],
+        "sourceMap": true,
+        "instrument": true
+    },
+    "keywords": [],
+    "author": "MobStac Inc",
+    "license": "Apache-2.0",
+    "devDependencies": {
+        "@types/chai": "4.1.7",
+        "@types/mocha": "5.2.6",
+        "chai": "4.2.0",
+        "mocha": "^6.2.0",
+        "nyc": "^14.1.1",
+        "prettier": "1.16.4",
+        "source-map-support": "0.5.11",
+        "ts-loader": "5.3.3",
+        "ts-node": "8.0.3",
+        "tslint": "5.14.0",
+        "tslint-config-prettier": "1.18.0",
+        "typescript": "3.4.3",
+        "webpack": "4.29.6",
+        "webpack-cli": "3.3.0"
+    },
+    "files": [
+        "lib/**/*"
     ],
-    "extension": [
-      ".ts",
-      ".tsx"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
-    "reporter": [
-      "text-summary",
-      "html"
-    ],
-    "sourceMap": true,
-    "instrument": true
-  },
-  "keywords": [],
-  "author": "MobStac Inc",
-  "license": "Apache-2.0",
-  "devDependencies": {
-    "@types/chai": "^4.1.7",
-    "@types/mocha": "^5.2.6",
-    "chai": "^4.2.0",
-    "mocha": "^6.0.2",
-    "nyc": "^13.3.0",
-    "prettier": "^1.16.4",
-    "source-map-support": "^0.5.11",
-    "ts-loader": "^5.3.3",
-    "ts-node": "^8.0.3",
-    "tslint": "^5.14.0",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.4.3",
-    "webpack": "^4.29.6",
-    "webpack-cli": "^3.3.0"
-  },
-  "files": [
-    "lib/**/*"
-  ],
-  "dependencies": {
-    "@types/node": "^11.13.0",
-    "canvas": "^2.4.1"
-  }
+    "dependencies": {
+        "@types/node": "11.13.0",
+        "canvas": "2.4.1"
+    }
 }

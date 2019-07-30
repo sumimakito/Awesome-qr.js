@@ -20,12 +20,53 @@ export enum QRMaskPattern {
     PATTERN100,
     PATTERN101,
     PATTERN110,
-    PATTERN111
+    PATTERN111,
 }
 
 export enum CanvasType {
     PDF = 'pdf',
     SVG = 'svg',
     JPEG = 'jpeg',
-    PNG = 'png'
+    PNG = 'png',
+}
+
+export enum EyeFrameShape {
+    SQUARE = 'square',
+    CIRCLE = 'circle',
+    ROUNDED = 'rounded',
+    LEFT_LEAF = 'left-leaf',
+    RIGHT_LEAF = 'right-leaf',
+}
+
+export enum EyeBallShape {
+    SQUARE = 'square',
+    CIRCLE = 'circle',
+    ROUNDED = 'rounded',
+    LEFT_LEAF = 'left-leaf',
+    RIGHT_LEAF = 'right-leaf',
+    LEFT_DIAMOND = 'left-diamond',
+    RIGHT_DIAMOND = 'right-diamond',
+}
+
+export enum DataPattern {
+    SQUARE = 'square',
+    CIRCLE = 'circle',
+    KITE = 'kite',
+    LEFT_DIAMOND = 'left-diamond',
+    RIGHT_DIAMOND = 'right-diamond',
+}
+
+export enum GradientType {
+    NONE = 'none',
+    LINEAR = 'linear',
+    RADIAL = 'radial',
+}
+
+export enum QRCodeFrame {
+    NONE = 'none',
+    BOX = 'box',
+    BANNER_TOP = 'banner-top',
+    BANNER_BOTTOM = 'banner-bottom',
+    BALLOON_BOTTOM = 'balloon-bottom',
+    BALLOON_TOP = 'balloon-top',
 }

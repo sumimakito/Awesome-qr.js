@@ -1,7 +1,6 @@
-import { CanvasType, QRErrorCorrectLevel } from './Enums';
+import { CanvasType, QRErrorCorrectLevel, EyeBallShape, EyeFrameShape, DataPattern, GradientType, QRCodeFrame } from './Enums';
 import { QRCode } from './Models';
 import { QRCodeConfig } from './Types';
-
 
 export class QRCodeBuilder {
     private config: QRCodeConfig;
@@ -9,7 +8,7 @@ export class QRCodeBuilder {
     public constructor(config?: Partial<QRCodeConfig>) {
         const defaultConfig: QRCodeConfig = {
             size: 800,
-            margin: 20,
+            margin: 60,
             typeNumber: 4,
             colorDark: '#000000',
             colorLight: '#ffffff',
@@ -107,6 +106,56 @@ export class QRCodeBuilder {
 
     public setMaskedDots(maskedDots: boolean) {
         this.config.maskedDots = maskedDots;
+        return this;
+    }
+
+    public setEyeFrameShape(eyeFrameShape: EyeFrameShape) {
+        this.config.eyeFrameShape = eyeFrameShape;
+        return this;
+    }
+
+    public setEyeBallShape(eyeBallShape: EyeBallShape) {
+        this.config.eyeBallShape = eyeBallShape;
+        return this;
+    }
+
+    public setEyeFrameColor(eyeFrameColor: string) {
+        this.config.eyeFrameColor = eyeFrameColor;
+        return this;
+    }
+
+    public setEyeBallColor(eyeBallColor: string) {
+        this.config.eyeBallColor = eyeBallColor;
+        return this;
+    }
+
+    public setDataPattern(dataPattern: DataPattern) {
+        this.config.dataPattern = dataPattern;
+        return this;
+    }
+
+    public setGradientType(gradientType: GradientType) {
+        this.config.gradientType = gradientType;
+        return this;
+    }
+
+    public setBackgroundColor(backgoundColor: string) {
+        this.config.backgroundColor = backgoundColor;
+        return this;
+    }
+
+    public setFrameStyle(frameStyle: QRCodeFrame) {
+        this.config.frameStyle = frameStyle;
+        return this;
+    }
+
+    public setFrameColor(frameColor: string) {
+        this.config.frameColor = frameColor;
+        return this;
+    }
+
+    public setFrameText(frameText: string) {
+        this.config.frameText = frameText;
         return this;
     }
 
