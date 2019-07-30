@@ -286,11 +286,7 @@ export class QRCode {
                 if (col + c <= -1 || this.moduleCount <= col + c) {
                     continue;
                 }
-                if (
-                    (0 <= r && r <= 6 && (c === 0 || c === 6)) ||
-                    (0 <= c && c <= 6 && (r === 0 || r === 6)) ||
-                    (2 <= r && r <= 4 && 2 <= c && c <= 4)
-                ) {
+                if ((0 <= r && r <= 6 && (c === 0 || c === 6)) || (0 <= c && c <= 6 && (r === 0 || r === 6)) || (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
                     this.modules[row + r][col + c] = !0;
                 } else {
                     this.modules[row + r][col + c] = !1;
@@ -480,13 +476,7 @@ export class Drawing {
     // noinspection JSMismatchedCollectionQueryUpdate
     private modules: Array<Array<boolean | null>>;
 
-    constructor(
-        moduleCount: number,
-        patternPosition: number[],
-        config: QRCodeConfig,
-        isDark: any,
-        modules: Array<Array<boolean | null>>,
-    ) {
+    constructor(moduleCount: number, patternPosition: number[], config: QRCodeConfig, isDark: any, modules: Array<Array<boolean | null>>) {
         this.moduleCount = moduleCount;
         this.patternPosition = patternPosition;
         this.isDark = isDark;
@@ -562,7 +552,8 @@ export class Drawing {
                 backgroundContext.drawImage(mainCanvas, 0, 0, size, size);
                 mainContext.drawImage(backgroundCanvas, -margin, -margin, size, size);
                 return this.scaleFinalImage(mainCanvas);
-            }).then((canvas: Canvas) => {
+            })
+            .then((canvas: Canvas) => {
                 return this.drawFrame(canvas, this.config.frameStyle, this.config.frameColor, this.config.frameText);
             })
             .then((canvas: Canvas) => {
@@ -573,13 +564,25 @@ export class Drawing {
 
     private async drawFrame(canvas: Canvas, frameStyle: QRCodeFrame | undefined, frameColor: string | undefined, frameText: string | undefined): Promise<Canvas> {
         if (!frameStyle || frameStyle === QRCodeFrame.NONE) return canvas;
-        
+
         const color = frameColor ? frameColor : '#000000';
         const moduleSize = this.config.moduleSize;
         const rawSize = this.config.rawSize;
         const size = rawSize + moduleSize * 2;
-        const text = frameText ? frameText : "";
-        let canvasWidth: number = size, canvasHeight: number = 0, borderX: number = 0, borderY: number = 0, padX: number = 0, padY: number = 0, padHeight: number = 0, spaceX: number=0, spaceY: number=0, textX: number = 0, textY: number = 0, qrX: number = 0, qrY: number = 0;
+        const text = frameText ? frameText : '';
+        let canvasWidth: number = size,
+            canvasHeight: number = 0,
+            borderX: number = 0,
+            borderY: number = 0,
+            padX: number = 0,
+            padY: number = 0,
+            padHeight: number = 0,
+            spaceX: number = 0,
+            spaceY: number = 0,
+            textX: number = 0,
+            textY: number = 0,
+            qrX: number = 0,
+            qrY: number = 0;
 
         switch (frameStyle) {
             case QRCodeFrame.BOX:
@@ -587,7 +590,7 @@ export class Drawing {
                 borderX = 0;
                 borderY = 0;
                 padX = 0;
-                padY = size -1;
+                padY = size - 1;
                 padHeight = 0;
                 spaceX = moduleSize;
                 spaceY = moduleSize;
@@ -610,7 +613,36 @@ export class Drawing {
                 qrX = moduleSize;
                 qrY = borderY + moduleSize;
                 break;
+            case QRCodeFrame.BALLOON_TOP:
+                canvasHeight = 1.25 * size;
+                borderX = 0;
+                borderY = size / 4;
+                padX = 0;
+                padY = 1;
+                padHeight = size / 4;
+                spaceX = moduleSize;
+                spaceY = borderY + moduleSize;
+                textX = size / 2;
+                textY = size / 6;
+                qrX = moduleSize;
+                qrY = borderY + moduleSize;
+                break;
+
             case QRCodeFrame.BANNER_BOTTOM:
+                canvasHeight = 1.25 * size;
+                borderX = 0;
+                borderY = 0;
+                padX = 0;
+                padY = size - 1;
+                padHeight = size / 4;
+                spaceX = moduleSize;
+                spaceY = moduleSize;
+                textX = size / 2;
+                textY = size * 1.13;
+                qrX = moduleSize;
+                qrY = moduleSize;
+                break;
+            case QRCodeFrame.BALLOON_BOTTOM:
                 canvasHeight = 1.25 * size;
                 borderX = 0;
                 borderY = 0;
@@ -630,15 +662,32 @@ export class Drawing {
         const finalCanvas: Canvas = createCanvas(canvasWidth, canvasHeight, this.canvasType);
         const finalContext = finalCanvas.getContext('2d');
         finalContext.fillStyle = color;
+        if (frameStyle === QRCodeFrame.BALLOON_BOTTOM || frameStyle === QRCodeFrame.BALLOON_TOP)
+            finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
         finalContext.fillRect(borderX, borderY, size, size);
+        finalContext.fillStyle = color;
         finalContext.fillRect(padX, padY, size, padHeight);
         finalContext.fillStyle = '#ffffff';
         finalContext.fillRect(spaceX, spaceY, size - moduleSize * 2, size - moduleSize * 2);
         if (frameStyle === QRCodeFrame.BOX) finalContext.fillStyle = '#000000';
         finalContext.textAlign = 'center';
-        finalContext.font = "90px arial";
+        finalContext.font = '90px arial';
         finalContext.fillText(text, textX, textY);
         finalContext.drawImage(canvas, qrX, qrY, rawSize, rawSize);
+        finalContext.fillStyle = frameColor ? frameColor : '#000000';
+        if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
+            finalContext.moveTo(borderX + size / 2, borderY + size);
+            finalContext.lineTo(borderX + size / 2 + moduleSize * 2, borderY + size);
+            finalContext.lineTo(borderX + size / 2, borderY + size - moduleSize * 2.5);
+            finalContext.lineTo(borderX + size / 2 - moduleSize * 2, borderY + size);
+        }
+        if (frameStyle === QRCodeFrame.BALLOON_TOP) {
+            finalContext.moveTo(borderX + size / 2, borderY);
+            finalContext.lineTo(borderX + size / 2 + moduleSize * 2, borderY);
+            finalContext.lineTo(borderX + size / 2, borderY + moduleSize * 2.5);
+            finalContext.lineTo(borderX + size / 2 - moduleSize * 2, borderY);
+        }
+        finalContext.fill();
         return finalCanvas;
     }
 
@@ -689,14 +738,7 @@ export class Drawing {
 
         context.fillStyle = '#ffffff';
         context.save();
-        CanvasUtil.prepareRoundedCornerClip(
-            context,
-            centreCoordinate,
-            centreCoordinate,
-            logoSize + 2 * logoMargin,
-            logoSize + 2 * logoMargin,
-            logoCornerRadius,
-        );
+        CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate, centreCoordinate, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
         context.clip();
         context.fill();
         context.restore();
@@ -704,14 +746,7 @@ export class Drawing {
         context.save();
 
         return loadImage(this.config.logoImage!).then(image => {
-            CanvasUtil.prepareRoundedCornerClip(
-                context,
-                centreCoordinate + logoMargin,
-                centreCoordinate + logoMargin,
-                logoSize,
-                logoSize,
-                logoCornerRadius,
-            );
+            CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate + logoMargin, centreCoordinate + logoMargin, logoSize, logoSize, logoCornerRadius);
             context.clip();
             context.drawImage(image, centreCoordinate + logoMargin, centreCoordinate + logoMargin, logoSize, logoSize);
             context.restore();
@@ -752,27 +787,9 @@ export class Drawing {
                 context.lineJoin = 'round';
                 context.lineWidth = cornerRadius;
 
-                this.drawSquareFrame(
-                    0 + cornerRadius / 4,
-                    0 + cornerRadius / 4,
-                    context,
-                    7 * moduleSize - cornerRadius / 2,
-                    true,
-                );
-                this.drawSquareFrame(
-                    (moduleCount - 7) * moduleSize + cornerRadius / 4,
-                    0 + cornerRadius / 4,
-                    context,
-                    7 * moduleSize - cornerRadius / 2,
-                    true,
-                );
-                this.drawSquareFrame(
-                    0 + cornerRadius / 4,
-                    (moduleCount - 7) * moduleSize + cornerRadius / 4,
-                    context,
-                    7 * moduleSize - cornerRadius / 2,
-                    true,
-                );
+                this.drawSquareFrame(0 + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, true);
+                this.drawSquareFrame((moduleCount - 7) * moduleSize + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, true);
+                this.drawSquareFrame(0 + cornerRadius / 4, (moduleCount - 7) * moduleSize + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, true);
                 context.fillStyle = this.config.colorDark;
                 context.strokeStyle = this.config.colorDark;
                 break;
@@ -784,27 +801,9 @@ export class Drawing {
                 context.lineJoin = 'round';
                 context.lineWidth = cornerRadius;
 
-                this.drawLeafFrame(
-                    0 + cornerRadius / 4,
-                    0 + cornerRadius / 4,
-                    context,
-                    7 * moduleSize - cornerRadius / 2,
-                    'left',
-                );
-                this.drawLeafFrame(
-                    (moduleCount - 7) * moduleSize + cornerRadius / 4,
-                    0 + cornerRadius / 4,
-                    context,
-                    7 * moduleSize - cornerRadius / 2,
-                    'left',
-                );
-                this.drawLeafFrame(
-                    0 + cornerRadius / 4,
-                    (moduleCount - 7) * moduleSize + cornerRadius / 4,
-                    context,
-                    7 * moduleSize - cornerRadius / 2,
-                    'left',
-                );
+                this.drawLeafFrame(0 + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'left');
+                this.drawLeafFrame((moduleCount - 7) * moduleSize + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'left');
+                this.drawLeafFrame(0 + cornerRadius / 4, (moduleCount - 7) * moduleSize + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'left');
                 context.fillStyle = this.config.colorDark;
                 context.strokeStyle = this.config.colorDark;
                 break;
@@ -816,27 +815,9 @@ export class Drawing {
                 context.lineJoin = 'round';
                 context.lineWidth = cornerRadius;
 
-                this.drawLeafFrame(
-                    0 + cornerRadius / 4,
-                    0 + cornerRadius / 4,
-                    context,
-                    7 * moduleSize - cornerRadius / 2,
-                    'right',
-                );
-                this.drawLeafFrame(
-                    (moduleCount - 7) * moduleSize + cornerRadius / 4,
-                    0 + cornerRadius / 4,
-                    context,
-                    7 * moduleSize - cornerRadius / 2,
-                    'right',
-                );
-                this.drawLeafFrame(
-                    0 + cornerRadius / 4,
-                    (moduleCount - 7) * moduleSize + cornerRadius / 4,
-                    context,
-                    7 * moduleSize - cornerRadius / 2,
-                    'right',
-                );
+                this.drawLeafFrame(0 + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'right');
+                this.drawLeafFrame((moduleCount - 7) * moduleSize + cornerRadius / 4, 0 + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'right');
+                this.drawLeafFrame(0 + cornerRadius / 4, (moduleCount - 7) * moduleSize + cornerRadius / 4, context, 7 * moduleSize - cornerRadius / 2, 'right');
                 context.fillStyle = this.config.colorDark;
                 context.strokeStyle = this.config.colorDark;
                 break;
@@ -852,13 +833,7 @@ export class Drawing {
         }
     }
 
-    private drawLeafFrame(
-        startX: number,
-        startY: number,
-        context: CanvasRenderingContext2D,
-        dimension: number,
-        direction: string,
-    ) {
+    private drawLeafFrame(startX: number, startY: number, context: CanvasRenderingContext2D, dimension: number, direction: string) {
         const moduleSize = this.config.moduleSize;
         const r = startX + dimension;
         const b = startY + dimension;
@@ -890,13 +865,7 @@ export class Drawing {
         }
     }
 
-    private drawSquareFrame(
-        startX: number,
-        startY: number,
-        context: CanvasRenderingContext2D,
-        dimension: number,
-        isRound: boolean,
-    ) {
+    private drawSquareFrame(startX: number, startY: number, context: CanvasRenderingContext2D, dimension: number, isRound: boolean) {
         const moduleSize = this.config.moduleSize;
         if (isRound) {
             const r = startX + dimension;
@@ -916,12 +885,7 @@ export class Drawing {
             context.stroke();
         } else {
             context.fillRect(startX, startY, dimension, dimension);
-            context.clearRect(
-                startX + 1 * moduleSize,
-                startY + 1 * moduleSize,
-                dimension - 2 * moduleSize,
-                dimension - 2 * moduleSize,
-            );
+            context.clearRect(startX + 1 * moduleSize, startY + 1 * moduleSize, dimension - 2 * moduleSize, dimension - 2 * moduleSize);
         }
     }
 
@@ -940,44 +904,16 @@ export class Drawing {
             case EyeBallShape.LEFT_DIAMOND: {
                 context.fillStyle = color;
                 this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
-                this.drawDiamond(
-                    (moduleCount - 7 + 2) * moduleSize,
-                    2 * moduleSize,
-                    context,
-                    3 * moduleSize,
-                    3 * moduleSize,
-                    false,
-                );
-                this.drawDiamond(
-                    2 * moduleSize,
-                    (moduleCount - 7 + 2) * moduleSize,
-                    context,
-                    3 * moduleSize,
-                    3 * moduleSize,
-                    false,
-                );
+                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
                 context.fillStyle = this.config.colorDark;
                 break;
             }
             case EyeBallShape.RIGHT_DIAMOND: {
                 context.fillStyle = color;
                 this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
-                this.drawDiamond(
-                    (moduleCount - 7 + 2) * moduleSize,
-                    2 * moduleSize,
-                    context,
-                    3 * moduleSize,
-                    3 * moduleSize,
-                    true,
-                );
-                this.drawDiamond(
-                    2 * moduleSize,
-                    (moduleCount - 7 + 2) * moduleSize,
-                    context,
-                    3 * moduleSize,
-                    3 * moduleSize,
-                    true,
-                );
+                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
+                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
                 context.fillStyle = this.config.colorDark;
                 break;
             }
@@ -992,22 +928,8 @@ export class Drawing {
             case EyeBallShape.LEFT_LEAF: {
                 context.fillStyle = color;
                 this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
-                this.drawDiamond(
-                    (moduleCount - 7 + 2) * moduleSize,
-                    2 * moduleSize,
-                    context,
-                    3 * moduleSize,
-                    3 * moduleSize,
-                    false,
-                );
-                this.drawDiamond(
-                    2 * moduleSize,
-                    (moduleCount - 7 + 2) * moduleSize,
-                    context,
-                    3 * moduleSize,
-                    3 * moduleSize,
-                    false,
-                );
+                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawCircle(3.5 * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
                 this.drawCircle((moduleCount - 3.5) * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
                 this.drawCircle(3.5 * moduleSize, (moduleCount - 3.5) * moduleSize, context, moduleSize * 1.5);
@@ -1017,22 +939,8 @@ export class Drawing {
             case EyeBallShape.RIGHT_LEAF: {
                 context.fillStyle = color;
                 this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
-                this.drawDiamond(
-                    (moduleCount - 7 + 2) * moduleSize,
-                    2 * moduleSize,
-                    context,
-                    3 * moduleSize,
-                    3 * moduleSize,
-                    true,
-                );
-                this.drawDiamond(
-                    2 * moduleSize,
-                    (moduleCount - 7 + 2) * moduleSize,
-                    context,
-                    3 * moduleSize,
-                    3 * moduleSize,
-                    true,
-                );
+                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
+                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true);
                 this.drawCircle(3.5 * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
                 this.drawCircle((moduleCount - 3.5) * moduleSize, 3.5 * moduleSize, context, moduleSize * 1.5);
                 this.drawCircle(3.5 * moduleSize, (moduleCount - 3.5) * moduleSize, context, moduleSize * 1.5);
@@ -1046,30 +954,9 @@ export class Drawing {
                 context.lineJoin = 'round';
                 context.lineWidth = cornerRadius;
 
-                this.drawSquare(
-                    2 * moduleSize + cornerRadius / 2,
-                    2 * moduleSize + cornerRadius / 2,
-                    context,
-                    3 * moduleSize - cornerRadius,
-                    3 * moduleSize - cornerRadius,
-                    true,
-                );
-                this.drawSquare(
-                    (moduleCount - 7 + 2) * moduleSize + cornerRadius / 2,
-                    2 * moduleSize + cornerRadius / 2,
-                    context,
-                    3 * moduleSize - cornerRadius,
-                    3 * moduleSize - cornerRadius,
-                    true,
-                );
-                this.drawSquare(
-                    2 * moduleSize + cornerRadius / 2,
-                    (moduleCount - 7 + 2) * moduleSize + cornerRadius / 2,
-                    context,
-                    3 * moduleSize - cornerRadius,
-                    3 * moduleSize - cornerRadius,
-                    true,
-                );
+                this.drawSquare(2 * moduleSize + cornerRadius / 2, 2 * moduleSize + cornerRadius / 2, context, 3 * moduleSize - cornerRadius, 3 * moduleSize - cornerRadius, true);
+                this.drawSquare((moduleCount - 7 + 2) * moduleSize + cornerRadius / 2, 2 * moduleSize + cornerRadius / 2, context, 3 * moduleSize - cornerRadius, 3 * moduleSize - cornerRadius, true);
+                this.drawSquare(2 * moduleSize + cornerRadius / 2, (moduleCount - 7 + 2) * moduleSize + cornerRadius / 2, context, 3 * moduleSize - cornerRadius, 3 * moduleSize - cornerRadius, true);
                 context.fillStyle = this.config.colorDark;
                 context.strokeStyle = this.config.colorDark;
                 break;
@@ -1077,36 +964,15 @@ export class Drawing {
             default: {
                 context.fillStyle = color;
                 this.drawSquare(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
-                this.drawSquare(
-                    (moduleCount - 7 + 2) * moduleSize,
-                    2 * moduleSize,
-                    context,
-                    3 * moduleSize,
-                    3 * moduleSize,
-                    false,
-                );
-                this.drawSquare(
-                    2 * moduleSize,
-                    (moduleCount - 7 + 2) * moduleSize,
-                    context,
-                    3 * moduleSize,
-                    3 * moduleSize,
-                    false,
-                );
+                this.drawSquare((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
+                this.drawSquare(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
                 context.fillStyle = this.config.colorDark;
                 break;
             }
         }
     }
 
-    private drawDiamond(
-        startX: number,
-        startY: number,
-        context: CanvasRenderingContext2D,
-        width: number,
-        height: number,
-        isRight?: boolean,
-    ) {
+    private drawDiamond(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRight?: boolean) {
         const moduleSize = width;
 
         if (isRight) {
@@ -1130,41 +996,20 @@ export class Drawing {
         }
     }
 
-    private drawCircle(
-        centerX: number,
-        centerY: number,
-        context: CanvasRenderingContext2D,
-        radiusX: number,
-        radiusY?: number,
-        isLarge?: boolean,
-    ) {
+    private drawCircle(centerX: number, centerY: number, context: CanvasRenderingContext2D, radiusX: number, radiusY?: number, isLarge?: boolean) {
         context.beginPath();
         context.arc(centerX, centerY, radiusX, 0, Math.PI * 2, true);
         context.fill();
     }
 
-    private drawSquare(
-        startX: number,
-        startY: number,
-        context: CanvasRenderingContext2D,
-        width: number,
-        height: number,
-        isRound: boolean,
-    ) {
+    private drawSquare(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound: boolean) {
         if (isRound) {
             context.strokeRect(startX, startY, width, height);
         }
         context.fillRect(startX, startY, width, height);
     }
 
-    private drawKite(
-        startX: number,
-        startY: number,
-        context: CanvasRenderingContext2D,
-        width: number,
-        height: number,
-        isRound?: boolean,
-    ) {
+    private drawKite(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound?: boolean) {
         context.beginPath();
         context.moveTo(startX + width / 2, startY);
         context.lineTo(startX + width, startY + height / 2);
@@ -1192,18 +1037,8 @@ export class Drawing {
         for (let i = 0; i < moduleCount - 15; i += 2) {
             switch (dataPattern) {
                 case DataPattern.CIRCLE:
-                    this.drawCircle(
-                        (8 + i) * moduleSize + moduleSize / 2,
-                        6 * moduleSize + moduleSize / 2,
-                        context,
-                        moduleSize / 2,
-                    );
-                    this.drawCircle(
-                        6 * moduleSize + moduleSize / 2,
-                        (8 + i) * moduleSize + moduleSize / 2,
-                        context,
-                        moduleSize / 2,
-                    );
+                    this.drawCircle((8 + i) * moduleSize + moduleSize / 2, 6 * moduleSize + moduleSize / 2, context, moduleSize / 2);
+                    this.drawCircle(6 * moduleSize + moduleSize / 2, (8 + i) * moduleSize + moduleSize / 2, context, moduleSize / 2);
                     break;
                 case DataPattern.KITE:
                     this.drawKite((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize);
@@ -1243,14 +1078,7 @@ export class Drawing {
         }
     }
 
-    private drawAlign(
-        context: CanvasRenderingContext2D,
-        centerX: number,
-        centerY: number,
-        nWidth: number,
-        nHeight: number,
-        shape: DataPattern,
-    ) {
+    private drawAlign(context: CanvasRenderingContext2D, centerX: number, centerY: number, nWidth: number, nHeight: number, shape: DataPattern) {
         let drawShape;
         let boolFlag: boolean = false;
         switch (shape) {
@@ -1349,18 +1177,12 @@ export class Drawing {
             for (let col = 0; col < moduleCount; col++) {
                 const bIsDark = this.isDark.bind(this)(row, col) || false;
 
-                const isBlkPosCtr =
-                    (col < 8 && (row < 8 || row >= moduleCount - 8)) || (col >= moduleCount - 8 && row < 8);
+                const isBlkPosCtr = (col < 8 && (row < 8 || row >= moduleCount - 8)) || (col >= moduleCount - 8 && row < 8);
                 let bProtected = row === 6 || col === 6 || isBlkPosCtr;
 
                 const patternPosition = this.patternPosition;
                 for (let i = 0; i < patternPosition.length - 1; i++) {
-                    bProtected =
-                        bProtected ||
-                        (row >= patternPosition[i] - 2 &&
-                            row <= patternPosition[i] + 2 &&
-                            col >= patternPosition[i] - 2 &&
-                            col <= patternPosition[i] + 2);
+                    bProtected = bProtected || (row >= patternPosition[i] - 2 && row <= patternPosition[i] + 2 && col >= patternPosition[i] - 2 && col <= patternPosition[i] + 2);
                 }
 
                 context.strokeStyle = bIsDark ? gradient : this.config.colorLight;
@@ -1383,11 +1205,7 @@ export class Drawing {
                         );
                     }
                 } else {
-                    const inAgnRange =
-                        col < moduleCount - 4 &&
-                        col >= moduleCount - 4 - 5 &&
-                        row < moduleCount - 4 &&
-                        row >= moduleCount - 4 - 5;
+                    const inAgnRange = col < moduleCount - 4 && col >= moduleCount - 4 - 5 && row < moduleCount - 4 && row >= moduleCount - 4 - 5;
                     if (!bProtected && !inAgnRange) {
                         this.fillRectWithMask(
                             context,
@@ -1404,15 +1222,7 @@ export class Drawing {
         }
     }
 
-    private fillRectWithMask(
-        canvas: CanvasRenderingContext2D,
-        x: number,
-        y: number,
-        w: number,
-        h: number,
-        bIsDark: boolean,
-        shape: DataPattern,
-    ) {
+    private fillRectWithMask(canvas: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
         if (!this.maskCanvas) {
             switch (shape) {
                 case DataPattern.CIRCLE:

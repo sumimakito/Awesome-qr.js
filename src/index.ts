@@ -8,7 +8,7 @@ export class QRCodeBuilder {
     public constructor(config?: Partial<QRCodeConfig>) {
         const defaultConfig: QRCodeConfig = {
             size: 800,
-            margin: 50,
+            margin: 60,
             typeNumber: 4,
             colorDark: '#000000',
             colorLight: '#ffffff',
