@@ -570,8 +570,8 @@ export class Drawing {
         const rawSize = this.config.rawSize;
         const size = rawSize + moduleSize * 2;
         const text = frameText ? frameText : '';
-        let canvasWidth: number = size,
-            canvasHeight: number = 0,
+        let canvasWidth: number = size + moduleSize,
+            canvasHeight: number = 1.25 * size,
             borderX: number = 0,
             borderY: number = 0,
             padX: number = 0,
@@ -582,113 +582,190 @@ export class Drawing {
             textX: number = 0,
             textY: number = 0,
             qrX: number = 0,
-            qrY: number = 0;
+            qrY: number = 0,
+            cornerRadius: number = 0;
+        const finalCanvas: Canvas = createCanvas(canvasWidth, canvasHeight, this.canvasType);
+        const finalContext = finalCanvas.getContext('2d');
 
         switch (frameStyle) {
-            case QRCodeFrame.BOX:
-                canvasHeight = 1.25 * size;
-                borderX = 0;
-                borderY = 0;
+            case QRCodeFrame.BOX_BOTTOM:
+                cornerRadius = moduleSize;
+                finalContext.lineJoin = 'round';
+                finalContext.lineWidth = cornerRadius;
+                canvasHeight = 2 * size;
+                borderX = cornerRadius / 2;
+                borderY = cornerRadius / 2;
                 padX = 0;
-                padY = 1.05*size;
+                padY = 1.05 * size + cornerRadius / 2;
                 padHeight = size / 6;
-                spaceX = moduleSize;
-                spaceY = moduleSize;
                 textX = size / 2;
-                textY = size * 1.17;
-                qrX = moduleSize;
-                qrY = moduleSize;
+                textY = size * 1.18 + cornerRadius / 2;
+                qrX = moduleSize + cornerRadius / 2;
+                qrY = moduleSize + cornerRadius / 2;
+                finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+                finalContext.fillRect(borderX + cornerRadius / 6, borderY + cornerRadius / 6, canvasWidth - 1.5 * cornerRadius, canvasWidth - 1.5 * cornerRadius);
+                finalContext.fillStyle = color;
+                finalContext.strokeStyle = color;
+                this.drawSquareFrame(borderX, borderY, finalContext, size, true);
+                this.drawSquare(padX + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size, padHeight - cornerRadius, true);
+                break;
+            case QRCodeFrame.BOX_TOP:
+                cornerRadius = moduleSize;
+                finalContext.lineJoin = 'round';
+                finalContext.lineWidth = cornerRadius;
+                canvasHeight = 2 * size;
+                padX = 0;
+                padY = 0;
+                padHeight = size / 6;
+                borderX = cornerRadius / 2;
+                borderY = 0.05 * size + padHeight + cornerRadius / 2;
+                textX = size / 2;
+                textY = size * 0.11 + cornerRadius / 2;
+                qrX = borderX + moduleSize;
+                qrY = borderY + moduleSize;
+                finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+                finalContext.fillRect(borderX + cornerRadius / 6, borderY + cornerRadius / 6, canvasWidth - 1.5 * cornerRadius, canvasWidth - 1.5 * cornerRadius);
+                finalContext.fillStyle = color;
+                finalContext.strokeStyle = color;
+                this.drawSquareFrame(borderX, borderY, finalContext, size, true);
+                this.drawSquare(padX + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size, padHeight - cornerRadius, true);
                 break;
             case QRCodeFrame.BANNER_TOP:
-                canvasHeight = 1.25 * size;
-                borderX = 0;
-                borderY = size / 6;
+                cornerRadius = moduleSize;
+                finalContext.lineJoin = 'round';
+                finalContext.lineWidth = cornerRadius;
+                canvasHeight = 2 * size;
                 padX = 0;
-                padY = 1;
+                padY = 0;
                 padHeight = size / 6;
-                spaceX = moduleSize;
-                spaceY = borderY + moduleSize;
+                borderX = cornerRadius / 2;
+                borderY = padHeight + cornerRadius / 2 - 1;
                 textX = size / 2;
-                textY = size / 7;
-                qrX = moduleSize;
+                textY = size * 0.11 + cornerRadius / 2;
+                qrX = borderX + moduleSize;
                 qrY = borderY + moduleSize;
+                finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+                finalContext.fillRect(borderX + cornerRadius / 6, borderY + cornerRadius / 6, canvasWidth - 1.5 * cornerRadius, canvasWidth - 1.5 * cornerRadius);
+                finalContext.fillStyle = color;
+                finalContext.strokeStyle = color;
+                this.drawSquareFrame(borderX, borderY, finalContext, size, true);
+                this.drawSquare(padX + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size, padHeight - cornerRadius, true);
+                finalContext.moveTo(0, size / 2);
+                finalContext.lineTo(0, padHeight / 2);
+                finalContext.lineTo(cornerRadius*2, padHeight);
+                finalContext.fill();
+                finalContext.moveTo(size+cornerRadius, size / 2);
+                finalContext.lineTo(size+cornerRadius, padHeight / 2);
+                finalContext.lineTo(size-cornerRadius*2, padHeight);
+                finalContext.fill();
+                break;
+            case QRCodeFrame.BANNER_BOTTOM:
+                cornerRadius = moduleSize;
+                finalContext.lineJoin = 'round';
+                finalContext.lineWidth = cornerRadius;
+                canvasHeight = 2 * size;
+                borderX = cornerRadius / 2;
+                borderY = cornerRadius / 2;
+                padX = 0;
+                padY = 1.05 * size + cornerRadius / 2;
+                padHeight = size / 6;
+                textX = size / 2;
+                textY = size * 1.18 + cornerRadius / 2;
+                qrX = moduleSize + cornerRadius / 2;
+                qrY = moduleSize + cornerRadius / 2;
+                finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+                finalContext.fillRect(borderX + cornerRadius / 6, borderY + cornerRadius / 6, canvasWidth - 1.5 * cornerRadius, canvasWidth - 1.5 * cornerRadius);
+                finalContext.fillStyle = color;
+                finalContext.strokeStyle = color;
+                finalContext.fillRect(0, padY - cornerRadius * 2, size + cornerRadius, padHeight);
+                this.drawSquareFrame(borderX, borderY, finalContext, size, true);
+                this.drawSquare(padX + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size, padHeight - cornerRadius, true);
+                finalContext.moveTo(0, padY);
+                finalContext.lineTo(0, size - cornerRadius);
+                finalContext.lineTo(cornerRadius, size - cornerRadius);
+                finalContext.lineTo(cornerRadius, padY);
+                finalContext.fill();
+                finalContext.moveTo(size + cornerRadius, size);
+                finalContext.lineTo(size + cornerRadius, size - cornerRadius);
+                finalContext.lineTo(size, size - cornerRadius);
+                finalContext.lineTo(size - cornerRadius, size);
+                finalContext.fill();
                 break;
             case QRCodeFrame.BALLOON_TOP:
-                canvasHeight = 1.25 * size;
-                borderX = 0;
-                borderY = size / 6;
+                cornerRadius = moduleSize;
+                finalContext.lineJoin = 'round';
+                finalContext.lineWidth = cornerRadius;
+                canvasHeight = 2 * size;
                 padX = 0;
-                padY = 1;
-                padHeight = size / 6;
-                spaceX = moduleSize;
-                spaceY = borderY + moduleSize;
+                padY = 0;
+                padHeight = size / 5;
+                borderX = cornerRadius / 2;
+                borderY = 0.05 * size + padHeight + cornerRadius / 2;
                 textX = size / 2;
-                textY = size / 8;
-                qrX = moduleSize;
+                textY = size * 0.11 + cornerRadius / 2;
+                qrX = borderX + moduleSize;
                 qrY = borderY + moduleSize;
-                break;
+                finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+                finalContext.fillRect(0, padHeight / 2, canvasWidth, canvasHeight);
+                finalContext.fillStyle = color;
+                finalContext.strokeStyle = color;
+                
+                this.drawSquare(padX + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size, padHeight - cornerRadius, true);
 
-            case QRCodeFrame.BANNER_BOTTOM:
-                canvasHeight = 1.25 * size;
-                borderX = 0;
-                borderY = 0;
-                padX = 0;
-                padY = size - 1;
-                padHeight = size / 6;
-                spaceX = moduleSize;
-                spaceY = moduleSize;
-                textX = size / 2;
-                textY = size * 1.1;
-                qrX = moduleSize;
-                qrY = moduleSize;
                 break;
             case QRCodeFrame.BALLOON_BOTTOM:
-                canvasHeight = 1.25 * size;
-                borderX = 0;
-                borderY = 0;
+                cornerRadius = moduleSize;
+                finalContext.lineJoin = 'round';
+                finalContext.lineWidth = cornerRadius;
+                canvasHeight = 2 * size;
+                borderX = cornerRadius / 2;
+                borderY = cornerRadius / 2;
                 padX = 0;
-                padY = size - 1;
-                padHeight = size / 6;
-                spaceX = moduleSize;
-                spaceY = moduleSize;
+                padY = 1.05 * size + cornerRadius / 2;
+                padHeight = size / 5;
                 textX = size / 2;
-                textY = size * 1.12;
-                qrX = moduleSize;
-                qrY = moduleSize;
+                textY = size * 1.18 + cornerRadius / 2;
+                qrX = moduleSize + cornerRadius / 2;
+                qrY = moduleSize + cornerRadius / 2;
+                finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+                finalContext.fillRect(0, 0, canvasWidth, canvasHeight);
+                finalContext.fillStyle = color;
+                finalContext.strokeStyle = color;
+                
+                this.drawSquare(padX + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size, padHeight - cornerRadius, true);
                 break;
             default:
                 return canvas;
         }
-        const finalCanvas: Canvas = createCanvas(canvasWidth, canvasHeight, this.canvasType);
-        const finalContext = finalCanvas.getContext('2d');
-        finalContext.fillStyle = color;
-        if (frameStyle === QRCodeFrame.BALLOON_BOTTOM || frameStyle === QRCodeFrame.BALLOON_TOP)
-            finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
-        finalContext.fillRect(borderX, borderY, size, size);
-        finalContext.fillStyle = color;
-        finalContext.fillRect(padX, padY, size, padHeight);
+        
         finalContext.fillStyle = '#ffffff';
-        finalContext.fillRect(spaceX, spaceY, size - moduleSize * 2, size - moduleSize * 2);
-        // if (frameStyle === QRCodeFrame.BOX) finalContext.fillStyle = '#000000';
         finalContext.textAlign = 'center';
         finalContext.font = '100px arial';
         finalContext.fillText(text, textX, textY);
         finalContext.drawImage(canvas, qrX, qrY, rawSize, rawSize);
+        this.drawSquare(padX + size / 11 + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size / 8 - cornerRadius, size / 6 - cornerRadius, true);      
+        return loadImage(__dirname + "/assets/smartphone-2237421.svg").then(image => {
+            finalContext.drawImage(image, padX + size / 15, padY + cornerRadius / 5, size / 6, size / 6);
+        
         finalContext.fillStyle = frameColor ? frameColor : '#000000';
         if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
-            finalContext.moveTo(borderX + size / 2, borderY + size);
-            finalContext.lineTo(borderX + size / 2 + moduleSize * 2, borderY + size);
-            finalContext.lineTo(borderX + size / 2, borderY + size - moduleSize * 2.5);
-            finalContext.lineTo(borderX + size / 2 - moduleSize * 2, borderY + size);
+            finalContext.moveTo(padX + size / 2, padY + 1);
+            finalContext.lineTo(padX + size / 2 + moduleSize * 2, padY + 1);
+            finalContext.lineTo(padX + size / 2, padY + 1 - moduleSize * 2.5);
+            finalContext.lineTo(padX + size / 2 - moduleSize * 2, padY + 1);
+            finalContext.fill();
         }
         if (frameStyle === QRCodeFrame.BALLOON_TOP) {
-            finalContext.moveTo(borderX + size / 2, borderY);
-            finalContext.lineTo(borderX + size / 2 + moduleSize * 2, borderY);
-            finalContext.lineTo(borderX + size / 2, borderY + moduleSize * 2.5);
-            finalContext.lineTo(borderX + size / 2 - moduleSize * 2, borderY);
+            finalContext.moveTo(padX + size / 2, padHeight - 1);
+            finalContext.lineTo(padX + size / 2 + moduleSize * 2, padHeight - 1);
+            finalContext.lineTo(padX + size / 2, padHeight - 1 + moduleSize * 2.5);
+            finalContext.lineTo(padX + size / 2 - moduleSize * 2, padHeight - 1);
+            finalContext.fill();
         }
-        finalContext.fill();
         return finalCanvas;
+        }, err => {
+                return finalCanvas;
+        })
     }
 
     private async scaleFinalImage(canvas: Canvas): Promise<Canvas> {

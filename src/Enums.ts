@@ -64,7 +64,8 @@ export enum GradientType {
 
 export enum QRCodeFrame {
     NONE = 'none',
-    BOX = 'box',
+    BOX_BOTTOM = 'box-bottom',
+    BOX_TOP = 'box-top',
     BANNER_TOP = 'banner-top',
     BANNER_BOTTOM = 'banner-bottom',
     BALLOON_BOTTOM = 'balloon-bottom',
