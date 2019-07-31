@@ -571,7 +571,7 @@ export class Drawing {
         const size = rawSize + moduleSize * 2;
         const text = frameText ? frameText : '';
         let canvasWidth: number = size + moduleSize,
-            canvasHeight: number = 1.25 * size,
+            canvasHeight: number = 1.3 * size,
             borderX: number = 0,
             borderY: number = 0,
             padX: number = 0,
@@ -592,14 +592,13 @@ export class Drawing {
                 cornerRadius = moduleSize;
                 finalContext.lineJoin = 'round';
                 finalContext.lineWidth = cornerRadius;
-                canvasHeight = 2 * size;
                 borderX = cornerRadius / 2;
                 borderY = cornerRadius / 2;
                 padX = 0;
                 padY = 1.05 * size + cornerRadius / 2;
-                padHeight = size / 6;
-                textX = size / 2;
-                textY = size * 1.18 + cornerRadius / 2;
+                padHeight = size / 5;
+                textX = size / 2 + moduleSize;
+                textY = size * 1.18 + cornerRadius / 2 + moduleSize / 2;
                 qrX = moduleSize + cornerRadius / 2;
                 qrY = moduleSize + cornerRadius / 2;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
@@ -613,14 +612,13 @@ export class Drawing {
                 cornerRadius = moduleSize;
                 finalContext.lineJoin = 'round';
                 finalContext.lineWidth = cornerRadius;
-                canvasHeight = 2 * size;
                 padX = 0;
                 padY = 0;
-                padHeight = size / 6;
+                padHeight = size / 5;
                 borderX = cornerRadius / 2;
                 borderY = 0.05 * size + padHeight + cornerRadius / 2;
-                textX = size / 2;
-                textY = size * 0.11 + cornerRadius / 2;
+                textX = size / 2 + moduleSize;
+                textY = size * 0.11 + cornerRadius / 2 + moduleSize / 2;
                 qrX = borderX + moduleSize;
                 qrY = borderY + moduleSize;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
@@ -634,14 +632,13 @@ export class Drawing {
                 cornerRadius = moduleSize;
                 finalContext.lineJoin = 'round';
                 finalContext.lineWidth = cornerRadius;
-                canvasHeight = 2 * size;
                 padX = 0;
                 padY = 0;
-                padHeight = size / 6;
+                padHeight = size / 5;
                 borderX = cornerRadius / 2;
                 borderY = padHeight + cornerRadius / 2 - 1;
                 textX = size / 2;
-                textY = size * 0.11 + cornerRadius / 2;
+                textY = size * 0.11 + cornerRadius / 2 + moduleSize;
                 qrX = borderX + moduleSize;
                 qrY = borderY + moduleSize;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
@@ -663,14 +660,13 @@ export class Drawing {
                 cornerRadius = moduleSize;
                 finalContext.lineJoin = 'round';
                 finalContext.lineWidth = cornerRadius;
-                canvasHeight = 2 * size;
                 borderX = cornerRadius / 2;
                 borderY = cornerRadius / 2;
                 padX = 0;
                 padY = 1.05 * size + cornerRadius / 2;
-                padHeight = size / 6;
+                padHeight = size / 5;
                 textX = size / 2;
-                textY = size * 1.18 + cornerRadius / 2;
+                textY = size * 1.18 + cornerRadius / 2 - moduleSize;
                 qrX = moduleSize + cornerRadius / 2;
                 qrY = moduleSize + cornerRadius / 2;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
@@ -695,18 +691,17 @@ export class Drawing {
                 cornerRadius = moduleSize;
                 finalContext.lineJoin = 'round';
                 finalContext.lineWidth = cornerRadius;
-                canvasHeight = 2 * size;
                 padX = 0;
                 padY = 0;
                 padHeight = size / 5;
                 borderX = cornerRadius / 2;
                 borderY = 0.05 * size + padHeight + cornerRadius / 2;
-                textX = size / 2;
-                textY = size * 0.11 + cornerRadius / 2;
+                textX = size / 2 + moduleSize;
+                textY = size * 0.11 + cornerRadius / 2 + moduleSize / 2;
                 qrX = borderX + moduleSize;
                 qrY = borderY + moduleSize;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
-                finalContext.fillRect(0, padHeight / 2, canvasWidth, canvasHeight);
+                finalContext.fillRect(0, padHeight / 2, canvasWidth, size + padHeight);
                 finalContext.fillStyle = color;
                 finalContext.strokeStyle = color;
                 
@@ -717,18 +712,17 @@ export class Drawing {
                 cornerRadius = moduleSize;
                 finalContext.lineJoin = 'round';
                 finalContext.lineWidth = cornerRadius;
-                canvasHeight = 2 * size;
                 borderX = cornerRadius / 2;
                 borderY = cornerRadius / 2;
                 padX = 0;
                 padY = 1.05 * size + cornerRadius / 2;
                 padHeight = size / 5;
-                textX = size / 2;
-                textY = size * 1.18 + cornerRadius / 2;
+                textX = size / 2 + moduleSize;
+                textY = size * 1.18 + cornerRadius / 2 + moduleSize / 2;
                 qrX = moduleSize + cornerRadius / 2;
                 qrY = moduleSize + cornerRadius / 2;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
-                finalContext.fillRect(0, 0, canvasWidth, canvasHeight);
+                finalContext.fillRect(0, 0, canvasWidth, padY + padHeight / 2);
                 finalContext.fillStyle = color;
                 finalContext.strokeStyle = color;
                 
@@ -739,14 +733,17 @@ export class Drawing {
         }
         
         finalContext.fillStyle = '#ffffff';
+        finalContext.strokeStyle = '#ffffff';
+        finalContext.lineWidth = cornerRadius / 4;
         finalContext.textAlign = 'center';
         finalContext.font = '100px arial';
         finalContext.fillText(text, textX, textY);
-        finalContext.drawImage(canvas, qrX, qrY, rawSize, rawSize);
-        this.drawSquare(padX + size / 11 + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size / 8 - cornerRadius, size / 6 - cornerRadius, true);      
-        return loadImage(__dirname + "/assets/smartphone-2237421.svg").then(image => {
-            finalContext.drawImage(image, padX + size / 15, padY + cornerRadius / 5, size / 6, size / 6);
-        
+        finalContext.drawImage(canvas, qrX, qrY, rawSize, rawSize);      
+        return loadImage(__dirname + "/assets/smartphone.svg").then(image => {
+            if (frameStyle !== QRCodeFrame.BANNER_BOTTOM && frameStyle !== QRCodeFrame.BANNER_TOP) {
+                this.drawSquare(padX + size / 11 + cornerRadius / 2, padY + cornerRadius, finalContext, size / 8 - cornerRadius, size / 6 - cornerRadius, true);
+                finalContext.drawImage(image, padX + size / 15, padY + cornerRadius / 1.5, size / 6, size / 6);
+            }        
         finalContext.fillStyle = frameColor ? frameColor : '#000000';
         if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
             finalContext.moveTo(padX + size / 2, padY + 1);
