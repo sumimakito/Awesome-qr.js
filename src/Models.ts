@@ -583,6 +583,8 @@ export class Drawing {
             textY: number = 0,
             qrX: number = 0,
             qrY: number = 0,
+            logoX: number = 0,
+            logoY: number = 0,
             cornerRadius: number = 0;
         const finalCanvas: Canvas = createCanvas(canvasWidth, canvasHeight, this.canvasType);
         const finalContext = finalCanvas.getContext('2d');
@@ -598,9 +600,11 @@ export class Drawing {
                 padY = 1.05 * size + cornerRadius / 2;
                 padHeight = size / 5;
                 textX = size / 2 + moduleSize;
-                textY = size * 1.165 + cornerRadius / 2 + moduleSize / 2;
+                textY = size * 1.17 + cornerRadius / 2 + moduleSize / 2;
                 qrX = moduleSize + cornerRadius / 2;
                 qrY = moduleSize + cornerRadius / 2;
+                logoX = padX + size / 4.2;
+                logoY = padY + cornerRadius * 1.45;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
                 finalContext.fillRect(borderX + cornerRadius / 6, borderY + cornerRadius / 6, canvasWidth - 1.5 * cornerRadius, canvasWidth - 1.5 * cornerRadius);
                 finalContext.fillStyle = color;
@@ -619,11 +623,13 @@ export class Drawing {
                 padY = 0;
                 padHeight = size / 5;
                 borderX = cornerRadius / 2;
-                borderY = 0.05 * size + padHeight + cornerRadius / 2;
+                borderY = 1.2 * padHeight + cornerRadius / 2;
                 textX = size / 2 + moduleSize;
-                textY = size * 0.11 + cornerRadius / 2 + moduleSize / 2;
+                textY = size * 0.105 + cornerRadius / 2 + moduleSize / 2;
                 qrX = borderX + moduleSize;
                 qrY = borderY + moduleSize;
+                logoX = padX + size / 4.2;
+                logoY = padY + cornerRadius * 1.45;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
                 finalContext.fillRect(borderX + cornerRadius / 6, borderY + cornerRadius / 6, canvasWidth - 1.5 * cornerRadius, canvasWidth - 1.5 * cornerRadius);
                 finalContext.fillStyle = color;
@@ -642,9 +648,11 @@ export class Drawing {
                 padY = 0;
                 padHeight = size / 5;
                 borderX = cornerRadius / 2;
-                borderY = padHeight + cornerRadius / 2 - 1;
-                textX = size / 2;
-                textY = size * 0.11 + cornerRadius / 2 + moduleSize;
+                borderY = padHeight - 1;
+                textX = size / 2 + moduleSize;
+                textY = size * 0.113 + cornerRadius / 2 + moduleSize / 2;
+                logoX = padX + size / 4.2;
+                logoY = padY + cornerRadius * 1.8;
                 qrX = borderX + moduleSize;
                 qrY = borderY + moduleSize;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
@@ -652,26 +660,14 @@ export class Drawing {
                 finalContext.fillStyle = color;
                 finalContext.strokeStyle = color;
                 this.drawSquareFrame(borderX, borderY, finalContext, size, size, false);
-                // cornerRadius = moduleSize * 4;
-                // finalContext.lineWidth = cornerRadius;
                 this.drawSquare(padX + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size, padHeight - cornerRadius, true);
-                // cornerRadius = moduleSize;
-                finalContext.moveTo(0, padHeight+cornerRadius * 2);
-                finalContext.lineTo(0, padHeight / 2);
-                finalContext.lineTo(cornerRadius * 2, padHeight);
-                finalContext.lineTo(0, padHeight);
+                finalContext.moveTo(cornerRadius/2, padHeight+cornerRadius * 2);
+                finalContext.lineTo(cornerRadius/2, padHeight / 2);
+                
+                finalContext.moveTo(size+cornerRadius/2, padHeight+cornerRadius * 2);
+                finalContext.lineTo(size+cornerRadius/2, padHeight / 2);
                 finalContext.stroke();
-                // finalContext.moveTo(moduleSize/2, padHeight+cornerRadius * 2);
-                // finalContext.lineTo(moduleSize/2, padHeight / 2);
-                // finalContext.stroke();
-                finalContext.moveTo(size+cornerRadius, padHeight+cornerRadius * 2);
-                finalContext.lineTo(size+cornerRadius, padHeight / 2);
-                finalContext.lineTo(size - cornerRadius * 2, padHeight);
-                finalContext.lineTo(size + cornerRadius, padHeight);
-                finalContext.stroke();
-                // finalContext.moveTo(size, padHeight+cornerRadius/2);
-                // finalContext.lineTo(size, padHeight / 2);
-                // finalContext.stroke();
+                
                 break;
             case QRCodeFrame.BANNER_BOTTOM:
                 cornerRadius = moduleSize;
@@ -682,8 +678,10 @@ export class Drawing {
                 padX = 0;
                 padY = size + cornerRadius / 2;
                 padHeight = size / 5;
-                textX = size / 2;
-                textY = size * 1.16 + cornerRadius / 2 - moduleSize;
+                textX = size / 2 + moduleSize;
+                textY = size * 1.11 + cornerRadius / 2 + moduleSize / 2;
+                logoX = padX + size / 4.2;
+                logoY = padY + cornerRadius * 1.2;
                 qrX = moduleSize + cornerRadius / 2;
                 qrY = moduleSize + cornerRadius / 2;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
@@ -692,13 +690,12 @@ export class Drawing {
                 finalContext.strokeStyle = color;
                 this.drawSquareFrame(borderX, borderY, finalContext, size, size, false);
                 this.drawSquare(padX + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size, padHeight - cornerRadius, true);
-                finalContext.moveTo(0, padY + cornerRadius / 2);
-                finalContext.lineTo(0, size - cornerRadius);
-                finalContext.lineTo(0.7*cornerRadius, padY);
-                finalContext.stroke();
-                finalContext.moveTo(size + cornerRadius, padY + cornerRadius / 2);
-                finalContext.lineTo(size + cornerRadius, size - cornerRadius);
-                finalContext.lineTo(size + cornerRadius/3, padY + cornerRadius);
+                finalContext.moveTo(cornerRadius/2, padY + cornerRadius / 2);
+                finalContext.lineTo(cornerRadius/2, size - cornerRadius);
+                finalContext.lineTo(cornerRadius/2, padY);
+                finalContext.moveTo(size + cornerRadius/2, padY + cornerRadius / 2);
+                finalContext.lineTo(size + cornerRadius/2, size - cornerRadius);
+                finalContext.lineTo(size + cornerRadius/2, padY + cornerRadius);
                 finalContext.stroke();
                 break;
             case QRCodeFrame.BALLOON_TOP:
@@ -712,6 +709,8 @@ export class Drawing {
                 borderY = 0.05 * size + padHeight + cornerRadius / 2;
                 textX = size / 2 + moduleSize;
                 textY = size * 0.1 + cornerRadius / 2 + moduleSize / 2;
+                logoX = padX + size / 4.2;
+                logoY = padY + cornerRadius * 1.3;
                 qrX = borderX + moduleSize;
                 qrY = borderY + moduleSize;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
@@ -734,6 +733,8 @@ export class Drawing {
                 padHeight = size / 5;
                 textX = size / 2 + moduleSize;
                 textY = size * 1.17 + cornerRadius / 2 + moduleSize / 2;
+                logoX = padX + size / 4.2;
+                logoY = padY + cornerRadius * 1.4;
                 qrX = moduleSize + cornerRadius / 2;
                 qrY = moduleSize + cornerRadius / 2;
                 finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
@@ -745,22 +746,48 @@ export class Drawing {
                 this.drawSquare(padX + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size - cornerRadius + moduleSize, padHeight - cornerRadius, true);
                 cornerRadius = moduleSize;
                 break;
+            // case QRCodeFrame.BOX_LIGHT:
+            //     cornerRadius = moduleSize;
+            //     finalContext.lineJoin = 'round';
+            //     finalContext.lineWidth = cornerRadius;
+            //     borderX = cornerRadius / 2;
+            //     borderY = cornerRadius / 2;
+            //     padX = 0;
+            //     padY = 1.06 * size;
+            //     padHeight = size / 5;
+            //     textX = size / 2 + moduleSize;
+            //     textY = size * 1.18 + cornerRadius / 2 + moduleSize / 2;
+            //     qrX = moduleSize + cornerRadius / 2;
+            //     qrY = moduleSize + cornerRadius / 2;
+            //     logoX = padX + size / 4.2;
+            //     logoY = padY + cornerRadius * 1.9;
+            //     finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+            //     finalContext.fillRect(borderX + cornerRadius / 6, borderY + cornerRadius / 6, canvasWidth - 1.5 * cornerRadius, canvasWidth - 1.5 * cornerRadius);
+            //     finalContext.fillStyle = color;
+            //     finalContext.strokeStyle = color;
+            //     this.drawSquareFrame(borderX, borderY, finalContext, size, size, false);
+            //     this.drawSquareFrame(padX + cornerRadius/2, padY+cornerRadius/2, finalContext, size, padHeight, false);
+            //     break;
             default:
                 return canvas;
         }
         
         finalContext.fillStyle = '#ffffff';
         finalContext.strokeStyle = '#ffffff';
+        let icon = "/assets/cellphone.svg"
+        // if (frameStyle === QRCodeFrame.BOX_LIGHT) {
+        //     finalContext.fillStyle = frameColor ? frameColor : '#000000';
+        //     finalContext.strokeStyle = frameColor ? frameColor : '#000000';
+        //     icon = "/assets/cellphone-dark.svg";
+        // }
         finalContext.lineWidth = cornerRadius;
         finalContext.textAlign = 'center';
         finalContext.font = '80px roboto';
-        finalContext.fillText(text, textX, textY);
+        finalContext.fillText(text, textX + 1.1 * moduleSize, textY);
         finalContext.drawImage(canvas, qrX, qrY, rawSize, rawSize);      
-        return loadImage(__dirname + "/assets/cellphone.svg").then(image => {
-            if (frameStyle !== QRCodeFrame.BANNER_BOTTOM && frameStyle !== QRCodeFrame.BANNER_TOP) {
-                this.drawSquare(padX + size / 5.5 + cornerRadius / 2, padY + cornerRadius * 1.4, finalContext, size / 10.5 - cornerRadius, size / 7.1 - cornerRadius, true);
-                finalContext.drawImage(image, padX + size / 6, padY + cornerRadius * 1.1, size / 8, size / 8);
-            }        
+        return loadImage(__dirname + icon).then(image => {
+
+            finalContext.drawImage(image, logoX, logoY, size / 10, size / 10);
         finalContext.fillStyle = frameColor ? frameColor : '#000000';
         if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
             finalContext.moveTo(padX + size / 2, padY + 1);
@@ -778,6 +805,7 @@ export class Drawing {
         }
         return finalCanvas;
         }, err => {
+                console.log(err);
                 return finalCanvas;
         })
     }
@@ -914,11 +942,11 @@ export class Drawing {
                 break;
             }
             default: {
-                context.fillStyle = color;
-                this.drawSquareFrame(0, 0, context, 7 * moduleSize,7 * moduleSize, false);
-                this.drawSquareFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false);
-                this.drawSquareFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false);
-                context.fillStyle = this.config.colorDark;
+                // context.fillStyle = color;
+                this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false);
+                this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false);
+                this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false);
+                // context.fillStyle = this.config.colorDark;
                 break;
             }
         }
@@ -956,6 +984,13 @@ export class Drawing {
         }
     }
 
+    private drawSquareEyeFrame(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound: boolean) {
+        const moduleSize = this.config.moduleSize;
+        context.fillRect(startX, startY, width, height);
+        context.clearRect(startX + 1 * moduleSize, startY + 1 * moduleSize, width - 2 * moduleSize, height - 2 * moduleSize);
+
+    }
+
     private drawSquareFrame(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound: boolean) {
         const moduleSize = this.config.moduleSize;
         if (isRound) {
@@ -963,7 +998,7 @@ export class Drawing {
             const b = startY + height;
             const radius = moduleSize * 2;
             context.beginPath();
-            context.lineWidth = moduleSize;
+            context.lineWidth = moduleSize / 1.5;
             context.moveTo(startX + radius, startY);
             context.lineTo(r - radius, startY);
             context.quadraticCurveTo(r, startY, r, startY + radius);
@@ -975,13 +1010,11 @@ export class Drawing {
             context.quadraticCurveTo(startX, startY, startX + radius, startY);
             context.stroke();
         } else {
-            // context.fillRect(startX, startY, width, height);
-            // context.clearRect(startX + 1 * moduleSize, startY + 1 * moduleSize, width - 2 * moduleSize, height - 2 * moduleSize);
             const r = startX + width;
             const b = startY + height;
-            const radius = moduleSize / 3;
+            const radius = moduleSize / 2;
             context.beginPath();
-            context.lineWidth = moduleSize;
+            context.lineWidth = moduleSize / 1.5;
             context.moveTo(startX + radius, startY);
             context.lineTo(r - radius, startY);
             context.quadraticCurveTo(r, startY, r, startY + radius);
@@ -1068,11 +1101,11 @@ export class Drawing {
                 break;
             }
             default: {
-                context.fillStyle = color;
+                // context.fillStyle = color;
                 this.drawSquare(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawSquare((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawSquare(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false);
-                context.fillStyle = this.config.colorDark;
+                // context.fillStyle = this.config.colorDark;
                 break;
             }
         }
