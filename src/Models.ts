@@ -764,17 +764,17 @@ export class Drawing {
             finalContext.drawImage(image, logoX, logoY, size / 10, size / 10);
             finalContext.fillStyle = frameColor ? frameColor : '#000000';
         if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
-            finalContext.moveTo(padX + size / 2, padY + 2);
-            finalContext.lineTo(padX + size / 2 + moduleSize * 2, padY + 2);
-            finalContext.lineTo(padX + size / 2, padY + 2 - moduleSize * 2.5);
-            finalContext.lineTo(padX + size / 2 - moduleSize * 2, padY + 2);
+            finalContext.moveTo(padX + 5 + size / 2, padY + 2);
+            finalContext.lineTo(padX + 5 + size / 2 + moduleSize * 2, padY + 2);
+            finalContext.lineTo(padX + 5 + size / 2, padY + 2 - moduleSize * 2.5);
+            finalContext.lineTo(padX + 5 + size / 2 - moduleSize * 2, padY + 2);
             finalContext.fill();
         }
         if (frameStyle === QRCodeFrame.BALLOON_TOP) {
-            finalContext.moveTo(padX + size / 2, padHeight - 2);
-            finalContext.lineTo(padX + size / 2 + moduleSize * 2, padHeight - 2);
-            finalContext.lineTo(padX + size / 2, padHeight - 2 + moduleSize * 2.5);
-            finalContext.lineTo(padX + size / 2 - moduleSize * 2, padHeight - 2);
+            finalContext.moveTo(padX + 5 + size / 2, padHeight - 2);
+            finalContext.lineTo(padX + 5 + size / 2 + moduleSize * 2, padHeight - 2);
+            finalContext.lineTo(padX + 5 + size / 2, padHeight - 2 + moduleSize * 2.5);
+            finalContext.lineTo(padX + 5 + size / 2 - moduleSize * 2, padHeight - 2);
             finalContext.fill();
         }
         return finalCanvas;
