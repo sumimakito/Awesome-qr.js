@@ -570,7 +570,7 @@ export class Drawing {
         const moduleSize = this.config.moduleSize;
         const rawSize = this.config.rawSize;
         const size = rawSize + moduleSize * 2;
-        const text = frameText ? frameText : '';
+        const text = frameText ? frameText : 'SCAN ME';
         let canvasWidth: number = size + moduleSize,
             canvasHeight: number = 1.3 * size,
             borderX: number = 0,
