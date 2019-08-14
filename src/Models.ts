@@ -5,6 +5,7 @@ import { CanvasType, QRErrorCorrectLevel, QRMode, EyeBallShape, EyeFrameShape, D
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { loadImage } from './Util';
 
+
 export class QRPolynomial {
     public num: number[];
 
@@ -745,61 +746,35 @@ export class Drawing {
                 this.drawSquare(padX + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size - cornerRadius + moduleSize, padHeight - cornerRadius, true);
                 cornerRadius = moduleSize;
                 break;
-                // case QRCodeFrame.BOX_LIGHT:
-                //     cornerRadius = moduleSize;
-                //     finalContext.lineJoin = 'round';
-                //     finalContext.lineWidth = cornerRadius;
-                //     borderX = cornerRadius / 2;
-                //     borderY = cornerRadius / 2;
-                //     padX = 0;
-                //     padY = 1.06 * size;
-                //     padHeight = size / 5;
-                //     textX = size / 2 + moduleSize;
-                //     textY = size * 1.18 + cornerRadius / 2 + moduleSize / 2;
-                //     qrX = moduleSize + cornerRadius / 2;
-                //     qrY = moduleSize + cornerRadius / 2;
-                //     logoX = padX + size / 4.2;
-                //     logoY = padY + cornerRadius * 1.9;
-                //     finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
-                //     finalContext.fillRect(borderX + cornerRadius / 6, borderY + cornerRadius / 6, canvasWidth - 1.5 * cornerRadius, canvasWidth - 1.5 * cornerRadius);
-                //     finalContext.fillStyle = color;
-                //     finalContext.strokeStyle = color;
-                //     this.drawSquareFrame(borderX, borderY, finalContext, size, size, false);
-                //     this.drawSquareFrame(padX + cornerRadius/2, padY+cornerRadius/2, finalContext, size, padHeight, false);
-                // break;
             default:
                 return canvas;
         }
         
         finalContext.fillStyle = '#ffffff';
         finalContext.strokeStyle = '#ffffff';
-        let icon = "/assets/cellphone.svg"
-        // if (frameStyle === QRCodeFrame.BOX_LIGHT) {
-        //     finalContext.fillStyle = frameColor ? frameColor : '#000000';
-        //     finalContext.strokeStyle = frameColor ? frameColor : '#000000';
-        //     icon = "/assets/cellphone-dark.svg";
-        // }
+
         finalContext.lineWidth = cornerRadius;
         finalContext.textAlign = 'center';
-        finalContext.font = '80px roboto';
+        let fontSize = this.config.size / 10;
+        finalContext.font = `${fontSize}px arial`;
         finalContext.fillText(text, textX + 1.1 * moduleSize, textY);
-        finalContext.drawImage(canvas, qrX, qrY, rawSize, rawSize);      
-        return loadImage(__dirname + icon).then(image => {
+        finalContext.drawImage(canvas, qrX, qrY, rawSize, rawSize);   
+        return loadImage("https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg").then(image => {
             
             finalContext.drawImage(image, logoX, logoY, size / 10, size / 10);
-        finalContext.fillStyle = frameColor ? frameColor : '#000000';
+            finalContext.fillStyle = frameColor ? frameColor : '#000000';
         if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
-            finalContext.moveTo(padX + size / 2, padY + 1);
-            finalContext.lineTo(padX + size / 2 + moduleSize * 2, padY + 1);
-            finalContext.lineTo(padX + size / 2, padY + 1 - moduleSize * 2.5);
-            finalContext.lineTo(padX + size / 2 - moduleSize * 2, padY + 1);
+            finalContext.moveTo(padX + size / 2, padY + 2);
+            finalContext.lineTo(padX + size / 2 + moduleSize * 2, padY + 2);
+            finalContext.lineTo(padX + size / 2, padY + 2 - moduleSize * 2.5);
+            finalContext.lineTo(padX + size / 2 - moduleSize * 2, padY + 2);
             finalContext.fill();
         }
         if (frameStyle === QRCodeFrame.BALLOON_TOP) {
-            finalContext.moveTo(padX + size / 2, padHeight - 1);
-            finalContext.lineTo(padX + size / 2 + moduleSize * 2, padHeight - 1);
-            finalContext.lineTo(padX + size / 2, padHeight - 1 + moduleSize * 2.5);
-            finalContext.lineTo(padX + size / 2 - moduleSize * 2, padHeight - 1);
+            finalContext.moveTo(padX + size / 2, padHeight - 2);
+            finalContext.lineTo(padX + size / 2 + moduleSize * 2, padHeight - 2);
+            finalContext.lineTo(padX + size / 2, padHeight - 2 + moduleSize * 2.5);
+            finalContext.lineTo(padX + size / 2 - moduleSize * 2, padHeight - 2);
             finalContext.fill();
         }
         return finalCanvas;
@@ -862,7 +837,7 @@ export class Drawing {
         context.restore();
 
         context.save();
-
+        
         return loadImage(this.config.logoImage!).then(image => {
             CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate + logoMargin, centreCoordinate + logoMargin, logoSize, logoSize, logoCornerRadius);
             context.clip();

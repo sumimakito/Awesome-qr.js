@@ -8,14 +8,14 @@ export class QRCodeBuilder {
     public constructor(config?: Partial<QRCodeConfig>) {
         const defaultConfig: QRCodeConfig = {
             size: 800,
-            margin: 60,
+            margin: 800/12, //margin must be 1/12 of size
             typeNumber: 4,
             colorDark: '#000000',
             colorLight: '#ffffff',
             correctLevel: QRErrorCorrectLevel.M,
             backgroundDimming: 'rgba(0,0,0,0)',
             logoScale: 0.15,
-            logoMargin: 15,
+            logoMargin: 800/12/4, // 1/4 of margin
             logoCornerRadius: 8,
             dotScale: 0.35,
             text: '',
@@ -160,7 +160,7 @@ export class QRCodeBuilder {
     }
 
     public async build(format?: CanvasType): Promise<QRCode | never> {
-        this.config.canvasType = format;
+        this.config.canvasType = format ? format : CanvasType.PNG;
         if (!this.config.text) {
             return Promise.reject('Setting text is necessary to generate the QRCode');
         }

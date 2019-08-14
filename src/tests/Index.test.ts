@@ -8,7 +8,7 @@ describe('QR code tests', () => {
             text: 'http://www.beaconstac.com/',
             backgroundImage: 'https://image.flaticon.com/teams/slug/google.jpg',
             backgroundColor: '#f7f7c3',
-            logoImage: __dirname + '/pokemon.png',
+            logoImage: 'https://static.beaconstac.com/assets/img/qr-code-logos/app-store.svg',
             canvasType: CanvasType.SVG,
             eyeFrameShape: EyeFrameShape.ROUNDED,
             eyeBallShape: EyeBallShape.LEFT_LEAF,
@@ -19,8 +19,8 @@ describe('QR code tests', () => {
             colorLight: '#999c14',
             dotScale: 0.96,
             gradientType: GradientType.RADIAL,
-            frameStyle: QRCodeFrame.BALLOON_TOP,
-            // frameColor: 'red',
+            frameStyle: QRCodeFrame.BALLOON_BOTTOM,
+            frameColor: '#0b1257',
             frameText: 'SCAN ME',
         });
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
