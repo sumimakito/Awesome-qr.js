@@ -572,7 +572,7 @@ export class Drawing {
         const size = rawSize + moduleSize * 2;
         const text = frameText ? frameText : 'SCAN ME';
         let canvasWidth: number = size + moduleSize,
-            canvasHeight: number = 1.3 * size,
+            canvasHeight: number = 1.265 * size,
             borderX: number = 0,
             borderY: number = 0,
             padX: number = 0,
@@ -587,6 +587,10 @@ export class Drawing {
             logoX: number = 0,
             logoY: number = 0,
             cornerRadius: number = 0;
+        if (frameStyle === QRCodeFrame.BANNER_TOP || frameStyle === QRCodeFrame.BANNER_BOTTOM)
+            canvasHeight = 1.216 * size;
+        if (frameStyle === QRCodeFrame.BOX_TOP || frameStyle === QRCodeFrame.BOX_BOTTOM)
+            canvasHeight = 1.27 * size;
         const finalCanvas: Canvas = createCanvas(canvasWidth, canvasHeight, this.canvasType);
         const finalContext = finalCanvas.getContext('2d');
 
