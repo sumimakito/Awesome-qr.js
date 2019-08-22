@@ -60,6 +60,8 @@ export enum GradientType {
     NONE = 'none',
     LINEAR = 'linear',
     RADIAL = 'radial',
+    VERTICAL = 'vertical',
+    HORIZONTAL = 'horizontal',
 }
 
 export enum QRCodeFrame {

@@ -503,6 +503,16 @@ export class Drawing {
                 gradient.addColorStop(0, this.config.colorDark);
                 gradient.addColorStop(1, this.config.colorLight);
                 break;
+            case GradientType.HORIZONTAL:
+                gradient = mainContext.createLinearGradient(0, 0, this.config.moduleSize * this.moduleCount, 0);
+                gradient.addColorStop(0, this.config.colorDark);
+                gradient.addColorStop(1, this.config.colorLight);
+                break;
+            case GradientType.VERTICAL:
+                gradient = mainContext.createLinearGradient(0, 0, 0, this.config.moduleSize * this.moduleCount);
+                gradient.addColorStop(0, this.config.colorDark);
+                gradient.addColorStop(1, this.config.colorLight);
+                break;
             case GradientType.RADIAL:
                 gradient = mainContext.createRadialGradient(
                     (this.config.moduleSize * this.moduleCount) / 2,
@@ -835,6 +845,7 @@ export class Drawing {
 
         context.fillStyle = '#ffffff';
         context.save();
+        if(logoMargin > 0)
         CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate, centreCoordinate, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
         context.clip();
         context.fill();
