@@ -845,7 +845,6 @@ export class Drawing {
 
         context.fillStyle = '#ffffff';
         context.save();
-        if(logoMargin > 0)
         CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate, centreCoordinate, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
         context.clip();
         context.fill();
