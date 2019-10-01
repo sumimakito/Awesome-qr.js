@@ -19,9 +19,11 @@ describe('QR code tests', () => {
             colorLight: '#999c14',
             dotScale: 0.96,
             gradientType: GradientType.RADIAL,
-            frameStyle: QRCodeFrame.BALLOON_BOTTOM,
+            frameStyle: QRCodeFrame.BALLOON_TOP,
             frameColor: '#0b1257',
             frameText: 'SCAN ME',
+            logoMargin: 10,
+            isVCard: false,
         });
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
             const fs = require('fs');

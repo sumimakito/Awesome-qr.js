@@ -1,4 +1,4 @@
-import { CanvasType, QRErrorCorrectLevel, EyeBallShape, EyeFrameShape, DataPattern, GradientType, QRCodeFrame } from './Enums';
+import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame, QRErrorCorrectLevel } from './Enums';
 import { QRCode } from './Models';
 import { QRCodeConfig } from './Types';
 
@@ -8,7 +8,7 @@ export class QRCodeBuilder {
     public constructor(config?: Partial<QRCodeConfig>) {
         const defaultConfig: QRCodeConfig = {
             size: 800,
-            margin: 800/12, //margin must be 1/12 of size
+            margin: 800/12, // margin must be 1/12 of size
             typeNumber: 4,
             colorDark: '#000000',
             colorLight: '#ffffff',
@@ -20,6 +20,7 @@ export class QRCodeBuilder {
             dotScale: 0.35,
             text: '',
             maskedDots: false,
+            isVCard: false
         };
         this.config = Object.assign({}, defaultConfig, config);
     }
@@ -156,6 +157,11 @@ export class QRCodeBuilder {
 
     public setFrameText(frameText: string) {
         this.config.frameText = frameText;
+        return this;
+    }
+
+    public setIsVCard(isVCard: boolean) {
+        this.config.isVCard = isVCard;
         return this;
     }
 
