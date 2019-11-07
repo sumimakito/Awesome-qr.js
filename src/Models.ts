@@ -1231,7 +1231,7 @@ export class Drawing {
                 if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-                    context.fillStyle = 'rgba(0, 0, 0, .2)';
+                    context.fillStyle = gradient;
                     this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 } else {
                     context.fillStyle = gradient;
