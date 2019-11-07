@@ -1,6 +1,6 @@
 {
     "name": "mobstac-awesome-qr",
-    "version": "1.1.1",
+    "version": "2.0.3",
     "description": "MobStac Awesome QR code library",
     "homepage": "https://github.com/mobstac/mobstac-awesome-qr",
     "bugs": "https://github.com/mobstac/mobstac-awesome-qr/issues",
@@ -42,6 +42,7 @@
         "@types/chai": "4.1.7",
         "@types/mocha": "5.2.6",
         "chai": "4.2.0",
+        "file-loader": "^4.2.0",
         "mocha": "^6.2.0",
         "nyc": "^14.1.1",
         "prettier": "1.16.4",
@@ -59,6 +60,6 @@
     ],
     "dependencies": {
         "@types/node": "11.13.0",
-        "canvas": "2.4.1"
+        "canvas": "2.5.0"
     }
 }
