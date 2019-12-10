@@ -888,7 +888,7 @@ export class Drawing {
 
         context.save();
 
-        return loadImage(this.config.logoImage!).then(image => {
+        return loadImage(this.config.logoImage!, this.config.imageServerURL, this.config.imageServerRequestHeaders).then((image: any) => {
             CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate + logoMargin, centreCoordinate + logoMargin, logoSize, logoSize, logoCornerRadius);
             context.clip();
             context.drawImage(image, centreCoordinate + logoMargin, centreCoordinate + logoMargin, logoSize, logoSize);
@@ -1425,7 +1425,7 @@ export class Drawing {
     }
 
     private async addBackgroundImage(context: CanvasRenderingContext2D, size: number, backgroundImage: string) {
-        return loadImage(backgroundImage).then(image => {
+        return loadImage(backgroundImage, this.config.imageServerURL, this.config.imageServerRequestHeaders).then(image => {
             if (this.config.autoColor) {
                 // @ts-ignore
                 const avgRGB = CanvasUtil.getAverageRGB(image, size);

@@ -32,6 +32,8 @@ export interface QRCodeConfig {
     frameColor?: string;
     frameText?: string;
     isVCard?: boolean;
+    imageServerURL?: string,
+    imageServerRequestHeaders?: object
 
     [key: string]: any;
 }
@@ -68,4 +70,6 @@ export interface QRDrawingConfig {
     frameColor?: string;
     frameText?: string;
     isVCard?: boolean;
+    imageServerURL?: string,
+    imageServerRequestHeaders?: object
 }
