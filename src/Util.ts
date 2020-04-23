@@ -2,7 +2,7 @@
 
 import { Image as ImageCanvas } from 'canvas';
 
-const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
+export const isNode = typeof process !== 'undefined' && process.versions != null && process.versions.node != null;
 
 export const loadImage = (src: string, imageServerURL?: string | undefined, imageServerRequestHeaders?: object | undefined) => {
     if (imageServerURL && !isNode) {

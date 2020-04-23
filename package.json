@@ -1,6 +1,6 @@
 {
     "name": "mobstac-awesome-qr",
-    "version": "2.0.5",
+    "version": "2.0.7",
     "description": "MobStac Awesome QR code library",
     "homepage": "https://github.com/mobstac/mobstac-awesome-qr",
     "bugs": "https://github.com/mobstac/mobstac-awesome-qr/issues",
@@ -57,7 +57,8 @@
         "webpack-cli": "3.3.0"
     },
     "files": [
-        "lib/**/*"
+        "lib/**/*",
+        "src/assets/**/*"
     ],
     "dependencies": {
         "@types/node": "11.13.0",

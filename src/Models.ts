@@ -1,4 +1,5 @@
-import { Canvas, CanvasRenderingContext2D, createCanvas, JPEGStream, PDFStream, PNGStream } from 'canvas';
+/* tslint:disable:no-var-requires */
+import { Canvas, CanvasRenderingContext2D, createCanvas, JPEGStream, PDFStream, PNGStream, registerFont } from 'canvas';
 import { BCH, CanvasUtil, QRMath, Util } from './Common';
 import * as constants from './Constants';
 import {
@@ -12,7 +13,13 @@ import {
     QRMode,
 } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
-import { loadImage } from './Util';
+import { isNode, loadImage } from './Util';
+
+if (isNode) {
+    const path = require('path');
+    const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
+    registerFont(fontPath, { family: 'Roboto' });
+}
 
 
 export class QRPolynomial {
@@ -782,8 +789,8 @@ export class Drawing {
 
         finalContext.lineWidth = cornerRadius;
         finalContext.textAlign = 'center';
-        let fontSize = this.config.size / 10;
-        finalContext.font = `${fontSize}px arial`;
+        const fontSize = this.config.size / 10;
+        finalContext.font = `${fontSize}px "Roboto"`;
 
         if (this.config.isVCard) {
             textX = textX + moduleSize * 3;
