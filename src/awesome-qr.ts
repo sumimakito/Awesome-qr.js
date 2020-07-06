@@ -35,7 +35,7 @@ const castImage = (imgOrSrc: HTMLImageElement | string): HTMLImageElement => {
   }
 };
 
-export class AwesomeQR {
+export default class AwesomeQR {
   private canvas: Canvas;
   private canvasContext: CanvasRenderingContext2D;
   private qrCode?: QRCodeModel;
