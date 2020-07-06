@@ -38,12 +38,7 @@ export class QRCodeModel {
   }
 
   isDark(row: number, col: number): boolean {
-    if (
-      row < 0 ||
-      this.moduleCount <= row ||
-      col < 0 ||
-      this.moduleCount <= col
-    ) {
+    if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
       throw new Error(row + "," + col);
     }
     return !!this.modules[row][col];
@@ -53,10 +48,7 @@ export class QRCodeModel {
     if (this.typeNumber < 1) {
       let typeNumber = 1;
       for (typeNumber = 1; typeNumber < 40; typeNumber++) {
-        const rsBlocks = QRRSBlock.getRSBlocks(
-          typeNumber,
-          this.errorCorrectLevel
-        );
+        const rsBlocks = QRRSBlock.getRSBlocks(typeNumber, this.errorCorrectLevel);
 
         const buffer = new QRBitBuffer();
         let totalDataCount = 0;
@@ -67,10 +59,7 @@ export class QRCodeModel {
         for (let i = 0; i < this.dataList.length; i++) {
           const data = this.dataList[i];
           buffer.put(data.mode, 4);
-          buffer.put(
-            data.length,
-            QRUtil.getLengthInBits(data.mode, typeNumber)
-          );
+          buffer.put(data.length, QRUtil.getLengthInBits(data.mode, typeNumber));
           data.write(buffer);
         }
         if (buffer.length <= totalDataCount * 8) break;
@@ -98,11 +87,7 @@ export class QRCodeModel {
       this._setupTypeNumber(test);
     }
     if (this.dataCache == null) {
-      this.dataCache = QRCodeModel._createData(
-        this.typeNumber,
-        this.errorCorrectLevel,
-        this.dataList
-      );
+      this.dataCache = QRCodeModel._createData(this.typeNumber, this.errorCorrectLevel, this.dataList);
     }
     this._mapData(this.dataCache, maskPattern);
   }
@@ -248,11 +233,7 @@ export class QRCodeModel {
     }
   }
 
-  static _createData(
-    typeNumber: number,
-    errorCorrectLevel: QRErrorCorrectLevel,
-    dataList: QR8bitByte[]
-  ): number[] {
+  static _createData(typeNumber: number, errorCorrectLevel: QRErrorCorrectLevel, dataList: QR8bitByte[]): number[] {
     const rsBlocks = QRRSBlock.getRSBlocks(typeNumber, errorCorrectLevel);
     const buffer = new QRBitBuffer();
     for (let i = 0; i < dataList.length; i++) {
@@ -266,13 +247,7 @@ export class QRCodeModel {
       totalDataCount += rsBlocks[i].dataCount;
     }
     if (buffer.length > totalDataCount * 8) {
-      throw new Error(
-        "code length overflow. (" +
-          buffer.length +
-          ">" +
-          totalDataCount * 8 +
-          ")"
-      );
+      throw new Error("code length overflow. (" + buffer.length + ">" + totalDataCount * 8 + ")");
     }
     if (buffer.length + 4 <= totalDataCount * 8) {
       buffer.put(0, 4);
@@ -497,17 +472,8 @@ export class QRUtil {
     [6, 26, 54, 82, 110, 138, 166],
     [6, 30, 58, 86, 114, 142, 170],
   ];
-  static G15 =
-    (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
-  static G18 =
-    (1 << 12) |
-    (1 << 11) |
-    (1 << 10) |
-    (1 << 9) |
-    (1 << 8) |
-    (1 << 5) |
-    (1 << 2) |
-    (1 << 0);
+  static G15 = (1 << 10) | (1 << 8) | (1 << 5) | (1 << 4) | (1 << 2) | (1 << 1) | (1 << 0);
+  static G18 = (1 << 12) | (1 << 11) | (1 << 10) | (1 << 9) | (1 << 8) | (1 << 5) | (1 << 2) | (1 << 0);
   static G15_MASK = (1 << 14) | (1 << 12) | (1 << 10) | (1 << 4) | (1 << 1);
   static getUTF8Length(text: string) {
     const replacedText = encodeURI(text)
@@ -515,10 +481,7 @@ export class QRUtil {
       .replace(/\%[0-9a-fA-F]{2}/g, "a");
     return replacedText.length + (replacedText.length != text.length ? 3 : 0);
   }
-  static getTypeNumber(
-    text: string,
-    nCorrectLevel: QRErrorCorrectLevel
-  ): number {
+  static getTypeNumber(text: string, nCorrectLevel: QRErrorCorrectLevel): number {
     let nType = 1;
     const length = QRUtil.getUTF8Length(text);
 
@@ -556,16 +519,14 @@ export class QRUtil {
   static getBCHTypeInfo(data: number): number {
     let d = data << 10;
     while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15) >= 0) {
-      d ^=
-        QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15));
+      d ^= QRUtil.G15 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G15));
     }
     return ((data << 10) | d) ^ QRUtil.G15_MASK;
   }
   static getBCHTypeNumber(data: number): number {
     let d = data << 12;
     while (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18) >= 0) {
-      d ^=
-        QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18));
+      d ^= QRUtil.G18 << (QRUtil.getBCHDigit(d) - QRUtil.getBCHDigit(QRUtil.G18));
     }
     return (data << 12) | d;
   }
@@ -731,8 +692,7 @@ export class QRUtil {
         }
       }
     }
-    const ratio =
-      Math.abs((100 * darkCount) / moduleCount / moduleCount - 50) / 5;
+    const ratio = Math.abs((100 * darkCount) / moduleCount / moduleCount - 50) / 5;
     lostPoint += ratio * 10;
     return lostPoint;
   }
@@ -746,10 +706,7 @@ class QRMath {
     }
     for (let i = 8; i < 256; i++) {
       QRMath.EXP_TABLE[i] =
-        QRMath.EXP_TABLE[i - 4] ^
-        QRMath.EXP_TABLE[i - 5] ^
-        QRMath.EXP_TABLE[i - 6] ^
-        QRMath.EXP_TABLE[i - 8];
+        QRMath.EXP_TABLE[i - 4] ^ QRMath.EXP_TABLE[i - 5] ^ QRMath.EXP_TABLE[i - 6] ^ QRMath.EXP_TABLE[i - 8];
     }
     for (let i = 0; i < 255; i++) {
       QRMath.LOG_TABLE[QRMath.EXP_TABLE[i]] = i;
@@ -797,9 +754,7 @@ class QRPolynomial {
     const num = new Array(this.length + e.length - 1);
     for (let i = 0; i < this.length; i++) {
       for (let j = 0; j < e.length; j++) {
-        num[i + j] ^= QRMath.gexp(
-          QRMath.glog(this.get(i)) + QRMath.glog(e.get(j))
-        );
+        num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i)) + QRMath.glog(e.get(j)));
       }
     }
     return new QRPolynomial(num, 0);
@@ -992,18 +947,10 @@ class QRRSBlock {
     [20, 45, 15, 61, 46, 16],
   ];
 
-  static getRSBlocks(
-    typeNumber: number,
-    errorCorrectLevel: QRErrorCorrectLevel
-  ): QRRSBlock[] {
+  static getRSBlocks(typeNumber: number, errorCorrectLevel: QRErrorCorrectLevel): QRRSBlock[] {
     const rsBlock = QRRSBlock.getRsBlockTable(typeNumber, errorCorrectLevel);
     if (rsBlock == undefined) {
-      throw new Error(
-        "bad rs block @ typeNumber:" +
-          typeNumber +
-          "/errorCorrectLevel:" +
-          errorCorrectLevel
-      );
+      throw new Error("bad rs block @ typeNumber:" + typeNumber + "/errorCorrectLevel:" + errorCorrectLevel);
     }
     const length = rsBlock.length / 3;
     const list: QRRSBlock[] = [];
@@ -1018,10 +965,7 @@ class QRRSBlock {
     return list;
   }
 
-  static getRsBlockTable(
-    typeNumber: number,
-    errorCorrectLevel: QRErrorCorrectLevel
-  ): number[] | undefined {
+  static getRsBlockTable(typeNumber: number, errorCorrectLevel: QRErrorCorrectLevel): number[] | undefined {
     switch (errorCorrectLevel) {
       case QRErrorCorrectLevel.L:
         return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];

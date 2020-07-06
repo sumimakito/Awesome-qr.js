@@ -64,17 +64,15 @@ export class AwesomeQR {
 
   constructor(options: AwesomeQR.Options) {
     const _options = Object.assign({}, options);
-    (Object.keys(AwesomeQR._defaultOptions) as (keyof AwesomeQR.Options)[]).map(
-      (k) => {
-        if (!(k in _options)) {
-          Object.defineProperty(_options, k, {
-            value: AwesomeQR._defaultOptions[k],
-            enumerable: true,
-            writable: true,
-          });
-        }
+    (Object.keys(AwesomeQR._defaultOptions) as (keyof AwesomeQR.Options)[]).map((k) => {
+      if (!(k in _options)) {
+        Object.defineProperty(_options, k, {
+          value: AwesomeQR._defaultOptions[k],
+          enumerable: true,
+          writable: true,
+        });
       }
-    );
+    });
     this.options = _options;
     this.canvas = createCanvas(options.size!, options.size!);
     this.canvasContext = this.canvas.getContext("2d")!;
@@ -145,12 +143,7 @@ export class AwesomeQR {
     }
 
     while ((i += blockSize * 4) < data.data.length) {
-      if (
-        data.data[i] > 200 ||
-        data.data[i + 1] > 200 ||
-        data.data[i + 2] > 200
-      )
-        continue;
+      if (data.data[i] > 200 || data.data[i + 1] > 200 || data.data[i + 2] > 200) continue;
       ++count;
       rgb.r += data.data[i];
       rgb.g += data.data[i + 1];
@@ -171,18 +164,8 @@ export class AwesomeQR {
     nWidth: number,
     nHeight: number
   ) {
-    canvasContext.clearRect(
-      (centerX - 2) * nWidth,
-      (centerY - 2) * nHeight,
-      5 * nWidth,
-      5 * nHeight
-    );
-    canvasContext.fillRect(
-      (centerX - 2) * nWidth,
-      (centerY - 2) * nHeight,
-      5 * nWidth,
-      5 * nHeight
-    );
+    canvasContext.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
+    canvasContext.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
   }
 
   private static _drawAlign(
@@ -192,36 +175,11 @@ export class AwesomeQR {
     nWidth: number,
     nHeight: number
   ) {
-    canvasContext.fillRect(
-      (centerX - 2) * nWidth,
-      (centerY - 2) * nHeight,
-      nWidth,
-      4 * nHeight
-    );
-    canvasContext.fillRect(
-      (centerX + 2) * nWidth,
-      (centerY - 2 + 1) * nHeight,
-      nWidth,
-      4 * nHeight
-    );
-    canvasContext.fillRect(
-      (centerX - 2 + 1) * nWidth,
-      (centerY - 2) * nHeight,
-      4 * nWidth,
-      nHeight
-    );
-    canvasContext.fillRect(
-      (centerX - 2) * nWidth,
-      (centerY + 2) * nHeight,
-      4 * nWidth,
-      nHeight
-    );
-    canvasContext.fillRect(
-      centerX * nWidth,
-      centerY * nHeight,
-      nWidth,
-      nHeight
-    );
+    canvasContext.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, nWidth, 4 * nHeight);
+    canvasContext.fillRect((centerX + 2) * nWidth, (centerY - 2 + 1) * nHeight, nWidth, 4 * nHeight);
+    canvasContext.fillRect((centerX - 2 + 1) * nWidth, (centerY - 2) * nHeight, 4 * nWidth, nHeight);
+    canvasContext.fillRect((centerX - 2) * nWidth, (centerY + 2) * nHeight, 4 * nWidth, nHeight);
+    canvasContext.fillRect(centerX * nWidth, centerY * nHeight, nWidth, nHeight);
   }
 
   private async _draw(): Promise<Buffer | ArrayBuffer | undefined> {
@@ -297,17 +255,7 @@ export class AwesomeQR {
 
       const backgroundImage = castImage(this.options.backgroundImage);
 
-      _bContext.drawImage(
-        backgroundImage,
-        0,
-        0,
-        backgroundImage.width,
-        backgroundImage.height,
-        0,
-        0,
-        size,
-        size
-      );
+      _bContext.drawImage(backgroundImage, 0, 0, backgroundImage.width, backgroundImage.height, 0, 0, size, size);
       _bContext.rect(0, 0, size, size);
       _bContext.fillStyle = backgroundDimming;
       _bContext.fill();
@@ -323,9 +271,7 @@ export class AwesomeQR {
     for (let row = 0; row < nCount; row++) {
       for (let col = 0; col < nCount; col++) {
         const bIsDark = this.qrCode!.isDark(row, col);
-        const isBlkPosCtr =
-          (col < 8 && (row < 8 || row >= nCount - 8)) ||
-          (col >= nCount - 8 && row < 8);
+        const isBlkPosCtr = (col < 8 && (row < 8 || row >= nCount - 8)) || (col >= nCount - 8 && row < 8);
         let bProtected = row === 6 || col === 6 || isBlkPosCtr;
 
         for (let i = 0; i < agnPatternCenter.length - 1; i++) {
@@ -339,19 +285,11 @@ export class AwesomeQR {
 
         const nLeft = col * nSize + (bProtected ? 0 : xyOffset * nSize);
         const nTop = row * nSize + (bProtected ? 0 : xyOffset * nSize);
-        _oContext.strokeStyle = bIsDark
-          ? this.options.colorDark!
-          : this.options.colorLight!;
+        _oContext.strokeStyle = bIsDark ? this.options.colorDark! : this.options.colorLight!;
         _oContext.lineWidth = 0.5;
-        _oContext.fillStyle = bIsDark
-          ? this.options.colorDark!
-          : "rgba(255, 255, 255, 0.6)";
+        _oContext.fillStyle = bIsDark ? this.options.colorDark! : "rgba(255, 255, 255, 0.6)";
         if (!bProtected) {
-          const inAgnRange =
-            col < nCount - 4 &&
-            col >= nCount - 4 - 5 &&
-            row < nCount - 4 &&
-            row >= nCount - 4 - 5;
+          const inAgnRange = col < nCount - 4 && col >= nCount - 4 - 5 && row < nCount - 4 && row >= nCount - 4 - 5;
           if (agnPatternCenter.length === 0 || !inAgnRange) {
             // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
             _oContext.fillRect(
@@ -384,12 +322,7 @@ export class AwesomeQR {
           continue;
         } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
           continue;
-        } else if (
-          agnX !== 6 &&
-          agnX !== edgeCenter &&
-          agnY !== 6 &&
-          agnY !== edgeCenter
-        ) {
+        } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
           AwesomeQR._drawAlignProtector(_oContext, agnX, agnY, nSize, nSize);
         } else {
           AwesomeQR._drawAlignProtector(_oContext, agnX, agnY, nSize, nSize);
@@ -413,18 +346,8 @@ export class AwesomeQR {
     _oContext.fillRect(6 * nSize, (nCount - 7) * nSize, nSize, 7 * nSize);
 
     _oContext.fillRect(2 * nSize, 2 * nSize, 3 * nSize, 3 * nSize);
-    _oContext.fillRect(
-      (nCount - 7 + 2) * nSize,
-      2 * nSize,
-      3 * nSize,
-      3 * nSize
-    );
-    _oContext.fillRect(
-      2 * nSize,
-      (nCount - 7 + 2) * nSize,
-      3 * nSize,
-      3 * nSize
-    );
+    _oContext.fillRect((nCount - 7 + 2) * nSize, 2 * nSize, 3 * nSize, 3 * nSize);
+    _oContext.fillRect(2 * nSize, (nCount - 7 + 2) * nSize, 3 * nSize, 3 * nSize);
 
     for (let i = 0; i < nCount - 8; i += 2) {
       _oContext.fillRect((8 + i) * nSize, 6 * nSize, nSize, nSize);
@@ -438,12 +361,7 @@ export class AwesomeQR {
           continue;
         } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
           continue;
-        } else if (
-          agnX !== 6 &&
-          agnX !== edgeCenter &&
-          agnY !== 6 &&
-          agnY !== edgeCenter
-        ) {
+        } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
           _oContext.fillStyle = "rgba(0, 0, 0, .2)";
           AwesomeQR._drawAlign(_oContext, agnX, agnY, nSize, nSize);
         } else {
@@ -498,14 +416,7 @@ export class AwesomeQR {
       _oContext.restore();
 
       _oContext.save();
-      AwesomeQR._prepareRoundedCornerClip(
-        _oContext,
-        x,
-        y,
-        logoSize,
-        logoSize,
-        logoCornerRadius
-      );
+      AwesomeQR._prepareRoundedCornerClip(_oContext, x, y, logoSize, logoSize, logoCornerRadius);
       _oContext.clip();
       _oContext.drawImage(logoImage, x, y, logoSize, logoSize);
       _oContext.restore();
@@ -531,22 +442,12 @@ export class AwesomeQR {
         if (backgroundCanvas === undefined) {
           backgroundCanvas = createCanvas(width, height);
           backgroundCanvasContext = backgroundCanvas.getContext("2d");
-          backgroundCanvasContext.rect(
-            0,
-            0,
-            backgroundCanvas.width,
-            backgroundCanvas.height
-          );
+          backgroundCanvasContext.rect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
           backgroundCanvasContext.fillStyle = "#ffffff";
           backgroundCanvasContext.fill();
         }
 
-        if (
-          !patchCanvas ||
-          !patchData ||
-          width !== patchCanvas.width ||
-          height !== patchCanvas.height
-        ) {
+        if (!patchCanvas || !patchData || width !== patchCanvas.width || height !== patchCanvas.height) {
           patchCanvas = createCanvas(width, height);
           patchCanvasContext = patchCanvas.getContext("2d");
           patchData = patchCanvasContext.createImageData(width, height);
@@ -555,11 +456,7 @@ export class AwesomeQR {
         patchData.data.set(frame.patch);
         patchCanvasContext.putImageData(patchData, 0, 0);
 
-        backgroundCanvasContext.drawImage(
-          patchCanvas,
-          frame.dims.left,
-          frame.dims.top
-        );
+        backgroundCanvasContext.drawImage(patchCanvas, frame.dims.left, frame.dims.top);
 
         const unscaledCanvas = createCanvas(size, size);
         const unscaledCanvasContext = unscaledCanvas.getContext("2d");
