@@ -21,7 +21,7 @@ declare namespace AwesomeQR {
         autoColor?: boolean;
     };
 }
-export default class AwesomeQR {
+export declare class AwesomeQR {
     private canvas;
     private canvasContext;
     private qrCode?;
