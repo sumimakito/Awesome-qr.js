@@ -1,28 +1,39 @@
 {
-    "name": "awesome-qr",
-    "version": "1.2.1",
-    "description": "An awesome QR code generator written in JavaScript.",
-    "main": "awesome-qr-node.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/SumiMakito/Awesome-qr.js.git"
-    },
-    "keywords": [
-        "qr",
-        "qrcode",
-        "barcode"
-    ],
-    "author": "Makito <sumimakito@hotmail.com>",
-    "license": "Apache-2.0",
-    "bugs": {
-        "url": "https://github.com/SumiMakito/Awesome-qr.js/issues"
-    },
-    "homepage": "https://github.com/SumiMakito/Awesome-qr.js#readme",
-    "dependencies": {
-        "canvas-prebuilt": "^1.6.5-prerelease.1",
-        "request": "^2.83.0"
-    }
+  "name": "awesome-qr",
+  "version": "2.0.0",
+  "description": "An awesome QR code generator written in JavaScript.",
+  "main": "./src/awesome-qr.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SumiMakito/Awesome-qr.js.git"
+  },
+  "keywords": [
+    "qr",
+    "qrcode",
+    "barcode"
+  ],
+  "author": "Makito <sumimakito@hotmail.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/SumiMakito/Awesome-qr.js/issues"
+  },
+  "homepage": "https://github.com/SumiMakito/Awesome-qr.js#readme",
+  "dependencies": {
+    "gifuct-js": "github:matt-way/gifuct-js"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.14",
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.6",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-node-externals": "^1.7.2"
+  },
+  "optionalDependencies": {
+    "canvas": "^2.6.1"
+  }
 }
