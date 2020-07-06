@@ -5,7 +5,8 @@
   "main": "./src/awesome-qr.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js",
+    "prepublish": "tsc"
   },
   "repository": {
     "type": "git",
