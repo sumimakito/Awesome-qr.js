@@ -56,6 +56,8 @@ function LZWEncoder(width, height, pixels, colorDepth) {
   // questions about this implementation to ames!jaw.
   var g_init_bits, ClearCode, EOFCode;
 
+  var remaining, curPixel, n_bits;
+
   // Add a character to the end of the current packet, and if it is 254
   // characters, flush the packet to disk.
   function char_out(c, outs) {
