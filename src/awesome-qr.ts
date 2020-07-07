@@ -1,29 +1,27 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
-import { decompressFrames, parseGIF } from "gifuct-js";
+import { decompressFrames, parseGIF } from "./gifuct-js";
 import { QRCodeModel, QRErrorCorrectLevel, QRUtil } from "./core";
 import GIFEncoder from "./gif.js/GIFEncoder";
 
-namespace AwesomeQR {
-  export type Options = {
-    text: string;
-    size?: number;
-    margin?: number;
-    typeNumber?: number;
-    colorDark?: string;
-    colorLight?: string;
-    correctLevel?: QRErrorCorrectLevel;
-    backgroundImage?: string | HTMLImageElement;
-    backgroundDimming?: string;
-    gifBackground?: ArrayBuffer;
-    logoImage?: string | HTMLImageElement;
-    logoScale?: number;
-    logoMargin?: number;
-    logoCornerRadius?: number;
-    whiteMargin?: boolean;
-    dotScale?: number;
-    autoColor?: boolean;
-  };
-}
+export type Options = {
+  text: string;
+  size?: number;
+  margin?: number;
+  typeNumber?: number;
+  colorDark?: string;
+  colorLight?: string;
+  correctLevel?: QRErrorCorrectLevel;
+  backgroundImage?: string | HTMLImageElement;
+  backgroundDimming?: string;
+  gifBackground?: ArrayBuffer;
+  logoImage?: string | HTMLImageElement;
+  logoScale?: number;
+  logoMargin?: number;
+  logoCornerRadius?: number;
+  whiteMargin?: boolean;
+  dotScale?: number;
+  autoColor?: boolean;
+};
 
 const castImage = (imgOrSrc: HTMLImageElement | string): HTMLImageElement => {
   if (typeof imgOrSrc === "string") {
@@ -39,11 +37,11 @@ export class AwesomeQR {
   private canvas: Canvas;
   private canvasContext: CanvasRenderingContext2D;
   private qrCode?: QRCodeModel;
-  private options: AwesomeQR.Options;
+  private options: Options;
 
   static CorrectLevel = QRErrorCorrectLevel;
 
-  static _defaultOptions: AwesomeQR.Options = {
+  static _defaultOptions: Options = {
     text: "",
     size: 800,
     margin: 20,
@@ -62,9 +60,9 @@ export class AwesomeQR {
     autoColor: true,
   };
 
-  constructor(options: AwesomeQR.Options) {
+  constructor(options: Options) {
     const _options = Object.assign({}, options);
-    (Object.keys(AwesomeQR._defaultOptions) as (keyof AwesomeQR.Options)[]).map((k) => {
+    (Object.keys(AwesomeQR._defaultOptions) as (keyof Options)[]).map((k) => {
       if (!(k in _options)) {
         Object.defineProperty(_options, k, {
           value: AwesomeQR._defaultOptions[k],
@@ -200,8 +198,8 @@ export class AwesomeQR {
     const viewportSize = nSize * nCount;
     const size = viewportSize + 2 * margin;
 
-    const _tCanvas = createCanvas(size, size);
-    const _oContext = _tCanvas.getContext("2d");
+    const mainCanvas = createCanvas(size, size);
+    const mainCanvasContext = mainCanvas.getContext("2d");
 
     const dotScale = this.options.dotScale!;
     this._clear();
@@ -211,20 +209,17 @@ export class AwesomeQR {
     }
 
     // Leave room for margin
-    _oContext.save();
-    _oContext.translate(margin, margin);
+    mainCanvasContext.save();
+    mainCanvasContext.translate(margin, margin);
 
-    const _bkgCanvas = createCanvas(size, size);
-    const _bContext = _bkgCanvas.getContext("2d");
+    const backgroundCanvas = createCanvas(size, size);
+    const backgroundCanvasContext = backgroundCanvas.getContext("2d");
 
     let parsedGIFBackground = null;
     let gifFrames: any[] = [];
 
     if (!!this.options.gifBackground) {
       const gif = parseGIF(this.options.gifBackground);
-      if (!gif.raw.hasImages) {
-        throw new Error("An invalid gif has been selected as the background.");
-      }
       parsedGIFBackground = gif;
       gifFrames = decompressFrames(gif, true);
       if (this.options.autoColor) {
@@ -255,14 +250,24 @@ export class AwesomeQR {
 
       const backgroundImage = castImage(this.options.backgroundImage);
 
-      _bContext.drawImage(backgroundImage, 0, 0, backgroundImage.width, backgroundImage.height, 0, 0, size, size);
-      _bContext.rect(0, 0, size, size);
-      _bContext.fillStyle = backgroundDimming;
-      _bContext.fill();
+      backgroundCanvasContext.drawImage(
+        backgroundImage,
+        0,
+        0,
+        backgroundImage.width,
+        backgroundImage.height,
+        0,
+        0,
+        size,
+        size
+      );
+      backgroundCanvasContext.rect(0, 0, size, size);
+      backgroundCanvasContext.fillStyle = backgroundDimming;
+      backgroundCanvasContext.fill();
     } else {
-      _bContext.rect(0, 0, size, size);
-      _bContext.fillStyle = "#ffffff";
-      _bContext.fill();
+      backgroundCanvasContext.rect(0, 0, size, size);
+      backgroundCanvasContext.fillStyle = "#ffffff";
+      backgroundCanvasContext.fill();
     }
 
     const agnPatternCenter = QRUtil.getPatternPosition(this.qrCode!.typeNumber);
@@ -285,14 +290,14 @@ export class AwesomeQR {
 
         const nLeft = col * nSize + (bProtected ? 0 : xyOffset * nSize);
         const nTop = row * nSize + (bProtected ? 0 : xyOffset * nSize);
-        _oContext.strokeStyle = bIsDark ? this.options.colorDark! : this.options.colorLight!;
-        _oContext.lineWidth = 0.5;
-        _oContext.fillStyle = bIsDark ? this.options.colorDark! : "rgba(255, 255, 255, 0.6)";
+        mainCanvasContext.strokeStyle = bIsDark ? this.options.colorDark! : this.options.colorLight!;
+        mainCanvasContext.lineWidth = 0.5;
+        mainCanvasContext.fillStyle = bIsDark ? this.options.colorDark! : "rgba(255, 255, 255, 0.6)";
         if (!bProtected) {
           const inAgnRange = col < nCount - 4 && col >= nCount - 4 - 5 && row < nCount - 4 && row >= nCount - 4 - 5;
           if (agnPatternCenter.length === 0 || !inAgnRange) {
             // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
-            _oContext.fillRect(
+            mainCanvasContext.fillRect(
               nLeft,
               nTop,
               (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nSize,
@@ -305,12 +310,12 @@ export class AwesomeQR {
 
     // Draw POSITION protectors
     const protectorStyle = "rgba(255, 255, 255, 0.6)";
-    _oContext.fillStyle = protectorStyle;
-    _oContext.fillRect(0, 0, 8 * nSize, 8 * nSize);
-    _oContext.fillRect(0, (nCount - 8) * nSize, 8 * nSize, 8 * nSize);
-    _oContext.fillRect((nCount - 8) * nSize, 0, 8 * nSize, 8 * nSize);
-    _oContext.fillRect(8 * nSize, 6 * nSize, (nCount - 8 - 8) * nSize, nSize);
-    _oContext.fillRect(6 * nSize, 8 * nSize, nSize, (nCount - 8 - 8) * nSize);
+    mainCanvasContext.fillStyle = protectorStyle;
+    mainCanvasContext.fillRect(0, 0, 8 * nSize, 8 * nSize);
+    mainCanvasContext.fillRect(0, (nCount - 8) * nSize, 8 * nSize, 8 * nSize);
+    mainCanvasContext.fillRect((nCount - 8) * nSize, 0, 8 * nSize, 8 * nSize);
+    mainCanvasContext.fillRect(8 * nSize, 6 * nSize, (nCount - 8 - 8) * nSize, nSize);
+    mainCanvasContext.fillRect(6 * nSize, 8 * nSize, nSize, (nCount - 8 - 8) * nSize);
 
     // Draw ALIGN protectors
     const edgeCenter = agnPatternCenter[agnPatternCenter.length - 1];
@@ -323,35 +328,35 @@ export class AwesomeQR {
         } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
           continue;
         } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-          AwesomeQR._drawAlignProtector(_oContext, agnX, agnY, nSize, nSize);
+          AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, nSize, nSize);
         } else {
-          AwesomeQR._drawAlignProtector(_oContext, agnX, agnY, nSize, nSize);
+          AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, nSize, nSize);
         }
       }
     }
 
     // Draw POSITION patterns
-    _oContext.fillStyle = this.options.colorDark!;
-    _oContext.fillRect(0, 0, 7 * nSize, nSize);
-    _oContext.fillRect((nCount - 7) * nSize, 0, 7 * nSize, nSize);
-    _oContext.fillRect(0, 6 * nSize, 7 * nSize, nSize);
-    _oContext.fillRect((nCount - 7) * nSize, 6 * nSize, 7 * nSize, nSize);
-    _oContext.fillRect(0, (nCount - 7) * nSize, 7 * nSize, nSize);
-    _oContext.fillRect(0, (nCount - 7 + 6) * nSize, 7 * nSize, nSize);
-    _oContext.fillRect(0, 0, nSize, 7 * nSize);
-    _oContext.fillRect(6 * nSize, 0, nSize, 7 * nSize);
-    _oContext.fillRect((nCount - 7) * nSize, 0, nSize, 7 * nSize);
-    _oContext.fillRect((nCount - 7 + 6) * nSize, 0, nSize, 7 * nSize);
-    _oContext.fillRect(0, (nCount - 7) * nSize, nSize, 7 * nSize);
-    _oContext.fillRect(6 * nSize, (nCount - 7) * nSize, nSize, 7 * nSize);
+    mainCanvasContext.fillStyle = this.options.colorDark!;
+    mainCanvasContext.fillRect(0, 0, 7 * nSize, nSize);
+    mainCanvasContext.fillRect((nCount - 7) * nSize, 0, 7 * nSize, nSize);
+    mainCanvasContext.fillRect(0, 6 * nSize, 7 * nSize, nSize);
+    mainCanvasContext.fillRect((nCount - 7) * nSize, 6 * nSize, 7 * nSize, nSize);
+    mainCanvasContext.fillRect(0, (nCount - 7) * nSize, 7 * nSize, nSize);
+    mainCanvasContext.fillRect(0, (nCount - 7 + 6) * nSize, 7 * nSize, nSize);
+    mainCanvasContext.fillRect(0, 0, nSize, 7 * nSize);
+    mainCanvasContext.fillRect(6 * nSize, 0, nSize, 7 * nSize);
+    mainCanvasContext.fillRect((nCount - 7) * nSize, 0, nSize, 7 * nSize);
+    mainCanvasContext.fillRect((nCount - 7 + 6) * nSize, 0, nSize, 7 * nSize);
+    mainCanvasContext.fillRect(0, (nCount - 7) * nSize, nSize, 7 * nSize);
+    mainCanvasContext.fillRect(6 * nSize, (nCount - 7) * nSize, nSize, 7 * nSize);
 
-    _oContext.fillRect(2 * nSize, 2 * nSize, 3 * nSize, 3 * nSize);
-    _oContext.fillRect((nCount - 7 + 2) * nSize, 2 * nSize, 3 * nSize, 3 * nSize);
-    _oContext.fillRect(2 * nSize, (nCount - 7 + 2) * nSize, 3 * nSize, 3 * nSize);
+    mainCanvasContext.fillRect(2 * nSize, 2 * nSize, 3 * nSize, 3 * nSize);
+    mainCanvasContext.fillRect((nCount - 7 + 2) * nSize, 2 * nSize, 3 * nSize, 3 * nSize);
+    mainCanvasContext.fillRect(2 * nSize, (nCount - 7 + 2) * nSize, 3 * nSize, 3 * nSize);
 
     for (let i = 0; i < nCount - 8; i += 2) {
-      _oContext.fillRect((8 + i) * nSize, 6 * nSize, nSize, nSize);
-      _oContext.fillRect(6 * nSize, (8 + i) * nSize, nSize, nSize);
+      mainCanvasContext.fillRect((8 + i) * nSize, 6 * nSize, nSize, nSize);
+      mainCanvasContext.fillRect(6 * nSize, (8 + i) * nSize, nSize, nSize);
     }
     for (let i = 0; i < agnPatternCenter.length; i++) {
       for (let j = 0; j < agnPatternCenter.length; j++) {
@@ -362,22 +367,22 @@ export class AwesomeQR {
         } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
           continue;
         } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-          _oContext.fillStyle = "rgba(0, 0, 0, .2)";
-          AwesomeQR._drawAlign(_oContext, agnX, agnY, nSize, nSize);
+          mainCanvasContext.fillStyle = "rgba(0, 0, 0, .2)";
+          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, nSize);
         } else {
-          _oContext.fillStyle = this.options.colorDark!;
-          AwesomeQR._drawAlign(_oContext, agnX, agnY, nSize, nSize);
+          mainCanvasContext.fillStyle = this.options.colorDark!;
+          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, nSize);
         }
       }
     }
 
     // Fill the margin
     if (whiteMargin) {
-      _oContext.fillStyle = "#FFFFFF";
-      _oContext.fillRect(-margin, -margin, size, margin);
-      _oContext.fillRect(-margin, viewportSize, size, margin);
-      _oContext.fillRect(viewportSize, -margin, margin, size);
-      _oContext.fillRect(-margin, -margin, margin, size);
+      mainCanvasContext.fillStyle = "#FFFFFF";
+      mainCanvasContext.fillRect(-margin, -margin, size, margin);
+      mainCanvasContext.fillRect(-margin, viewportSize, size, margin);
+      mainCanvasContext.fillRect(viewportSize, -margin, margin, size);
+      mainCanvasContext.fillRect(-margin, -margin, margin, size);
     }
 
     if (!!this.options.logoImage) {
@@ -395,31 +400,31 @@ export class AwesomeQR {
         logoCornerRadius = 0;
       }
 
-      _oContext.restore();
+      mainCanvasContext.restore();
 
       const logoSize = viewportSize * logoScale;
       const x = 0.5 * (size - logoSize);
       const y = x;
 
-      _oContext.fillStyle = "#FFFFFF";
-      _oContext.save();
+      mainCanvasContext.fillStyle = "#FFFFFF";
+      mainCanvasContext.save();
       AwesomeQR._prepareRoundedCornerClip(
-        _oContext,
+        mainCanvasContext,
         x - logoMargin,
         y - logoMargin,
         logoSize + 2 * logoMargin,
         logoSize + 2 * logoMargin,
         logoCornerRadius
       );
-      _oContext.clip();
-      _oContext.fill();
-      _oContext.restore();
+      mainCanvasContext.clip();
+      mainCanvasContext.fill();
+      mainCanvasContext.restore();
 
-      _oContext.save();
-      AwesomeQR._prepareRoundedCornerClip(_oContext, x, y, logoSize, logoSize, logoCornerRadius);
-      _oContext.clip();
-      _oContext.drawImage(logoImage, x, y, logoSize, logoSize);
-      _oContext.restore();
+      mainCanvasContext.save();
+      AwesomeQR._prepareRoundedCornerClip(mainCanvasContext, x, y, logoSize, logoSize, logoCornerRadius);
+      mainCanvasContext.clip();
+      mainCanvasContext.drawImage(logoImage, x, y, logoSize, logoSize);
+      mainCanvasContext.restore();
     }
 
     if (!!parsedGIFBackground) {
@@ -436,10 +441,12 @@ export class AwesomeQR {
       gifFrames.forEach(function (frame: any) {
         if (!gifOutput) {
           gifOutput = new GIFEncoder(rawSize, rawSize);
+          gifOutput.setDelay(frame.delay);
+          gifOutput.setRepeat(0);
         }
 
         const { width, height } = frame.dims;
-        if (backgroundCanvas === undefined) {
+        if (!backgroundCanvas) {
           backgroundCanvas = createCanvas(width, height);
           backgroundCanvasContext = backgroundCanvas.getContext("2d");
           backgroundCanvasContext.rect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
@@ -462,36 +469,33 @@ export class AwesomeQR {
         const unscaledCanvasContext = unscaledCanvas.getContext("2d");
 
         unscaledCanvasContext.drawImage(backgroundCanvas, 0, 0, size, size);
-        unscaledCanvasContext.drawImage(_tCanvas, 0, 0, size, size);
+        unscaledCanvasContext.drawImage(mainCanvas, 0, 0, size, size);
 
         // Scale the final image
-        const _fCanvas = createCanvas(rawSize, rawSize);
-        const _fContext = _fCanvas.getContext("2d");
-        _fContext.drawImage(unscaledCanvas, 0, 0, rawSize, rawSize);
-        gifOutput.addFrame(_fContext, { copy: true, delay: frame.delay });
+        const outCanvas = createCanvas(rawSize, rawSize);
+        const outCanvasContext = outCanvas.getContext("2d");
+        outCanvasContext.drawImage(unscaledCanvas, 0, 0, rawSize, rawSize);
+        gifOutput.addFrame(outCanvasContext.getImageData(0, 0, outCanvas.width, outCanvas.height).data);
       });
 
-      if (gifOutput === undefined) {
+      if (!gifOutput) {
         throw new Error("No frames.");
       }
 
-      const renderAsync = new Promise<ArrayBuffer>((resolve) =>
-        gifOutput.on("finished", (blob: any) => resolve(blob.arrayBuffer()))
-      );
+      gifOutput.finish();
+      console.log(gifOutput.stream());
 
-      gifOutput.render();
-
-      return Promise.resolve(await renderAsync);
+      return Promise.resolve(gifOutput.stream().toBuffer());
     } else {
       // Swap and merge the foreground and the background
-      _bContext.drawImage(_tCanvas, 0, 0, size, size);
-      _oContext.drawImage(_bkgCanvas, -margin, -margin, size, size);
+      backgroundCanvasContext.drawImage(mainCanvas, 0, 0, size, size);
+      mainCanvasContext.drawImage(backgroundCanvas, -margin, -margin, size, size);
 
       // Scale the final image
-      const _fCanvas = createCanvas(rawSize, rawSize); //document.createElement("canvas");
-      const _fContext = _fCanvas.getContext("2d");
-      _fContext.drawImage(_tCanvas, 0, 0, rawSize, rawSize);
-      this.canvas = _fCanvas;
+      const outCanvas = createCanvas(rawSize, rawSize); //document.createElement("canvas");
+      const outCanvasContext = outCanvas.getContext("2d");
+      outCanvasContext.drawImage(mainCanvas, 0, 0, rawSize, rawSize);
+      this.canvas = outCanvas;
 
       return Promise.resolve(this.canvas.toBuffer());
     }
