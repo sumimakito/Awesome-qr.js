@@ -56,6 +56,7 @@ declare class ByteArray {
     newPage(): void;
     cursor: number | undefined;
     getData(): string;
+    toBuffer(): Buffer;
     writeByte(val: any): void;
     writeUTFBytes(string: any): void;
     writeBytes(array: any, offset: any, length: any): void;

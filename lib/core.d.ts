@@ -66,7 +66,7 @@ export declare class QRUtil {
     static getPatternPosition(typeNumber: number): number[];
     static getMask(maskPattern: QRMaskPattern, i: number, j: number): boolean;
     static getErrorCorrectPolynomial(errorCorrectLength: QRErrorCorrectLevel): QRPolynomial;
-    static getLengthInBits(mode: QRMode, type: number): 8 | 10 | 9 | 12 | 11 | 16 | 14 | 13;
+    static getLengthInBits(mode: QRMode, type: number): 10 | 9 | 8 | 12 | 11 | 16 | 14 | 13;
     static getLostPoint(qrCode: QRCodeModel): number;
 }
 declare class QRPolynomial {
