@@ -1,4 +1,4 @@
-import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
+import { Canvas, CanvasRenderingContext2D, createCanvas, Image } from "canvas";
 import { decompressFrames, parseGIF } from "./gifuct-js";
 import { QRCodeModel, QRErrorCorrectLevel, QRUtil } from "./qrcode";
 import GIFEncoder from "./gif.js/GIFEncoder";
@@ -11,10 +11,10 @@ export type Options = {
   colorDark?: string;
   colorLight?: string;
   correctLevel?: number;
-  backgroundImage?: string | HTMLImageElement;
+  backgroundImage?: string | Buffer;
   backgroundDimming?: string;
   gifBackground?: ArrayBuffer;
-  logoImage?: string | HTMLImageElement;
+  logoImage?: string | Buffer;
   logoScale?: number;
   logoMargin?: number;
   logoCornerRadius?: number;
@@ -23,14 +23,10 @@ export type Options = {
   autoColor?: boolean;
 };
 
-const castImage = (imgOrSrc: HTMLImageElement | string): HTMLImageElement => {
-  if (typeof imgOrSrc === "string") {
-    const img = new Image();
-    img.src = imgOrSrc;
-    return img;
-  } else {
-    return imgOrSrc;
-  }
+const castImage = (imageData: string | Buffer): Image => {
+  const img = new Image();
+  img.src = imageData;
+  return img;
 };
 
 export class AwesomeQR {
@@ -104,8 +100,7 @@ export class AwesomeQR {
     canvasContext.closePath();
   }
 
-  private static _getAverageRGB(imgOrSrc: HTMLImageElement | string) {
-    const el = castImage(imgOrSrc);
+  private static _getAverageRGB(image: Image) {
     const blockSize = 5;
     const defaultRGB = {
       r: 0,
@@ -121,8 +116,8 @@ export class AwesomeQR {
     };
     let count = 0;
 
-    height = el.naturalHeight || el.offsetHeight || el.height;
-    width = el.naturalWidth || el.offsetWidth || el.width;
+    height = image.naturalHeight || image.height;
+    width = image.naturalWidth || image.width;
 
     const canvas = createCanvas(width, height);
     const context = canvas.getContext("2d");
@@ -131,7 +126,7 @@ export class AwesomeQR {
       return defaultRGB;
     }
 
-    context.drawImage(el, 0, 0);
+    context.drawImage(image, 0, 0);
 
     let data;
     try {
@@ -243,12 +238,12 @@ export class AwesomeQR {
         this.options.colorDark = `rgb(${r},${g},${b})`;
       }
     } else if (!!this.options.backgroundImage) {
+      const backgroundImage = castImage(this.options.backgroundImage);
+
       if (this.options.autoColor) {
-        const avgRGB = AwesomeQR._getAverageRGB(this.options.backgroundImage!);
+        const avgRGB = AwesomeQR._getAverageRGB(backgroundImage);
         this.options.colorDark = `rgb(${avgRGB.r},${avgRGB.g},${avgRGB.b})`;
       }
-
-      const backgroundImage = castImage(this.options.backgroundImage);
 
       backgroundCanvasContext.drawImage(
         backgroundImage,
@@ -395,10 +390,11 @@ export class AwesomeQR {
     }
 
     if (!!this.options.logoImage) {
+      const logoImage = castImage(this.options.logoImage!);
+
       let logoScale = this.options.logoScale!;
       let logoMargin = this.options.logoMargin!;
       let logoCornerRadius = this.options.logoCornerRadius!;
-      const logoImage = castImage(this.options.logoImage!);
       if (logoScale <= 0 || logoScale >= 1.0) {
         logoScale = 0.2;
       }
