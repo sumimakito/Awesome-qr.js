@@ -272,14 +272,6 @@ export class AwesomeQR {
 
     const agnPatternCenter = QRUtil.getPatternPosition(this.qrCode!.typeNumber);
 
-    for (let row = 0; row < nCount; row++) {
-      let r = "";
-      for (let col = 0; col < nCount; col++) {
-        r += this.qrCode!.isDark(row, col) ? "+" : " ";
-      }
-      console.log(r);
-    }
-
     const xyOffset = (1 - dotScale) * 0.5;
     for (let row = 0; row < nCount; row++) {
       for (let col = 0; col < nCount; col++) {
@@ -503,7 +495,6 @@ export class AwesomeQR {
       }
 
       gifOutput.finish();
-      console.log(gifOutput.stream());
 
       return Promise.resolve(gifOutput.stream().toBuffer());
     } else {
