@@ -22,4 +22,7 @@ module.exports = {
     globalObject: "this",
     library: "AwesomeQR",
   },
+  optimization: {
+    minimize: false,
+  },
 };
