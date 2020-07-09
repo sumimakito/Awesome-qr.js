@@ -8,8 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "allowJs": true,
-    "noImplicitAny": false
+    "allowJs": true
   },
   "typeAcquisition": {
     "enable": true
