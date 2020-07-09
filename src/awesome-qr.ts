@@ -1,4 +1,5 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas, Image } from "canvas";
+const _Canvas = require("canvas");
 import { decompressFrames, parseGIF } from "./gifuct-js";
 import { QRCodeModel, QRErrorCorrectLevel, QRUtil } from "./qrcode";
 import GIFEncoder from "./gif.js/GIFEncoder";
@@ -24,6 +25,8 @@ export type Options = {
 };
 
 const castImage = (imageData: string | Buffer): Image => {
+  console.log(_Canvas);
+  console.log(Canvas);
   const img = new Image();
   img.src = imageData;
   return img;
