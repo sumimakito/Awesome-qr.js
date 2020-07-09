@@ -7,10 +7,10 @@ export declare type Options = {
     colorDark?: string;
     colorLight?: string;
     correctLevel?: number;
-    backgroundImage?: string | HTMLImageElement;
+    backgroundImage?: string | Buffer;
     backgroundDimming?: string;
     gifBackground?: ArrayBuffer;
-    logoImage?: string | HTMLImageElement;
+    logoImage?: string | Buffer;
     logoScale?: number;
     logoMargin?: number;
     logoCornerRadius?: number;
