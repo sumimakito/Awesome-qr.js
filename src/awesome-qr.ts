@@ -1,6 +1,6 @@
 import { Canvas, CanvasRenderingContext2D, createCanvas } from "canvas";
 import { decompressFrames, parseGIF } from "./gifuct-js";
-import { QRCodeModel, QRErrorCorrectLevel, QRUtil } from "./core";
+import { QRCodeModel, QRErrorCorrectLevel, QRUtil } from "./qrcode";
 import GIFEncoder from "./gif.js/GIFEncoder";
 
 export type Options = {
@@ -10,7 +10,7 @@ export type Options = {
   typeNumber?: number;
   colorDark?: string;
   colorLight?: string;
-  correctLevel?: QRErrorCorrectLevel;
+  correctLevel?: number;
   backgroundImage?: string | HTMLImageElement;
   backgroundDimming?: string;
   gifBackground?: ArrayBuffer;
@@ -272,6 +272,14 @@ export class AwesomeQR {
 
     const agnPatternCenter = QRUtil.getPatternPosition(this.qrCode!.typeNumber);
 
+    for (let row = 0; row < nCount; row++) {
+      let r = "";
+      for (let col = 0; col < nCount; col++) {
+        r += this.qrCode!.isDark(row, col) ? "+" : " ";
+      }
+      console.log(r);
+    }
+
     const xyOffset = (1 - dotScale) * 0.5;
     for (let row = 0; row < nCount; row++) {
       for (let col = 0; col < nCount; col++) {
@@ -293,9 +301,18 @@ export class AwesomeQR {
         mainCanvasContext.strokeStyle = bIsDark ? this.options.colorDark! : this.options.colorLight!;
         mainCanvasContext.lineWidth = 0.5;
         mainCanvasContext.fillStyle = bIsDark ? this.options.colorDark! : "rgba(255, 255, 255, 0.6)";
-        if (!bProtected) {
+        if (agnPatternCenter.length === 0) {
+          if (!bProtected) {
+            mainCanvasContext.fillRect(
+              nLeft,
+              nTop,
+              (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nSize,
+              (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nSize
+            );
+          }
+        } else {
           const inAgnRange = col < nCount - 4 && col >= nCount - 4 - 5 && row < nCount - 4 && row >= nCount - 4 - 5;
-          if (agnPatternCenter.length === 0 || !inAgnRange) {
+          if (!bProtected && !inAgnRange) {
             // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
             mainCanvasContext.fillRect(
               nLeft,
@@ -469,6 +486,9 @@ export class AwesomeQR {
         const unscaledCanvasContext = unscaledCanvas.getContext("2d");
 
         unscaledCanvasContext.drawImage(backgroundCanvas, 0, 0, size, size);
+        unscaledCanvasContext.rect(0, 0, size, size);
+        unscaledCanvasContext.fillStyle = backgroundDimming;
+        unscaledCanvasContext.fill();
         unscaledCanvasContext.drawImage(mainCanvas, 0, 0, size, size);
 
         // Scale the final image
