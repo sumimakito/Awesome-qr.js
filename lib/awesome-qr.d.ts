@@ -1,5 +1,4 @@
 /// <reference types="node" />
-import { QRErrorCorrectLevel } from "./core";
 export declare type Options = {
     text: string;
     size?: number;
@@ -7,7 +6,7 @@ export declare type Options = {
     typeNumber?: number;
     colorDark?: string;
     colorLight?: string;
-    correctLevel?: QRErrorCorrectLevel;
+    correctLevel?: number;
     backgroundImage?: string | HTMLImageElement;
     backgroundDimming?: string;
     gifBackground?: ArrayBuffer;
@@ -24,7 +23,12 @@ export declare class AwesomeQR {
     private canvasContext;
     private qrCode?;
     private options;
-    static CorrectLevel: typeof QRErrorCorrectLevel;
+    static CorrectLevel: {
+        L: number;
+        M: number;
+        Q: number;
+        H: number;
+    };
     static _defaultOptions: Options;
     constructor(options: Options);
     draw(): Promise<Buffer | ArrayBuffer | undefined>;
