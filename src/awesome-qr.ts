@@ -1,4 +1,4 @@
-import { Canvas, CanvasRenderingContext2D, createCanvas, Image } from "canvas";
+import { Canvas, CanvasRenderingContext2D, createCanvas, Image, loadImage } from "canvas";
 import { decompressFrames, parseGIF } from "./gifuct-js";
 import { QRCodeModel, QRErrorCorrectLevel, QRUtil } from "./qrcode";
 import GIFEncoder from "./gif.js/GIFEncoder";
@@ -21,12 +21,6 @@ export type Options = {
   whiteMargin?: boolean;
   dotScale?: number;
   autoColor?: boolean;
-};
-
-const castImage = (imageData: string | Buffer): Image => {
-  const img = new Image();
-  img.src = imageData;
-  return img;
 };
 
 export class AwesomeQR {
@@ -238,7 +232,7 @@ export class AwesomeQR {
         this.options.colorDark = `rgb(${r},${g},${b})`;
       }
     } else if (!!this.options.backgroundImage) {
-      const backgroundImage = castImage(this.options.backgroundImage);
+      const backgroundImage = await loadImage(this.options.backgroundImage!);
 
       if (this.options.autoColor) {
         const avgRGB = AwesomeQR._getAverageRGB(backgroundImage);
@@ -272,7 +266,7 @@ export class AwesomeQR {
       for (let col = 0; col < nCount; col++) {
         const bIsDark = this.qrCode!.isDark(row, col);
         const isBlkPosCtr = (col < 8 && (row < 8 || row >= nCount - 8)) || (col >= nCount - 8 && row < 8);
-        let bProtected = row === 6 || col === 6 || isBlkPosCtr;
+        let bProtected = isBlkPosCtr;
 
         for (let i = 0; i < agnPatternCenter.length - 1; i++) {
           bProtected =
@@ -332,9 +326,9 @@ export class AwesomeQR {
         } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
           continue;
         } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-          AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, nSize, nSize);
+          AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
         } else {
-          AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, nSize, nSize);
+          // AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
         }
       }
     }
@@ -359,9 +353,20 @@ export class AwesomeQR {
     mainCanvasContext.fillRect(2 * nSize, (nCount - 7 + 2) * nSize, 3 * nSize, 3 * nSize);
 
     for (let i = 0; i < nCount - 8; i += 2) {
-      mainCanvasContext.fillRect((8 + i) * nSize, 6 * nSize, nSize, nSize);
-      mainCanvasContext.fillRect(6 * nSize, (8 + i) * nSize, nSize, nSize);
+      mainCanvasContext.fillRect(
+        (8 + i + xyOffset) * nSize,
+        (6 + xyOffset) * nSize,
+        dotScale * nSize,
+        dotScale * nSize
+      );
+      mainCanvasContext.fillRect(
+        (6 + xyOffset) * nSize,
+        (8 + i + xyOffset) * nSize,
+        dotScale * nSize,
+        dotScale * nSize
+      );
     }
+
     for (let i = 0; i < agnPatternCenter.length; i++) {
       for (let j = 0; j < agnPatternCenter.length; j++) {
         const agnX = agnPatternCenter[j];
@@ -390,7 +395,7 @@ export class AwesomeQR {
     }
 
     if (!!this.options.logoImage) {
-      const logoImage = castImage(this.options.logoImage!);
+      const logoImage = await loadImage(this.options.logoImage!);
 
       let logoScale = this.options.logoScale!;
       let logoMargin = this.options.logoMargin!;
