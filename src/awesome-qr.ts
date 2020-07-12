@@ -159,14 +159,43 @@ export class AwesomeQR {
     canvasContext: CanvasRenderingContext2D,
     centerX: number,
     centerY: number,
-    nWidth: number,
-    nHeight: number
+    nSize: number,
+    xyOffset: number = 0,
+    dotScale: number = 1
   ) {
-    canvasContext.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, nWidth, 4 * nHeight);
-    canvasContext.fillRect((centerX + 2) * nWidth, (centerY - 2 + 1) * nHeight, nWidth, 4 * nHeight);
-    canvasContext.fillRect((centerX - 2 + 1) * nWidth, (centerY - 2) * nHeight, 4 * nWidth, nHeight);
-    canvasContext.fillRect((centerX - 2) * nWidth, (centerY + 2) * nHeight, 4 * nWidth, nHeight);
-    canvasContext.fillRect(centerX * nWidth, centerY * nHeight, nWidth, nHeight);
+    console.log(arguments);
+    new Array(4).fill(0).map((_, i) => {
+      canvasContext.fillRect(
+        (centerX - 2 + xyOffset) * nSize,
+        (centerY - 2 + xyOffset + i) * nSize,
+        dotScale * nSize,
+        dotScale * nSize
+      );
+      canvasContext.fillRect(
+        (centerX + 2 + xyOffset) * nSize,
+        (centerY - 2 + 1 + xyOffset + i) * nSize,
+        dotScale * nSize,
+        dotScale * nSize
+      );
+      canvasContext.fillRect(
+        (centerX - 2 + 1 + xyOffset + i) * nSize,
+        (centerY - 2) * nSize,
+        dotScale * nSize,
+        dotScale * nSize
+      );
+      canvasContext.fillRect(
+        (centerX - 2 + xyOffset + i) * nSize,
+        (centerY + 2) * nSize,
+        dotScale * nSize,
+        dotScale * nSize
+      );
+    });
+    canvasContext.fillRect(
+      (centerX + xyOffset) * nSize,
+      (centerY + xyOffset) * nSize,
+      dotScale * nSize,
+      dotScale * nSize
+    );
   }
 
   private async _draw(): Promise<Buffer | ArrayBuffer | undefined> {
@@ -312,8 +341,8 @@ export class AwesomeQR {
     mainCanvasContext.fillRect(0, 0, 8 * nSize, 8 * nSize);
     mainCanvasContext.fillRect(0, (nCount - 8) * nSize, 8 * nSize, 8 * nSize);
     mainCanvasContext.fillRect((nCount - 8) * nSize, 0, 8 * nSize, 8 * nSize);
-    mainCanvasContext.fillRect(8 * nSize, 6 * nSize, (nCount - 8 - 8) * nSize, nSize);
-    mainCanvasContext.fillRect(6 * nSize, 8 * nSize, nSize, (nCount - 8 - 8) * nSize);
+    // mainCanvasContext.fillRect(8 * nSize, 6 * nSize, (nCount - 8 - 8) * nSize, nSize);
+    // mainCanvasContext.fillRect(6 * nSize, 8 * nSize, nSize, (nCount - 8 - 8) * nSize);
 
     // Draw ALIGN protectors
     const edgeCenter = agnPatternCenter[agnPatternCenter.length - 1];
@@ -328,7 +357,7 @@ export class AwesomeQR {
         } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
           AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
         } else {
-          // AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
+          AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
         }
       }
     }
@@ -377,10 +406,10 @@ export class AwesomeQR {
           continue;
         } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
           mainCanvasContext.fillStyle = "rgba(0, 0, 0, .2)";
-          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, nSize);
+          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale);
         } else {
           mainCanvasContext.fillStyle = this.options.colorDark!;
-          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, nSize);
+          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale);
         }
       }
     }
