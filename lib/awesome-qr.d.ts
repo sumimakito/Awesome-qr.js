@@ -31,7 +31,7 @@ export declare class AwesomeQR {
     };
     static _defaultOptions: Options;
     constructor(options: Options);
-    draw(): Promise<Buffer | ArrayBuffer | undefined>;
+    draw(): Promise<Buffer | ArrayBuffer | string | undefined>;
     private _clear;
     private static _prepareRoundedCornerClip;
     private static _getAverageRGB;
