@@ -341,6 +341,7 @@ export class AwesomeQR {
     mainCanvasContext.fillRect(0, 0, 8 * nSize, 8 * nSize);
     mainCanvasContext.fillRect(0, (nCount - 8) * nSize, 8 * nSize, 8 * nSize);
     mainCanvasContext.fillRect((nCount - 8) * nSize, 0, 8 * nSize, 8 * nSize);
+    // Protectors for timing patterns
     // mainCanvasContext.fillRect(8 * nSize, 6 * nSize, (nCount - 8 - 8) * nSize, nSize);
     // mainCanvasContext.fillRect(6 * nSize, 8 * nSize, nSize, (nCount - 8 - 8) * nSize);
 
