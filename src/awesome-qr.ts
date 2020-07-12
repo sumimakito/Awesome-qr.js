@@ -69,7 +69,7 @@ export class AwesomeQR {
     this.qrCode.make();
   }
 
-  draw(): Promise<Buffer | ArrayBuffer | undefined> {
+  draw(): Promise<Buffer | ArrayBuffer | string | undefined> {
     return new Promise((resolve) => this._draw().then(resolve));
   }
 
@@ -198,7 +198,7 @@ export class AwesomeQR {
     );
   }
 
-  private async _draw(): Promise<Buffer | ArrayBuffer | undefined> {
+  private async _draw(): Promise<Buffer | ArrayBuffer | string | undefined> {
     const nCount = this.qrCode?.moduleCount!;
     const rawSize = this.options.size!;
     let rawMargin = this.options.margin!;
@@ -539,7 +539,28 @@ export class AwesomeQR {
       outCanvasContext.drawImage(mainCanvas, 0, 0, rawSize, rawSize);
       this.canvas = outCanvas;
 
+      if (isElement(this.canvas)) {
+        return Promise.resolve(this.canvas.toDataURL());
+      }
+
       return Promise.resolve(this.canvas.toBuffer());
     }
+  }
+}
+
+function isElement(obj: any): boolean {
+  try {
+    //Using W3 DOM2 (works for FF, Opera and Chrome)
+    return obj instanceof HTMLElement;
+  } catch (e) {
+    //Browsers not supporting W3 DOM2 don't have HTMLElement and
+    //an exception is thrown and we end up here. Testing some
+    //properties that all elements have (works on IE7)
+    return (
+      typeof obj === "object" &&
+      obj.nodeType === 1 &&
+      typeof obj.style === "object" &&
+      typeof obj.ownerDocument === "object"
+    );
   }
 }
