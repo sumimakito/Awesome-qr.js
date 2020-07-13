@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "module": "CommonJS",
+    "outDir": "./lib",
+    "declaration": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowJs": true
+  },
+  "typeAcquisition": {
+    "enable": true
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "lib"]
+}
