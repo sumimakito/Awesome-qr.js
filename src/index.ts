@@ -1,4 +1,12 @@
-import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame, QRErrorCorrectLevel } from './Enums';
+import {
+    CanvasType,
+    DataPattern,
+    EyeBallShape,
+    EyeFrameShape,
+    GradientType,
+    QRCodeFrame,
+    QRErrorCorrectLevel,
+} from './Enums';
 import { QRCode } from './Models';
 import { QRCodeConfig } from './Types';
 
@@ -12,7 +20,7 @@ export class QRCodeBuilder {
             typeNumber: 4,
             colorDark: '#000000',
             colorLight: '#ffffff',
-            correctLevel: QRErrorCorrectLevel.M,
+            correctLevel: QRErrorCorrectLevel.H,
             backgroundDimming: 'rgba(0,0,0,0)',
             logoScale: 0.15,
             logoMargin: 800/12/4, // 1/4 of margin
@@ -184,8 +192,21 @@ export class QRCodeBuilder {
             this.config.logoScale = 0.15;
             this.config.logoMargin = (this.config.logoMargin > 5) ? 5 : this.config.logoMargin;
         }
+
+
         const qrCode: QRCode = new QRCode(-1, this.config);
-        qrCode.canvas = await qrCode.drawing.draw();
-        return Promise.resolve(qrCode);
+
+        // for testing
+        // qrCode.canvas = await qrCode.drawing.draw();
+        // return Promise.resolve(qrCode);
+
+        if (this.config.canvasType !== CanvasType.SVG) {
+            qrCode.canvas = await qrCode.drawing.draw();
+            return Promise.resolve(qrCode);
+        } else {
+            // qrCode.canvas = await qrCode.svgDrawing.draw();
+            qrCode.svg = qrCode.svgDrawing.drawSVG();
+            return Promise.resolve(qrCode);
+        }
     }
 }

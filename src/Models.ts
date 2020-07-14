@@ -15,6 +15,8 @@ import {
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { isNode, loadImage } from './Util';
 
+import { SVGDrawing } from './Svg';
+
 if (isNode) {
     const path = require('path');
     const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
@@ -168,8 +170,10 @@ export class QRCode {
     public dataCache?: any[];
     public dataList: QR8bitByte[] = [];
     public drawing: Drawing;
+    public svgDrawing: SVGDrawing;
     // @ts-ignore
     public canvas: Canvas;
+    public svg: any = '';
 
     private config: QRCodeConfig;
 
@@ -180,6 +184,7 @@ export class QRCode {
         this.addData(config.text);
         this.make();
         this.drawing = new Drawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
+        this.svgDrawing = new SVGDrawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
     }
 
     get patternPosition() {
@@ -197,14 +202,17 @@ export class QRCode {
     }
 
     public toBuffer(): Buffer {
+        if (this.config.canvasType === CanvasType.SVG) {
+            return this.svg;
+        }
         let drawing = this.canvas.toBuffer();
         switch (this.config.canvasType) {
             case CanvasType.PDF:
                 drawing = this.canvas.toBuffer('application/pdf');
                 break;
-            case CanvasType.SVG:
-                drawing = this.canvas.toBuffer();
-                break;
+            // case CanvasType.SVG:
+            //     drawing = this.canvas.toBuffer();
+            //     break;
             default:
                 throw { error: `Cannot convert to buffer for ${this.config.canvasType}` };
         }
@@ -557,21 +565,21 @@ export class Drawing {
             .then(() => {
                 return this.drawAlignPatterns(mainContext, gradient);
             })
-            .then(() => {
-                return this.drawPositionProtectors(mainContext);
-            })
-            .then(() => {
-                return this.drawAlignProtectors(mainContext);
-            })
-            .then(() => {
-                return this.drawPositionPatterns(mainContext, gradient);
-            })
-            .then(() => {
-                return this.fillMargin(mainContext);
-            })
-            .then(() => {
-                return this.drawLogoImage(mainContext);
-            })
+            // .then(() => {
+            //     return this.drawPositionProtectors(mainContext);
+            // })
+            // .then(() => {
+            //     return this.drawAlignProtectors(mainContext);
+            // })
+            // .then(() => {
+            //     return this.drawPositionPatterns(mainContext, gradient);
+            // })
+            // .then(() => {
+            //     return this.fillMargin(mainContext);
+            // })
+            // .then(() => {
+            //     return this.drawLogoImage(mainContext);
+            // })
             .then(() => {
                 // Swap and merge the foreground and the background
                 const size = this.config.size;
@@ -1190,6 +1198,7 @@ export class Drawing {
 
     private drawPositionPatterns(context: CanvasRenderingContext2D, gradient: CanvasGradient | string) {
         context.fillStyle = gradient;
+        context.fillStyle = '#242'
 
         const moduleSize = this.config.moduleSize;
         const moduleCount = this.moduleCount;
@@ -1308,6 +1317,7 @@ export class Drawing {
     }
 
     private drawAlignProtectors(context: CanvasRenderingContext2D) {
+        // context.fillStyle = '#242'
         const patternPosition = this.patternPosition;
         const moduleSize = this.config.moduleSize;
         const edgeCenter = patternPosition[patternPosition.length - 1];
@@ -1327,6 +1337,7 @@ export class Drawing {
     }
 
     private drawPositionProtectors(context: CanvasRenderingContext2D) {
+        // context.fillStyle = '#242';
         context.fillStyle = this.config.backgroundImage ? 'rgba(255, 255, 255, 0.6)' : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
         const size = this.config.moduleSize;
         const moduleCount = this.moduleCount;
@@ -1394,6 +1405,7 @@ export class Drawing {
 
     private fillRectWithMask(canvas: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
         if (!this.maskCanvas) {
+            console.log("no mask canvas")
             switch (shape) {
                 case DataPattern.CIRCLE:
                     this.drawCircle(x + w / 2, y + h / 2, canvas, h / 2);
@@ -1412,6 +1424,7 @@ export class Drawing {
                     break;
             }
         } else {
+            console.log("mask canvas")
             canvas.drawImage(this.maskCanvas, x, y, w, h, x, y, w, h);
             const fill = canvas.fillStyle;
             canvas.fillStyle = bIsDark ? 'rgba(0, 0, 0, .5)' : 'rgba(255, 255, 255, .7)';
