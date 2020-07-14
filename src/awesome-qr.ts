@@ -144,6 +144,22 @@ export class AwesomeQR {
     return rgb;
   }
 
+  private static _drawDot(
+    canvasContext: CanvasRenderingContext2D,
+    centerX: number,
+    centerY: number,
+    nSize: number,
+    xyOffset: number = 0,
+    dotScale: number = 1
+  ) {
+    canvasContext.fillRect(
+      (centerX + xyOffset) * nSize,
+      (centerY + xyOffset) * nSize,
+      dotScale * nSize,
+      dotScale * nSize
+    );
+  }
+
   private static _drawAlignProtector(
     canvasContext: CanvasRenderingContext2D,
     centerX: number,
@@ -161,41 +177,50 @@ export class AwesomeQR {
     centerY: number,
     nSize: number,
     xyOffset: number = 0,
-    dotScale: number = 1
+    dotScale: number = 1,
+    colorDark: string
   ) {
-    console.log(arguments);
+    const oldFillStyle = canvasContext.fillStyle;
+    canvasContext.fillStyle = colorDark;
     new Array(4).fill(0).map((_, i) => {
-      canvasContext.fillRect(
-        (centerX - 2 + xyOffset) * nSize,
-        (centerY - 2 + xyOffset + i) * nSize,
-        dotScale * nSize,
-        dotScale * nSize
-      );
-      canvasContext.fillRect(
-        (centerX + 2 + xyOffset) * nSize,
-        (centerY - 2 + 1 + xyOffset + i) * nSize,
-        dotScale * nSize,
-        dotScale * nSize
-      );
-      canvasContext.fillRect(
-        (centerX - 2 + 1 + xyOffset + i) * nSize,
-        (centerY - 2) * nSize,
-        dotScale * nSize,
-        dotScale * nSize
-      );
-      canvasContext.fillRect(
-        (centerX - 2 + xyOffset + i) * nSize,
-        (centerY + 2) * nSize,
-        dotScale * nSize,
-        dotScale * nSize
-      );
+      // canvasContext.fillRect(
+      //   (centerX - 2 + xyOffset) * nSize,
+      //   (centerY - 2 + xyOffset + i) * nSize,
+      //   dotScale * nSize,
+      //   dotScale * nSize
+      // );
+      // canvasContext.fillRect(
+      //   (centerX + 2 + xyOffset) * nSize,
+      //   (centerY - 2 + 1 + xyOffset + i) * nSize,
+      //   dotScale * nSize,
+      //   dotScale * nSize
+      // );
+      // canvasContext.fillRect(
+      //   (centerX - 2 + 1 + xyOffset + i) * nSize,
+      //   (centerY - 2) * nSize,
+      //   dotScale * nSize,
+      //   dotScale * nSize
+      // );
+      // canvasContext.fillRect(
+      //   (centerX - 2 + xyOffset + i) * nSize,
+      //   (centerY + 2) * nSize,
+      //   dotScale * nSize,
+      //   dotScale * nSize
+      // );
+      AwesomeQR._drawDot(canvasContext, centerX - 2 + i, centerY - 2, nSize, xyOffset, dotScale);
+      AwesomeQR._drawDot(canvasContext, centerX + 2, centerY - 2 + i, nSize, xyOffset, dotScale);
+      AwesomeQR._drawDot(canvasContext, centerX + 2 - i, centerY + 2, nSize, xyOffset, dotScale);
+      AwesomeQR._drawDot(canvasContext, centerX - 2, centerY + 2 - i, nSize, xyOffset, dotScale);
     });
-    canvasContext.fillRect(
-      (centerX + xyOffset) * nSize,
-      (centerY + xyOffset) * nSize,
-      dotScale * nSize,
-      dotScale * nSize
-    );
+    AwesomeQR._drawDot(canvasContext, centerX, centerY, nSize, xyOffset, dotScale);
+    canvasContext.fillStyle = "rgba(255, 255, 255, 0.6)";
+    new Array(2).fill(0).map((_, i) => {
+      AwesomeQR._drawDot(canvasContext, centerX - 1 + i, centerY - 1, nSize, xyOffset, dotScale);
+      AwesomeQR._drawDot(canvasContext, centerX + 1, centerY - 1 + i, nSize, xyOffset, dotScale);
+      AwesomeQR._drawDot(canvasContext, centerX + 1 - i, centerY + 1, nSize, xyOffset, dotScale);
+      AwesomeQR._drawDot(canvasContext, centerX - 1, centerY + 1 - i, nSize, xyOffset, dotScale);
+    });
+    canvasContext.fillStyle = oldFillStyle;
   }
 
   private async _draw(): Promise<Buffer | ArrayBuffer | string | undefined> {
@@ -345,23 +370,24 @@ export class AwesomeQR {
     // mainCanvasContext.fillRect(8 * nSize, 6 * nSize, (nCount - 8 - 8) * nSize, nSize);
     // mainCanvasContext.fillRect(6 * nSize, 8 * nSize, nSize, (nCount - 8 - 8) * nSize);
 
-    // Draw ALIGN protectors
     const edgeCenter = agnPatternCenter[agnPatternCenter.length - 1];
-    for (let i = 0; i < agnPatternCenter.length; i++) {
-      for (let j = 0; j < agnPatternCenter.length; j++) {
-        const agnX = agnPatternCenter[j];
-        const agnY = agnPatternCenter[i];
-        if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
-          continue;
-        } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
-          continue;
-        } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-          AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
-        } else {
-          AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
-        }
-      }
-    }
+
+    // Draw ALIGN protectors
+    // for (let i = 0; i < agnPatternCenter.length; i++) {
+    //   for (let j = 0; j < agnPatternCenter.length; j++) {
+    //     const agnX = agnPatternCenter[j];
+    //     const agnY = agnPatternCenter[i];
+    //     if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
+    //       continue;
+    //     } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
+    //       continue;
+    //     } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
+    //       AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
+    //     } else {
+    //       AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
+    //     }
+    //   }
+    // }
 
     // Draw POSITION patterns
     mainCanvasContext.fillStyle = this.options.colorDark!;
@@ -406,11 +432,11 @@ export class AwesomeQR {
         } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
           continue;
         } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-          mainCanvasContext.fillStyle = "rgba(0, 0, 0, .2)";
-          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale);
+          // mainCanvasContext.fillStyle = "rgba(0, 0, 0, .2)";
+          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale, this.options.colorDark!);
         } else {
-          mainCanvasContext.fillStyle = this.options.colorDark!;
-          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale);
+          // mainCanvasContext.fillStyle = this.options.colorDark!;
+          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale, this.options.colorDark!);
         }
       }
     }
