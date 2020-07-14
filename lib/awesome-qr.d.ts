@@ -35,6 +35,7 @@ export declare class AwesomeQR {
     private _clear;
     private static _prepareRoundedCornerClip;
     private static _getAverageRGB;
+    private static _drawDot;
     private static _drawAlignProtector;
     private static _drawAlign;
     private _draw;

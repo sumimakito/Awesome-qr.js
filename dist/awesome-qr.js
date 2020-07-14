@@ -628,26 +628,64 @@ var AwesomeQR = /** @class */ (function () {
         rgb.b = ~~(rgb.b / count);
         return rgb;
     };
+    AwesomeQR._drawDot = function (canvasContext, centerX, centerY, nSize, xyOffset, dotScale) {
+        if (xyOffset === void 0) { xyOffset = 0; }
+        if (dotScale === void 0) { dotScale = 1; }
+        canvasContext.fillRect((centerX + xyOffset) * nSize, (centerY + xyOffset) * nSize, dotScale * nSize, dotScale * nSize);
+    };
     AwesomeQR._drawAlignProtector = function (canvasContext, centerX, centerY, nWidth, nHeight) {
         canvasContext.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
         canvasContext.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
     };
-    AwesomeQR._drawAlign = function (canvasContext, centerX, centerY, nSize, xyOffset, dotScale) {
+    AwesomeQR._drawAlign = function (canvasContext, centerX, centerY, nSize, xyOffset, dotScale, colorDark) {
         if (xyOffset === void 0) { xyOffset = 0; }
         if (dotScale === void 0) { dotScale = 1; }
-        console.log(arguments);
+        var oldFillStyle = canvasContext.fillStyle;
+        canvasContext.fillStyle = colorDark;
         new Array(4).fill(0).map(function (_, i) {
-            canvasContext.fillRect((centerX - 2 + xyOffset) * nSize, (centerY - 2 + xyOffset + i) * nSize, dotScale * nSize, dotScale * nSize);
-            canvasContext.fillRect((centerX + 2 + xyOffset) * nSize, (centerY - 2 + 1 + xyOffset + i) * nSize, dotScale * nSize, dotScale * nSize);
-            canvasContext.fillRect((centerX - 2 + 1 + xyOffset + i) * nSize, (centerY - 2) * nSize, dotScale * nSize, dotScale * nSize);
-            canvasContext.fillRect((centerX - 2 + xyOffset + i) * nSize, (centerY + 2) * nSize, dotScale * nSize, dotScale * nSize);
+            // canvasContext.fillRect(
+            //   (centerX - 2 + xyOffset) * nSize,
+            //   (centerY - 2 + xyOffset + i) * nSize,
+            //   dotScale * nSize,
+            //   dotScale * nSize
+            // );
+            // canvasContext.fillRect(
+            //   (centerX + 2 + xyOffset) * nSize,
+            //   (centerY - 2 + 1 + xyOffset + i) * nSize,
+            //   dotScale * nSize,
+            //   dotScale * nSize
+            // );
+            // canvasContext.fillRect(
+            //   (centerX - 2 + 1 + xyOffset + i) * nSize,
+            //   (centerY - 2) * nSize,
+            //   dotScale * nSize,
+            //   dotScale * nSize
+            // );
+            // canvasContext.fillRect(
+            //   (centerX - 2 + xyOffset + i) * nSize,
+            //   (centerY + 2) * nSize,
+            //   dotScale * nSize,
+            //   dotScale * nSize
+            // );
+            AwesomeQR._drawDot(canvasContext, centerX - 2 + i, centerY - 2, nSize, xyOffset, dotScale);
+            AwesomeQR._drawDot(canvasContext, centerX + 2, centerY - 2 + i, nSize, xyOffset, dotScale);
+            AwesomeQR._drawDot(canvasContext, centerX + 2 - i, centerY + 2, nSize, xyOffset, dotScale);
+            AwesomeQR._drawDot(canvasContext, centerX - 2, centerY + 2 - i, nSize, xyOffset, dotScale);
         });
-        canvasContext.fillRect((centerX + xyOffset) * nSize, (centerY + xyOffset) * nSize, dotScale * nSize, dotScale * nSize);
+        AwesomeQR._drawDot(canvasContext, centerX, centerY, nSize, xyOffset, dotScale);
+        canvasContext.fillStyle = "rgba(255, 255, 255, 0.6)";
+        new Array(2).fill(0).map(function (_, i) {
+            AwesomeQR._drawDot(canvasContext, centerX - 1 + i, centerY - 1, nSize, xyOffset, dotScale);
+            AwesomeQR._drawDot(canvasContext, centerX + 1, centerY - 1 + i, nSize, xyOffset, dotScale);
+            AwesomeQR._drawDot(canvasContext, centerX + 1 - i, centerY + 1, nSize, xyOffset, dotScale);
+            AwesomeQR._drawDot(canvasContext, centerX - 1, centerY + 1 - i, nSize, xyOffset, dotScale);
+        });
+        canvasContext.fillStyle = oldFillStyle;
     };
     AwesomeQR.prototype._draw = function () {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var nCount, rawSize, rawMargin, margin, rawViewportSize, whiteMargin, backgroundDimming, nSize, viewportSize, size, mainCanvas, mainCanvasContext, dotScale, backgroundCanvas, backgroundCanvasContext, parsedGIFBackground, gifFrames, gif, r, g, b, count, i, c, backgroundImage, avgRGB, agnPatternCenter, xyOffset, row, col, bIsDark, isBlkPosCtr, bProtected, i, nLeft, nTop, inAgnRange, protectorStyle, edgeCenter, i, j, agnX, agnY, i, i, j, agnX, agnY, logoImage, logoScale, logoMargin, logoCornerRadius, logoSize, x, y, gifOutput_1, backgroundCanvas_1, backgroundCanvasContext_1, patchCanvas_1, patchCanvasContext_1, patchData_1, outCanvas, outCanvasContext;
+            var nCount, rawSize, rawMargin, margin, rawViewportSize, whiteMargin, backgroundDimming, nSize, viewportSize, size, mainCanvas, mainCanvasContext, dotScale, backgroundCanvas, backgroundCanvasContext, parsedGIFBackground, gifFrames, gif, r, g, b, count, i, c, backgroundImage, avgRGB, agnPatternCenter, xyOffset, row, col, bIsDark, isBlkPosCtr, bProtected, i, nLeft, nTop, inAgnRange, protectorStyle, edgeCenter, i, i, j, agnX, agnY, logoImage, logoScale, logoMargin, logoCornerRadius, logoSize, x, y, gifOutput_1, backgroundCanvas_1, backgroundCanvasContext_1, patchCanvas_1, patchCanvasContext_1, patchData_1, outCanvas, outCanvasContext;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -762,24 +800,22 @@ var AwesomeQR = /** @class */ (function () {
                         mainCanvasContext.fillRect(0, (nCount - 8) * nSize, 8 * nSize, 8 * nSize);
                         mainCanvasContext.fillRect((nCount - 8) * nSize, 0, 8 * nSize, 8 * nSize);
                         edgeCenter = agnPatternCenter[agnPatternCenter.length - 1];
-                        for (i = 0; i < agnPatternCenter.length; i++) {
-                            for (j = 0; j < agnPatternCenter.length; j++) {
-                                agnX = agnPatternCenter[j];
-                                agnY = agnPatternCenter[i];
-                                if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
-                                    continue;
-                                }
-                                else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
-                                    continue;
-                                }
-                                else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-                                    AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
-                                }
-                                else {
-                                    AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
-                                }
-                            }
-                        }
+                        // Draw ALIGN protectors
+                        // for (let i = 0; i < agnPatternCenter.length; i++) {
+                        //   for (let j = 0; j < agnPatternCenter.length; j++) {
+                        //     const agnX = agnPatternCenter[j];
+                        //     const agnY = agnPatternCenter[i];
+                        //     if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
+                        //       continue;
+                        //     } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
+                        //       continue;
+                        //     } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
+                        //       AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
+                        //     } else {
+                        //       AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
+                        //     }
+                        //   }
+                        // }
                         // Draw POSITION patterns
                         mainCanvasContext.fillStyle = this.options.colorDark;
                         mainCanvasContext.fillRect(0, 0, 7 * nSize, nSize);
@@ -812,12 +848,12 @@ var AwesomeQR = /** @class */ (function () {
                                     continue;
                                 }
                                 else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-                                    mainCanvasContext.fillStyle = "rgba(0, 0, 0, .2)";
-                                    AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale);
+                                    // mainCanvasContext.fillStyle = "rgba(0, 0, 0, .2)";
+                                    AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale, this.options.colorDark);
                                 }
                                 else {
-                                    mainCanvasContext.fillStyle = this.options.colorDark;
-                                    AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale);
+                                    // mainCanvasContext.fillStyle = this.options.colorDark!;
+                                    AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale, this.options.colorDark);
                                 }
                             }
                         }
