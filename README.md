@@ -7,13 +7,13 @@ An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
 [点此阅读简体中文版本文档](README-zh_CN.md)
 
-### Live demo
+## Live demo
 
 Check out our [**brand-new** live demo](https://www.bitcat.cc/webapp/awesome-qr/index.html).
 
 Or you can also access the live demo by typing `bitcat.cc/awesome` in the browser on your smartphone.
 
-### Compatibility
+## Compatibility
 
 > Awesome-qr.js is compatible with following browsers.
 
@@ -25,7 +25,7 @@ Or you can also access the live demo by typing `bitcat.cc/awesome` in the browse
 - Edge 12+
 - IE 9+
 
-### Gallery
+## Gallery
 
 > These QR codes were made with Awesome-qr.js 🤗
 
@@ -37,13 +37,63 @@ Or you can also access the live demo by typing `bitcat.cc/awesome` in the browse
   	</tr>
 </table>
 
-### Play with Awesome-qr.js
+## Play with Awesome-qr.js
 
-> Note: Module 'awesome-qr' on npmjs has been totally changed after v1.2.0.
+### Node.js
+
+> **Please read ⚠️**
+>
+> Awesome-qr.js uses node-canvas as its drawing backend. You might need to take a look at [its documentation](https://github.com/Automattic/node-canvas#installation) to ensure that node-canvas works on your environment.
+
+```shell
+yarn add awesome-qr // using Yarn
+npm install --save awesome-qr // using NPM
+```
+
+```js
+const { AwesomeQR } = require("awesome-qr");
+const fs = require("fs");
+
+// ...
+
+const background = fs.readFileSync("background.png");
+
+const buffer = await new AwesomeQR({
+  text: "AwesomeQR by Makito - Awesome, right now.",
+  size: 500,
+  backgroundImage: background,
+}).draw();
+
+fs.writeFileSync("qrcode.png", buffer);
+```
+
+### Browsers
+
+```html
+<!-- import to the global scope -->
+<script src="./dist/awesome-qr.js"></script>
+
+<!-- or use require.js -->
+<script>
+  require(["dist/awesome-qr.js"], (AwesomeQR) => ...);
+</script>
+```
+
+```js
+var background;
+var reader = new FileReader();
+reader.onload = function () {
+  background = this.result;
+  new AwesomeQR({
+    text: "AwesomeQR by Makito - Awesome, right now.",
+    size: 500,
+    backgroundImage: background,
+  }).draw().then((dataURL) => );
+};
+reader.readAsDataURL(file);
+```
 
 #### α. Use in Node.js (on server side)
-
-> **IMPORTANT**: Awesome-qr.js uses node-canvas to draw the generated QR code image, so before running the `npm install ...` command, you really should take a carefully look at [its documentation](https://github.com/Automattic/node-canvas#installation) to ensure that node-canvas will work on your server correctly.
 
 ```
 npm install awesome-qr --save
