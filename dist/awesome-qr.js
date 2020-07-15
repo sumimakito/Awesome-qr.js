@@ -643,30 +643,6 @@ var AwesomeQR = /** @class */ (function () {
         var oldFillStyle = canvasContext.fillStyle;
         canvasContext.fillStyle = colorDark;
         new Array(4).fill(0).map(function (_, i) {
-            // canvasContext.fillRect(
-            //   (centerX - 2 + xyOffset) * nSize,
-            //   (centerY - 2 + xyOffset + i) * nSize,
-            //   dotScale * nSize,
-            //   dotScale * nSize
-            // );
-            // canvasContext.fillRect(
-            //   (centerX + 2 + xyOffset) * nSize,
-            //   (centerY - 2 + 1 + xyOffset + i) * nSize,
-            //   dotScale * nSize,
-            //   dotScale * nSize
-            // );
-            // canvasContext.fillRect(
-            //   (centerX - 2 + 1 + xyOffset + i) * nSize,
-            //   (centerY - 2) * nSize,
-            //   dotScale * nSize,
-            //   dotScale * nSize
-            // );
-            // canvasContext.fillRect(
-            //   (centerX - 2 + xyOffset + i) * nSize,
-            //   (centerY + 2) * nSize,
-            //   dotScale * nSize,
-            //   dotScale * nSize
-            // );
             AwesomeQR._drawDot(canvasContext, centerX - 2 + i, centerY - 2, nSize, xyOffset, dotScale);
             AwesomeQR._drawDot(canvasContext, centerX + 2, centerY - 2 + i, nSize, xyOffset, dotScale);
             AwesomeQR._drawDot(canvasContext, centerX + 2 - i, centerY + 2, nSize, xyOffset, dotScale);
@@ -685,7 +661,7 @@ var AwesomeQR = /** @class */ (function () {
     AwesomeQR.prototype._draw = function () {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var nCount, rawSize, rawMargin, margin, rawViewportSize, whiteMargin, backgroundDimming, nSize, viewportSize, size, mainCanvas, mainCanvasContext, dotScale, backgroundCanvas, backgroundCanvasContext, parsedGIFBackground, gifFrames, gif, r, g, b, count, i, c, backgroundImage, avgRGB, agnPatternCenter, xyOffset, row, col, bIsDark, isBlkPosCtr, bProtected, i, nLeft, nTop, inAgnRange, protectorStyle, edgeCenter, i, i, j, agnX, agnY, logoImage, logoScale, logoMargin, logoCornerRadius, logoSize, x, y, gifOutput_1, backgroundCanvas_1, backgroundCanvasContext_1, patchCanvas_1, patchCanvasContext_1, patchData_1, outCanvas, outCanvasContext;
+            var nCount, rawSize, rawMargin, margin, rawViewportSize, whiteMargin, backgroundDimming, nSize, viewportSize, size, mainCanvas, mainCanvasContext, dotScale, backgroundCanvas, backgroundCanvasContext, parsedGIFBackground, gifFrames, gif, r, g, b, count, i, c, backgroundImage, avgRGB, agnPatternCenter, xyOffset, row, col, bIsDark, isBlkPosCtr, bProtected, i, nLeft, nTop, inAgnRange, protectorStyle, edgeCenter, i, i, j, agnX, agnY, logoImage, logoScale, logoMargin, logoCornerRadius, logoSize, x, y, gifOutput_1, backgroundCanvas_1, backgroundCanvasContext_1, patchCanvas_1, patchCanvasContext_1, patchData_1, u8array, binary, outCanvas, outCanvasContext;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -938,9 +914,12 @@ var AwesomeQR = /** @class */ (function () {
                                 throw new Error("No frames.");
                             }
                             gifOutput_1.finish();
-                            return [2 /*return*/, Promise.resolve(typeof Buffer === "undefined"
-                                    ? gifOutput_1.stream().toFlattenUint8Array()
-                                    : Buffer.from(gifOutput_1.stream().toFlattenUint8Array()))];
+                            if (isElement(this.canvas)) {
+                                u8array = gifOutput_1.stream().toFlattenUint8Array();
+                                binary = u8array.reduce(function (bin, u8) { return bin + String.fromCharCode(u8); }, "");
+                                return [2 /*return*/, Promise.resolve("data:image/gif;base64," + window.btoa(binary))];
+                            }
+                            return [2 /*return*/, Promise.resolve(Buffer.from(gifOutput_1.stream().toFlattenUint8Array()))];
                         }
                         else {
                             // Swap and merge the foreground and the background
