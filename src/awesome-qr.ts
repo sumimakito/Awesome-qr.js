@@ -183,30 +183,6 @@ export class AwesomeQR {
     const oldFillStyle = canvasContext.fillStyle;
     canvasContext.fillStyle = colorDark;
     new Array(4).fill(0).map((_, i) => {
-      // canvasContext.fillRect(
-      //   (centerX - 2 + xyOffset) * nSize,
-      //   (centerY - 2 + xyOffset + i) * nSize,
-      //   dotScale * nSize,
-      //   dotScale * nSize
-      // );
-      // canvasContext.fillRect(
-      //   (centerX + 2 + xyOffset) * nSize,
-      //   (centerY - 2 + 1 + xyOffset + i) * nSize,
-      //   dotScale * nSize,
-      //   dotScale * nSize
-      // );
-      // canvasContext.fillRect(
-      //   (centerX - 2 + 1 + xyOffset + i) * nSize,
-      //   (centerY - 2) * nSize,
-      //   dotScale * nSize,
-      //   dotScale * nSize
-      // );
-      // canvasContext.fillRect(
-      //   (centerX - 2 + xyOffset + i) * nSize,
-      //   (centerY + 2) * nSize,
-      //   dotScale * nSize,
-      //   dotScale * nSize
-      // );
       AwesomeQR._drawDot(canvasContext, centerX - 2 + i, centerY - 2, nSize, xyOffset, dotScale);
       AwesomeQR._drawDot(canvasContext, centerX + 2, centerY - 2 + i, nSize, xyOffset, dotScale);
       AwesomeQR._drawDot(canvasContext, centerX + 2 - i, centerY + 2, nSize, xyOffset, dotScale);
@@ -553,11 +529,13 @@ export class AwesomeQR {
 
       gifOutput.finish();
 
-      return Promise.resolve(
-        typeof Buffer === "undefined"
-          ? gifOutput.stream().toFlattenUint8Array()
-          : Buffer.from(gifOutput.stream().toFlattenUint8Array())
-      );
+      if (isElement(this.canvas)) {
+        const u8array = gifOutput.stream().toFlattenUint8Array();
+        const binary = u8array.reduce((bin: string, u8: number) => bin + String.fromCharCode(u8), "");
+        return Promise.resolve(`data:image/gif;base64,${window.btoa(binary)}`);
+      }
+
+      return Promise.resolve(Buffer.from(gifOutput.stream().toFlattenUint8Array()));
     } else {
       // Swap and merge the foreground and the background
       backgroundCanvasContext.drawImage(mainCanvas, 0, 0, size, size);
