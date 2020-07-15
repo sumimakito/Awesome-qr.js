@@ -41,6 +41,8 @@ Or you can also access the live demo by typing `bitcat.cc/awesome` in the browse
 
 ### Node.js
 
+Type definitions are included in the npm package.
+
 > **Please read ⚠️**
 >
 > Awesome-qr.js uses node-canvas as its drawing backend. You might need to take a look at [its documentation](https://github.com/Automattic/node-canvas#installation) to ensure that node-canvas works on your environment.
@@ -49,6 +51,8 @@ Or you can also access the live demo by typing `bitcat.cc/awesome` in the browse
 yarn add awesome-qr // using Yarn
 npm install --save awesome-qr // using NPM
 ```
+
+> Awesome-qr.js prior to v2.0.0 **does not work well** in Node.js environment and Awesome-qr.js prior to v1.2.0 **does not work** in Node.js environment.
 
 ```js
 const { AwesomeQR } = require("awesome-qr");
@@ -71,7 +75,7 @@ fs.writeFileSync("qrcode.png", buffer);
 
 ```html
 <!-- import to the global scope -->
-<script src="./dist/awesome-qr.js"></script>
+<script src="dist/awesome-qr.js"></script>
 
 <!-- or use require.js -->
 <script>
@@ -91,71 +95,6 @@ reader.onload = function () {
   }).draw().then((dataURL) => );
 };
 reader.readAsDataURL(file);
-```
-
-#### α. Use in Node.js (on server side)
-
-```
-npm install awesome-qr --save
-```
-
-> Before V1.2.0, Awesome-qr.js was NOT designed for servers running Node.js. Therefore, please do NOT use npm to install versions below V1.2.0 on your server, you may get a painful error otherwise.
-
-```javascript
-let AwesomeQR = require("awesome-qr");
-
-new AwesomeQR().create({
-  text: "Makito loves Kafuu Chino.",
-  size: 500,
-  callback: (data) => {
-    // binary PNG data
-  },
-});
-```
-
-#### β. Use in the browser
-
-> Note: There's **no need to** use npmjs. We **just need** require.js here.
-
-Copy JavaScript files under `dist/` to a appropriate place, for example – `js/`.
-
-The file structure might look like the tree below:
-
-```
-|- ...
-|- index.html
-|- js
-    |- awesome-qr.js
-    |- gif.js
-    |- gif.worker.js
-    |- require.js
-|- ...
-```
-
-Import require.js:
-
-```html
-<script type="text/javascript" src="js/require.js"></script>
-```
-
-Then, require awesome-qr.js:
-
-```javascript
-// This will specify the base path for awesome-qr.js, gif.js, and gif.worker.js.
-// In the case showed above, the base path should be "js".
-// The variable's name should NOT be changed.
-var __awesome_qr_base_path = "js";
-
-// require awesome-qr.js
-require([__awesome_qr_base_path + "/awesome-qr"], function (AwesomeQR) {
-  // ... and make use of it
-  AwesomeQR.create({
-    text: "Makito loves Kafuu Chino.",
-    size: 800,
-    margin: 20,
-    bindElement: "qrcode",
-  });
-});
 ```
 
 ### More examples
