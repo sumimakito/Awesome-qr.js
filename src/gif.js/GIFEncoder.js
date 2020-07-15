@@ -37,7 +37,7 @@ ByteArray.prototype.getData = function () {
   return rv;
 };
 
-ByteArray.prototype.toBuffer = function () {
+ByteArray.prototype.toFlattenUint8Array = function () {
   const chunks = [];
   for (var p = 0; p < this.pages.length; p++) {
     if (p === this.pages.length - 1) {
@@ -47,7 +47,12 @@ ByteArray.prototype.toBuffer = function () {
       chunks.push(this.pages[p]);
     }
   }
-  return Buffer.concat(chunks);
+  const flatten = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0));
+  chunks.reduce((lastLength, chunk) => {
+    flatten.set(chunk, lastLength);
+    return lastLength + chunk.length;
+  }, 0);
+  return flatten;
 };
 
 ByteArray.prototype.writeByte = function (val) {

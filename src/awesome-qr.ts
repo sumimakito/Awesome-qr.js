@@ -223,7 +223,7 @@ export class AwesomeQR {
     canvasContext.fillStyle = oldFillStyle;
   }
 
-  private async _draw(): Promise<Buffer | ArrayBuffer | string | undefined> {
+  private async _draw(): Promise<Buffer | Uint8Array | string | undefined> {
     const nCount = this.qrCode?.moduleCount!;
     const rawSize = this.options.size!;
     let rawMargin = this.options.margin!;
@@ -553,7 +553,11 @@ export class AwesomeQR {
 
       gifOutput.finish();
 
-      return Promise.resolve(gifOutput.stream().toBuffer());
+      return Promise.resolve(
+        typeof Buffer === "undefined"
+          ? gifOutput.stream().toFlattenUint8Array()
+          : Buffer.from(gifOutput.stream().toFlattenUint8Array())
+      );
     } else {
       // Swap and merge the foreground and the background
       backgroundCanvasContext.drawImage(mainCanvas, 0, 0, size, size);
