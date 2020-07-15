@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/SumiMakito/Awesome-qr.js#readme",
   "dependencies": {
+    "buffer": "^5.6.0",
     "canvas": "^2.6.1",
     "js-binary-schema-parser": "^2.0.0"
   },
