@@ -47,12 +47,13 @@ export const loadImage = (src: string, imageServerURL?: string | undefined, imag
                         reject();
                     }
                 };
-                xhttp.open('GET', imageServerURL + `?url=${src}`, true);
+                xhttp.open('POST', imageServerURL, true);
                 if (imageServerRequestHeaders) {
                     // @ts-ignore
                     xhttp.setRequestHeader('Authorization', imageServerRequestHeaders.authorization);
+                    xhttp.setRequestHeader('Content-Type', 'application/json');
                 }
-                xhttp.send();
+                xhttp.send(JSON.stringify({url: src}));
             }
         });
     }
