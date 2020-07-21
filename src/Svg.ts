@@ -102,7 +102,7 @@ export class SVGDrawing {
         this.canvas = SVG(svgDocument.documentElement).size(config.size, config.size);
     }
 
-    public drawSVG() {
+    public drawSVG(): Promise<any> {
 
         const mainCanvas = SVG(svgDocument.documentElement).size(this.config.size, this.config.size);
 
@@ -110,108 +110,43 @@ export class SVGDrawing {
 
 
 
-        this.addBackground(mainCanvas, this.config.size, this.config.backgroundImage, this.config.backgroundColor)
-        this.drawPositionProtectors(mainCanvas);
-        this.drawAlignProtectors(mainCanvas);
-        this.drawAlignPatterns(mainCanvas, gradient);
-        this.drawPositionPatterns(mainCanvas, gradient);
-        this.drawLogoImage(mainCanvas);
-        console.log(mainCanvas.children().length)
+        return this.addBackground(mainCanvas, this.config.size, this.config.backgroundImage, this.config.backgroundColor).then(() => {
+            return this.drawAlignPatterns(mainCanvas, gradient);
+        })
+            .then(() => {
+                return this.drawPositionProtectors(mainCanvas);
+            })
+            .then(() => {
+                return this.drawAlignProtectors(mainCanvas);
+            })
+            .then(() => {
+                return this.drawPositionPatterns(mainCanvas, gradient);
+            })
+            .then(() => {
+                return this.fillMargin(mainCanvas);
+            })
+            .then(() => {
+                return this.drawLogoImage(mainCanvas);
+            })
+            .then(() => {
+                return mainCanvas.svg();
+            })
+        // this.drawPositionProtectors(mainCanvas);
+        // this.drawAlignProtectors(mainCanvas);
+        // this.drawPositionPatterns(mainCanvas, gradient);
+        // this.drawLogoImage(mainCanvas);
 
         // const image = mainCanvas.image('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/icons/small-icons/logo.svg')
         // image.size(100, 100).move(20, 20)
         // mainCanvas.rect(100, 100).fill(gradient).move(this.config.margin / 10, this.config.margin / 10);
 
 
-        return mainCanvas.svg();
+        // return mainCanvas.svg();
     }
 
     public draw(): Promise<Canvas | null> {
 
         return Promise.resolve(null);
-
-        // const mainCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
-        // const mainContext = mainCanvas.getContext('2d');
-        //
-        // const gradient: CanvasGradient | string = this.config.colorDark;
-
-        // switch (this.config.gradientType) {
-        //     case GradientType.NONE:
-        //         gradient = this.config.colorDark;
-        //         break;
-        //     case GradientType.LINEAR:
-        //         gradient = mainContext.createLinearGradient(0, 0, this.config.moduleSize * this.moduleCount, 0);
-        //         gradient.addColorStop(0, this.config.colorDark);
-        //         gradient.addColorStop(1, this.config.colorLight);
-        //         break;
-        //     case GradientType.HORIZONTAL:
-        //         gradient = mainContext.createLinearGradient(0, 0, this.config.moduleSize * this.moduleCount, 0);
-        //         gradient.addColorStop(0, this.config.colorDark);
-        //         gradient.addColorStop(1, this.config.colorLight);
-        //         break;
-        //     case GradientType.VERTICAL:
-        //         gradient = mainContext.createLinearGradient(0, 0, 0, this.config.moduleSize * this.moduleCount);
-        //         gradient.addColorStop(0, this.config.colorDark);
-        //         gradient.addColorStop(1, this.config.colorLight);
-        //         break;
-        //     case GradientType.RADIAL:
-        //         gradient = mainContext.createRadialGradient(
-        //             (this.config.moduleSize * this.moduleCount) / 2,
-        //             (this.config.moduleSize * this.moduleCount) / 2,
-        //             (this.config.moduleSize * this.moduleCount) / 6,
-        //             (this.config.moduleSize * this.moduleCount) / 2,
-        //             (this.config.moduleSize * this.moduleCount) / 2,
-        //             (this.config.moduleSize * this.moduleCount) / 2,
-        //         );
-        //         gradient.addColorStop(0, this.config.colorLight);
-        //         gradient.addColorStop(1, this.config.colorDark);
-        //         break;
-        //     default:
-        //         gradient = this.config.colorDark;
-        //         break;
-        // }
-
-        // Leave room for margin
-        // mainContext.translate(this.config.margin, this.config.margin);
-        // mainContext.save();
-        //
-        // const backgroundCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
-        // const backgroundContext = backgroundCanvas.getContext('2d');
-        //
-        // return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage, this.config.backgroundColor)
-        //     .then(() => {
-        //         return this.drawAlignPatterns(mainContext, gradient);
-        //     })
-        //     .then(() => {
-        //         return this.drawPositionProtectors(mainContext);
-        //     })
-        //     .then(() => {
-        //         return this.drawAlignProtectors(mainContext);
-        //     })
-        //     .then(() => {
-        //         return this.drawPositionPatterns(mainContext, gradient);
-        //     })
-        //     .then(() => {
-        //         return this.fillMargin(mainContext);
-        //     })
-            // .then(() => {
-            //     return this.drawLogoImage(mainContext);
-            // })
-            // .then(() => {
-            //     // Swap and merge the foreground and the background
-            //     const size = this.config.size;
-            //     const margin = this.config.margin;
-            //     backgroundContext.drawImage(mainCanvas, 0, 0, size, size);
-            //     mainContext.drawImage(backgroundCanvas, -margin, -margin, size, size);
-            //     return this.scaleFinalImage(mainCanvas);
-            // })
-            // .then((canvas: Canvas) => {
-            //     return this.drawFrame(canvas, this.config.frameStyle, this.config.frameColor, this.config.frameText);
-            // })
-            // .then((canvas: Canvas) => {
-            //     this.isPainted = true;
-            //     return canvas;
-            // });
     }
 
     private async drawLogoImage(context: object) {
@@ -239,7 +174,7 @@ export class SVGDrawing {
         const coordinate = 0.5 * (this.config.size - logoSize);
         const centreCoordinate = coordinate - logoMargin - mainMargin;
 
-        const color = '#ffffff';
+        const color = '#ffffff99';
         // context.save();
         // CanvasUtil.prepareRoundedCornerClipSVG(context, centreCoordinate, centreCoordinate, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
         // context.clip();
@@ -248,43 +183,49 @@ export class SVGDrawing {
 
         // context.save();
 
-        // @ts-ignore
-        context.rect(logoSize + logoMargin, logoSize + logoMargin).fill('#ffffff').move(centreCoordinate + this.config.margin, centreCoordinate + this.config.margin).radius(10)
-        // @ts-ignore
-        context.image('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/icons/small-icons/logo.svg').size(logoSize, logoSize).move(centreCoordinate + logoMargin + this.config.margin, centreCoordinate + logoMargin + this.config.margin);
-
         return loadImage(this.config.logoImage!, this.config.imageServerURL, this.config.imageServerRequestHeaders).then((image: any) => {
-            // CanvasUtil.prepareRoundedCornerClipSVG(context, centreCoordinate + logoMargin, centreCoordinate + logoMargin, logoSize, logoSize, logoCornerRadius);
-            // context.clip();
-            // context.drawImage(image, centreCoordinate + logoMargin, centreCoordinate + logoMargin, logoSize, logoSize);
-            // context.restore();
             // @ts-ignore
-            context.image('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/icons/small-icons/logo.svg').size(10, 10).move(10, 10)
+            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill('#ffffff').move(centreCoordinate + this.config.margin, centreCoordinate + this.config.margin).radius(10)
+            // @ts-ignore
+            context.image(this.config.logoImage).size(logoSize, logoSize).move(centreCoordinate + logoMargin + this.config.margin, centreCoordinate + logoMargin + this.config.margin);
         });
     }
 
-    private addBackground(context: object, size: number, backgroundImage?: string, backgroundColor?: string) {
-        // if (!backgroundImage) {
-            const color = backgroundColor ? backgroundColor : '#ffffff';
+    private async addBackground(context: object, size: number, backgroundImage?: string, backgroundColor?: string) {
+        if (!backgroundImage) {
+            const color = backgroundColor ? backgroundColor : '#ffffff99';
             // @ts-ignore
             context.rect(size, size).fill(color).move(0, 0);
             return;
-        // }
+        }
 
-        // return this.addBackgroundImage(context, size, backgroundImage!);
+        return this.addBackgroundImage(context, size, backgroundImage!);
     }
 
-    private fillMargin(context: CanvasRenderingContext2D) {
+    private async addBackgroundImage(context: object, size: number, backgroundImage: string) {
+        return loadImage(backgroundImage, this.config.imageServerURL, this.config.imageServerRequestHeaders).then(image => {
+
+            // @ts-ignore
+            context.image(this.config.backgroundImage).size(this.config.size, this.config.size).move(0, 0);
+
+        });
+    }
+
+    private fillMargin(context: object) {
         const margin = this.config.margin;
         const size = this.config.size;
         const viewportSize = this.config.viewportSize;
 
         if (this.config.whiteMargin) {
-            context.fillStyle = '#ffffff';
-            context.fillRect(-margin, -margin, size, margin);
-            context.fillRect(-margin, viewportSize, size, margin);
-            context.fillRect(viewportSize, -margin, margin, size);
-            context.fillRect(-margin, -margin, margin, size);
+            const color = '#ffffff99';
+            // @ts-ignore
+            context.rect(size, margin).fill(color).move(-margin, -margin);
+            // @ts-ignore
+            context.rect(size, margin).fill(color).move(-margin, viewportSize);
+            // @ts-ignore
+            context.rect(margin, size).fill(color).move(viewportSize, -margin);
+            // @ts-ignore
+            context.rect(margin, size).fill(color).move(-margin, -margin);
         }
     }
 
@@ -306,9 +247,6 @@ export class SVGDrawing {
                     bProtected = bProtected || (row >= patternPosition[i] - 2 && row <= patternPosition[i] + 2 && col >= patternPosition[i] - 2 && col <= patternPosition[i] + 2);
                 }
 
-                // context.strokeStyle = bIsDark ? gradient : this.config.colorLight;
-                // context.lineWidth = 0.5;
-                // context.fillStyle = bIsDark ? gradient : this.config.backgroundImage ? 'rgba(255, 255, 255, 0.6)' : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
 
                 const nLeft = col * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
                 const nTop = row * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
@@ -345,11 +283,11 @@ export class SVGDrawing {
 
     private fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
         if (!this.maskCanvas) {
-            const color = bIsDark ? '#000' : '#fff';
+            const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
                     this.drawSquare(x, y, canvas, w, h, false, color);
 
         } else {
-            const color = bIsDark ? '#000' : '#fff';
+            const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';;
             this.drawSquare(x, y, canvas, w, h, false, color);
         }
     }
@@ -358,6 +296,7 @@ export class SVGDrawing {
         const patternPosition = this.patternPosition;
         const moduleSize = this.config.moduleSize;
         const margin  = this.config.margin;
+        const color = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
         const edgeCenter = patternPosition[patternPosition.length - 1];
         for (let i = 0; i < patternPosition.length; i++) {
             for (let j = 0; j < patternPosition.length; j++) {
@@ -366,16 +305,16 @@ export class SVGDrawing {
                 if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin);
+                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin, color);
                 } else {
-                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin);
+                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin, color);
                 }
             }
         }
     }
 
     private drawPositionProtectors(context: object) {
-        const color = '#ffffff';
+        const color = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
         // context.fillStyle = this.config.backgroundImage ? 'rgba(255, 255, 255, 0.6)' : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
         const size = this.config.moduleSize;
         const moduleCount = this.moduleCount;
@@ -424,10 +363,8 @@ export class SVGDrawing {
                 if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-                    // context.fillStyle = gradient;
                     this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 } else {
-                    // context.fillStyle = gradient;
                     this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 }
             }
@@ -496,10 +433,9 @@ export class SVGDrawing {
     }
 
     private drawSquare(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string) {
-        // console.log(gradient)
         if (isRound) {
             // @ts-ignore
-            canvas.rect(height, width).fill(gradient).move(startX, startY).radius(100);
+            canvas.rect(height, width).fill(gradient).move(startX + this.config.margin, startY + this.config.margin).radius(20);
         }
         // startX = startX + this.config.margin
         // startY = startY + this.config.margin
@@ -510,8 +446,8 @@ export class SVGDrawing {
     private drawSquareEyeFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string) {
         const moduleSize = this.config.moduleSize;
         // @ts-ignore
-        canvas.rect(height, width).fill('#000').move(startX + this.config.margin, startY + this.config.margin);
+        canvas.rect(height, width).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : this.config.colorDark ? this.config.colorDark : '#000000').move(startX + this.config.margin, startY + this.config.margin);
         // @ts-ignore
-        canvas.rect(height - 2 * moduleSize, width - 2 * moduleSize).fill('#fff').move(startX + moduleSize + this.config.margin, startY + moduleSize + this.config.margin);
+        canvas.rect(height - 2 * moduleSize, width - 2 * moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize + this.config.margin, startY + moduleSize + this.config.margin);
     }
 }

@@ -132,18 +132,6 @@ export const CanvasUtil = {
         ctx.closePath();
     },
 
-    prepareRoundedCornerClipSVG(ctx: object, x: number, y: number, w: number, h: number, r: number) {
-        // ctx.beginPath();
-        // ctx.moveTo(x, y);
-        // ctx.arcTo(x + w, y, x + w, y + h, r);
-        // ctx.arcTo(x + w, y + h, x, y + h, r);
-        // ctx.arcTo(x, y + h, x, y, r);
-        // ctx.arcTo(x, y, x + w, y, r);
-        // ctx.closePath();
-
-        // TODO: prepare path using SVG.js
-    },
-
     drawAlignProtector(
         context: CanvasRenderingContext2D,
         centerX: number,
@@ -161,12 +149,13 @@ export const CanvasUtil = {
         centerY: number,
         nWidth: number,
         nHeight: number,
-        margin: number
+        margin: number,
+        color: string
     ) {
         // context.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
         // context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
         // @ts-ignore
-        context.rect(5 * nWidth, 5 * nHeight).fill('#ffffff').move((centerX - 2) * nWidth + margin, (centerY - 2) * nHeight + margin);
+        context.rect(5 * nWidth, 5 * nHeight).fill(color).move((centerX - 2) * nWidth + margin, (centerY - 2) * nHeight + margin);
     },
 
     drawAlign(context: CanvasRenderingContext2D, centerX: number, centerY: number, nWidth: number, nHeight: number) {

@@ -565,21 +565,21 @@ export class Drawing {
             .then(() => {
                 return this.drawAlignPatterns(mainContext, gradient);
             })
-            // .then(() => {
-            //     return this.drawPositionProtectors(mainContext);
-            // })
-            // .then(() => {
-            //     return this.drawAlignProtectors(mainContext);
-            // })
-            // .then(() => {
-            //     return this.drawPositionPatterns(mainContext, gradient);
-            // })
-            // .then(() => {
-            //     return this.fillMargin(mainContext);
-            // })
-            // .then(() => {
-            //     return this.drawLogoImage(mainContext);
-            // })
+            .then(() => {
+                return this.drawPositionProtectors(mainContext);
+            })
+            .then(() => {
+                return this.drawAlignProtectors(mainContext);
+            })
+            .then(() => {
+                return this.drawPositionPatterns(mainContext, gradient);
+            })
+            .then(() => {
+                return this.fillMargin(mainContext);
+            })
+            .then(() => {
+                return this.drawLogoImage(mainContext);
+            })
             .then(() => {
                 // Swap and merge the foreground and the background
                 const size = this.config.size;
@@ -1405,7 +1405,6 @@ export class Drawing {
 
     private fillRectWithMask(canvas: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
         if (!this.maskCanvas) {
-            console.log("no mask canvas")
             switch (shape) {
                 case DataPattern.CIRCLE:
                     this.drawCircle(x + w / 2, y + h / 2, canvas, h / 2);
@@ -1424,7 +1423,6 @@ export class Drawing {
                     break;
             }
         } else {
-            console.log("mask canvas")
             canvas.drawImage(this.maskCanvas, x, y, w, h, x, y, w, h);
             const fill = canvas.fillStyle;
             canvas.fillStyle = bIsDark ? 'rgba(0, 0, 0, .5)' : 'rgba(255, 255, 255, .7)';

@@ -15,6 +15,7 @@ module.exports = {
     resolve: {
         extensions: [ '.tsx', '.ts', '.js' ]
     },
+    externals: { fs: "commonjs fs" },
     output: {
         library: 'QRCodeGenerator',
         filename: 'bundle.js',

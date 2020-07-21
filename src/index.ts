@@ -205,7 +205,7 @@ export class QRCodeBuilder {
             return Promise.resolve(qrCode);
         } else {
             // qrCode.canvas = await qrCode.svgDrawing.draw();
-            qrCode.svg = qrCode.svgDrawing.drawSVG();
+            qrCode.svg = await qrCode.svgDrawing.drawSVG();
             return Promise.resolve(qrCode);
         }
     }
