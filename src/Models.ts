@@ -857,7 +857,6 @@ export class Drawing {
         finalContext.drawImage(canvas, 0, 0, rawSize, rawSize);
         return finalCanvas;
     }
-
     private get canvasType(): 'svg' | 'pdf' | undefined {
         switch (this.config.canvasType) {
             case CanvasType.SVG:
@@ -868,6 +867,7 @@ export class Drawing {
                 return;
         }
     }
+
 
     private async drawLogoImage(context: CanvasRenderingContext2D) {
         if (!this.config.logoImage) {
