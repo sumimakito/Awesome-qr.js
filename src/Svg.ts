@@ -11,24 +11,6 @@ if (isNode) {
     registerFont(fontPath, { family: 'Roboto' });
 }
 
-const { createSVGWindow } = require('svgdom')
-const svgWindow = createSVGWindow()
-const svgDocument = svgWindow.document
-const { SVG, registerWindow } = require('@svgdotjs/svg.js')
-
-// export const generateSVG = () => {
-//     // register window and document
-//     registerWindow(svgWindow, svgDocument);
-//
-//     // create canvas
-//     const canvas = SVG(svgDocument.documentElement).size(200, 200);
-//
-//     // use svg.js as normal
-//     canvas.rect(100, 100).fill('yellow').move(50,50);
-//
-//     return canvas.svg();
-// }
-
 
 export class SVGDrawing {
     private static generateDrawingConfig(config: QRCodeConfig, qrModuleCount: number): QRDrawingConfig {
@@ -89,6 +71,11 @@ export class SVGDrawing {
         this.config = SVGDrawing.generateDrawingConfig(config, moduleCount);
         this.isPainted = false;
 
+        const { createSVGWindow } = require('svgdom')
+        const svgWindow = createSVGWindow()
+        const svgDocument = svgWindow.document
+        const { SVG, registerWindow } = require('@svgdotjs/svg.js')
+
         registerWindow(svgWindow, svgDocument);
         this.canvas = SVG(svgDocument.documentElement).size(config.size, config.size);
     }
@@ -99,6 +86,11 @@ export class SVGDrawing {
         let mainCanvas: object;
         let canvasHeight: number;
         let canvasWidth: number;
+
+        const { createSVGWindow } = require('svgdom')
+        const svgWindow = createSVGWindow()
+        const svgDocument = svgWindow.document
+        const { SVG, registerWindow } = require('@svgdotjs/svg.js')
 
         if (frameStyle) {
             const moduleSize = this.config.moduleSize;
@@ -120,18 +112,31 @@ export class SVGDrawing {
 
             switch (frameStyle) {
                 case QRCodeFrame.BALLOON_BOTTOM:
+                    this.shiftX = 1.5 * this.config.moduleSize;
+                    this.shiftY = 1.5 * this.config.moduleSize;
                     break
                 case QRCodeFrame.BALLOON_TOP:
+                    this.shiftX = 1.5 * this.config.moduleSize;
+                    this.shiftY = 3.5 * this.config.moduleSize + size / 6;
+                    if (this.config.isVCard) {
+                        this.shiftY = 10 * moduleSize + size / 6;
+                    }
                     break;
                 case QRCodeFrame.BOX_BOTTOM:
                     this.shiftX = 1.5 * this.config.moduleSize;
                     this.shiftY = 1.5 * this.config.moduleSize;
                     break;
                 case QRCodeFrame.BOX_TOP:
+                    this.shiftX = 1.5 * this.config.moduleSize;
+                    this.shiftY = 1.5 * this.config.moduleSize  + size / 6 - 1;
                     break;
                 case QRCodeFrame.BANNER_BOTTOM:
+                    this.shiftX = 1.5 * this.config.moduleSize;
+                    this.shiftY = 1.5 * this.config.moduleSize;
                     break;
                 case QRCodeFrame.BANNER_TOP:
+                    this.shiftX = 1.5 * this.config.moduleSize;
+                    this.shiftY = 2.5 * this.config.moduleSize + size / 6;
                     break
                 default:
                     break;
@@ -152,7 +157,7 @@ export class SVGDrawing {
 
         return this.drawFrame(mainCanvas, this.config.frameStyle, this.config.frameColor, this.config.frameText)
             .then(() => {
-                // return this.addBackground(mainCanvas, this.config.size, this.config.backgroundImage, this.config.backgroundColor)
+                return this.addBackground(mainCanvas, this.config.size, this.config.backgroundImage, this.config.backgroundColor)
             })
             .then(() => {
             return this.drawAlignPatterns(mainCanvas, gradient);
@@ -236,9 +241,9 @@ export class SVGDrawing {
 
     private async addBackground(context: object, size: number, backgroundImage?: string, backgroundColor?: string) {
         if (!backgroundImage) {
-            const color = backgroundColor ? backgroundColor : '#ffffff99';
+            const color = backgroundColor ? backgroundColor : '#ffffff';
             // @ts-ignore
-            context.rect(size, size).fill(color).move(0, 0);
+            context.rect(size, size).fill(color).move(this.shiftX, this.shiftY).radius(this.config.moduleSize);
             return;
         }
 
@@ -255,7 +260,7 @@ export class SVGDrawing {
             ct.save();
 
             // @ts-ignore
-            context.image(this.config.backgroundImage).size(this.config.size, this.config.size).move(0, 0);
+            context.image(this.config.backgroundImage).size(this.config.size, this.config.size).move(this.shiftX, this.shiftY);
 
         });
     }
@@ -331,11 +336,7 @@ export class SVGDrawing {
     }
 
     private fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
-        // TODO: handle for all frames and shapes
-        // if (this.config.frameStyle) {
-        //     x = x + this.shiftX;
-        //     y = y + this.shiftY;
-        // }
+
         if (!this.maskCanvas) {
             const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
 
@@ -492,8 +493,6 @@ export class SVGDrawing {
                 drawShape = this.drawSquare.bind(this);
                 break;
         }
-
-        console.log(this.config.colorDark)
 
         let x = shape === DataPattern.CIRCLE ? (centerX - 2) * nWidth + nWidth / 2 : (centerX - 2) * nWidth;
         let y = shape === DataPattern.CIRCLE ? (centerY - 2) * nHeight + nHeight / 2 : (centerY - 2) * nHeight;
@@ -675,10 +674,10 @@ export class SVGDrawing {
     }
 
     private drawKite(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRound?: boolean) {
-        const coordinates = [[startX + width / 2 + this.config.margin, startY + this.config.margin],
-            [startX + width + this.config.margin, startY + height / 2 + this.config.margin],
-            [startX + width / 2 + this.config.margin, startY + height + this.config.margin],
-            [startX + this.config.margin, startY + height / 2 + this.config.margin]];
+        const coordinates = [[startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
+            [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
+            [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
+            [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY]];
         // @ts-ignore
         const polygon = context.polygon(coordinates)
         polygon.fill(gradient)
@@ -687,19 +686,19 @@ export class SVGDrawing {
     private drawDiamond(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRight?: boolean) {
         // const c1 = [[0,0], [100,50], [50,100]]
         const coordinates = isRight ? [
-            [startX + width / 2 + this.config.margin, startY + this.config.margin],
-            [startX + width + this.config.margin, startY + this.config.margin],
-            [startX + width + this.config.margin, startY + height / 2 + this.config.margin],
-            [startX + width / 2 + this.config.margin, startY + height + this.config.margin],
-            [startX + this.config.margin, startY + height + this.config.margin],
-            [startX + this.config.margin, startY + height / 2 + this.config.margin]
+            [startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
+            [startX + width + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
+            [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
+            [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
+            [startX + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
+            [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY]
                 ] : [
-            [startX + this.config.margin, startY + this.config.margin],
-            [startX + width / 2 + this.config.margin, startY + this.config.margin],
-            [startX + width + this.config.margin, startY + height / 2 + this.config.margin],
-            [startX + width + this.config.margin, startY + height + this.config.margin],
-            [startX + width / 2 + this.config.margin, startY + height + this.config.margin],
-            [startX + this.config.margin, startY + height / 2 + this.config.margin]
+            [startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
+            [startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
+            [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
+            [startX + width + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
+            [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
+            [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY]
         ];
         // @ts-ignore
         const polygon = context.polygon(coordinates)
@@ -781,33 +780,140 @@ export class SVGDrawing {
         const rawSize = this.config.rawSize;
         const size = rawSize + moduleSize * 2;
         const text = frameText ? frameText : 'SCAN ME';
-        let canvasWidth: number = size + moduleSize,
-            canvasHeight: number = 1.265 * size,
-            borderX: number = 0,
-            borderY: number = 0,
-            padX: number = 0,
-            padY: number = 0,
-            padHeight: number = 0,
-            spaceX: number = 0,
-            spaceY: number = 0,
-            textX: number = 0,
-            textY: number = 0,
-            qrX: number = 0,
-            qrY: number = 0,
-            logoX: number = 0,
-            logoY: number = 0,
-            cornerRadius: number = 0;
-        if (frameStyle === QRCodeFrame.BANNER_TOP || frameStyle === QRCodeFrame.BANNER_BOTTOM) {
-            canvasHeight = 1.216 * size;
-        }
-        if (frameStyle === QRCodeFrame.BOX_TOP || frameStyle === QRCodeFrame.BOX_BOTTOM) {
-            canvasHeight = 1.27 * size;
-        }
-        const finalCanvas: Canvas = createCanvas(canvasWidth, canvasHeight, this.canvasType);
-        const finalContext = finalCanvas.getContext('2d');
 
-        this.drawSquareFrame(moduleSize / 2, moduleSize / 2, canvas, frameColor, size, size);
+        let borderX = 0, borderY = 0, bannerX = 0, bannerY = 0,
+        textX = 0, textY = 0, logoX = 0, logoY = 0, cornerRadius = 0;
 
-        return;
+        if (isNode) {
+            const path = require('path');
+            const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto');
+            const {setFontDir, setFontFamilyMappings, preloadFonts} = require('svgdom');
+            setFontDir(fontPath)
+            setFontFamilyMappings({'Roboto': 'Roboto-Regular.ttf'})
+            preloadFonts()
+        }
+
+
+
+        switch (frameStyle) {
+            case QRCodeFrame.BOX_BOTTOM:
+                cornerRadius = moduleSize;
+                borderX = moduleSize / 2;
+                borderY = moduleSize / 2;
+                bannerX = moduleSize / 2;
+                bannerY = size + moduleSize / 2 - 1;
+                textX = size / 3;
+                textY = size+ 1 * moduleSize + size / 10;
+                logoX = size / 3 - size / 9;
+                logoY = size + moduleSize * 1.5;
+                break;
+            case QRCodeFrame.BOX_TOP:
+                borderX = moduleSize / 2;
+                borderY = moduleSize / 2 + size / 6 - 1;
+                bannerX = moduleSize / 2;
+                bannerY = moduleSize / 2;
+                textX = size / 3;
+                textY =  1.5 * moduleSize + size / 10;
+                logoX = size / 3 - size / 9;
+                logoY = moduleSize * 2;
+                break;
+            case QRCodeFrame.BANNER_BOTTOM:
+                borderX = moduleSize / 2;
+                borderY = moduleSize / 2;
+                bannerX = moduleSize / 2;
+                bannerY = size + moduleSize * 1.5;
+                textX = size / 3;
+                textY = size + moduleSize * 2.5 + size / 10;
+                logoX = size / 3 - size / 9;
+                logoY = size + moduleSize * 3;
+                break;
+            case QRCodeFrame.BANNER_TOP:
+                borderX = moduleSize / 2;
+                borderY = moduleSize * 1.5 + size / 6;
+                bannerX = moduleSize / 2;
+                bannerY = moduleSize / 2;
+                textX = size / 3;
+                textY =  1.5 * moduleSize + size / 10;
+                logoX = size / 3 - size / 9;
+                logoY = moduleSize * 2;
+                break;
+            case QRCodeFrame.BALLOON_BOTTOM:
+                borderX = moduleSize / 2;
+                borderY = moduleSize / 2;
+                bannerX = moduleSize / 2;
+                bannerY = size + moduleSize * 2.5;
+                textX = size / 3;
+                textY = size + 3.5 * moduleSize + size / 10;
+                logoX = size / 3 - size / 9;
+                logoY = size + moduleSize * 4;
+
+                if (this.config.isVCard) {
+                    bannerY += 4.5 * moduleSize;
+                    textY += 5.5 * moduleSize;
+                    logoY += 5.5 * moduleSize;
+                }
+                break;
+            case QRCodeFrame.BALLOON_TOP:
+                borderX = moduleSize / 2;
+                borderY = moduleSize * 1.5 + size / 6;
+                bannerX = moduleSize / 2;
+                bannerY = moduleSize / 2;
+                textX = size / 3;
+                textY =  this.config.isVCard ? moduleSize * 2.5 + size / 10 : moduleSize * 1.5 + size / 10;
+                logoX = size / 3 - size / 9;
+                logoY = this.config.isVCard ? moduleSize * 3 : moduleSize * 2;
+                break;
+            default:
+                break;
+        }
+
+        if (frameStyle !== QRCodeFrame.BALLOON_TOP && frameStyle !== QRCodeFrame.BALLOON_BOTTOM) {
+            this.drawSquareFrame(borderX, borderY, canvas, color, size, size);
+        }
+
+        if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
+            const coordinates = [[0, 0], [size / 24, size / 12], [-size / 24, size / 12]];
+            // @ts-ignore
+            canvas.polygon(coordinates).fill(color).move(size / 2 - moduleSize, size - moduleSize / 1.5);
+        }
+        if (frameStyle === QRCodeFrame.BALLOON_TOP) {
+            const coordinates = [[0, 0], [size / 24, 0], [0, size / 12], [-size / 24, 0]];
+            // @ts-ignore
+            canvas.polygon(coordinates).fill(color).move(size / 2 - moduleSize, size / 6 - moduleSize / 2);
+        }
+
+        // Banner for frame text
+        // @ts-ignore
+        canvas.rect(size, size / 6).fill(color).radius(moduleSize)
+            .move(bannerX, bannerY);
+
+        if (frameStyle === QRCodeFrame.BOX_BOTTOM) {
+            // @ts-ignore
+            canvas.rect(moduleSize, moduleSize * 2).fill(color)
+                .move(bannerX, bannerY - moduleSize);
+
+            // @ts-ignore
+            canvas.rect(moduleSize, moduleSize * 2).fill(color)
+                .move(size - moduleSize / 2, bannerY - moduleSize);
+        }
+        if (frameStyle === QRCodeFrame.BOX_TOP) {
+            // @ts-ignore
+            canvas.rect(moduleSize, moduleSize * 2).fill(color)
+                .move(bannerX, bannerY - moduleSize + size / 6);
+
+            // @ts-ignore
+            canvas.rect(moduleSize, moduleSize * 2).fill(color)
+                .move(size - moduleSize / 2, bannerY - moduleSize + size / 6);
+        }
+        // @ts-ignore
+        canvas.plain(text).move(textX, textY)
+            .font({ fill: '#fff', family: 'Roboto', size: size / 10, leading: 0 });
+
+        return loadImage('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg').then(image => {
+            // @ts-ignore
+            canvas.image('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg').size(size / 10, size / 10).move(logoX, logoY);
+        });
     }
+
 }
+
