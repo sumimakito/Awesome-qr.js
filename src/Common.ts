@@ -150,12 +150,14 @@ export const CanvasUtil = {
         nWidth: number,
         nHeight: number,
         margin: number,
-        color: string
+        color: string,
+        shiftX: number,
+        shiftY: number
     ) {
         // context.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
         // context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
         // @ts-ignore
-        context.rect(5 * nWidth, 5 * nHeight).fill(color).move((centerX - 2) * nWidth + margin, (centerY - 2) * nHeight + margin);
+        context.rect(5 * nWidth, 5 * nHeight).fill(color).move((centerX - 2) * nWidth + margin + shiftX, (centerY - 2) * nHeight + margin + shiftY);
     },
 
     drawAlign(context: CanvasRenderingContext2D, centerX: number, centerY: number, nWidth: number, nHeight: number) {

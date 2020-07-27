@@ -78,6 +78,8 @@ export class SVGDrawing {
     private isDark: any;
     // noinspection JSMismatchedCollectionQueryUpdate
     private modules: Array<Array<boolean | null>>;
+    private shiftX = 0;
+    private shiftY = 0;
 
     constructor(moduleCount: number, patternPosition: number[], config: QRCodeConfig, isDark: any, modules: Array<Array<boolean | null>>) {
         this.moduleCount = moduleCount;
@@ -92,20 +94,16 @@ export class SVGDrawing {
     }
 
     public drawSVG(): Promise<any> {
-        const frameColor = this.config.frameColor;
-        const frameText = 'SCAN ME';
         const frameStyle = this.config.frameStyle;
 
         let mainCanvas: object;
         let canvasHeight: number;
         let canvasWidth: number;
 
-        if (this.config.frameStyle) {
-            const color = frameColor ? frameColor : '#000000';
+        if (frameStyle) {
             const moduleSize = this.config.moduleSize;
             const rawSize = this.config.rawSize;
             const size = rawSize + moduleSize * 2;
-            const text = frameText ? frameText : 'SCAN ME';
             canvasHeight = 1.265 * size;
             canvasWidth = size + moduleSize;
             if (frameStyle === QRCodeFrame.BANNER_TOP || frameStyle === QRCodeFrame.BANNER_BOTTOM) {
@@ -114,15 +112,34 @@ export class SVGDrawing {
             if (frameStyle === QRCodeFrame.BOX_TOP || frameStyle === QRCodeFrame.BOX_BOTTOM) {
                 canvasHeight = 1.27 * size;
             }
-            // const finalCanvas: Canvas = createCanvas(canvasWidth, canvasHeight, this.canvasType);
-            // const finalContext = finalCanvas.getContext('2d');
+
             mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth, canvasHeight);
 
             // @ts-ignore
             mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight);
+
+            switch (frameStyle) {
+                case QRCodeFrame.BALLOON_BOTTOM:
+                    break
+                case QRCodeFrame.BALLOON_TOP:
+                    break;
+                case QRCodeFrame.BOX_BOTTOM:
+                    this.shiftX = 1.5 * this.config.moduleSize;
+                    this.shiftY = 1.5 * this.config.moduleSize;
+                    break;
+                case QRCodeFrame.BOX_TOP:
+                    break;
+                case QRCodeFrame.BANNER_BOTTOM:
+                    break;
+                case QRCodeFrame.BANNER_TOP:
+                    break
+                default:
+                    break;
+            }
         } else {
             canvasHeight = this.config.size;
             canvasWidth = this.config.size;
+
             mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth, canvasHeight);
 
             // @ts-ignore
@@ -135,7 +152,7 @@ export class SVGDrawing {
 
         return this.drawFrame(mainCanvas, this.config.frameStyle, this.config.frameColor, this.config.frameText)
             .then(() => {
-                return this.addBackground(mainCanvas, this.config.size, this.config.backgroundImage, this.config.backgroundColor)
+                // return this.addBackground(mainCanvas, this.config.size, this.config.backgroundImage, this.config.backgroundColor)
             })
             .then(() => {
             return this.drawAlignPatterns(mainCanvas, gradient);
@@ -211,9 +228,9 @@ export class SVGDrawing {
             ct.save();
 
             // @ts-ignore
-            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill('#ffffff').move(centreCoordinate + this.config.margin, centreCoordinate + this.config.margin).radius(10)
+            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill('#ffffff').move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin+ this.shiftY).radius(10)
             // @ts-ignore
-            context.image(cn.toDataURL()).size(logoSize, logoSize).move(centreCoordinate + logoMargin + this.config.margin, centreCoordinate + logoMargin + this.config.margin);
+            context.image(cn.toDataURL()).size(logoSize, logoSize).move(centreCoordinate + logoMargin + this.config.margin + this.shiftX, centreCoordinate + logoMargin + this.config.margin + this.shiftY);
         });
     }
 
@@ -251,13 +268,13 @@ export class SVGDrawing {
         if (this.config.whiteMargin) {
             const color = '#ffffff99';
             // @ts-ignore
-            context.rect(size, margin).fill(color).move(-margin, -margin);
+            context.rect(size, margin).fill(color).move(-margin + this.shiftX, -margin + this.shiftY);
             // @ts-ignore
-            context.rect(size, margin).fill(color).move(-margin, viewportSize);
+            context.rect(size, margin).fill(color).move(-margin + this.shiftX, viewportSize + this.shiftY);
             // @ts-ignore
-            context.rect(margin, size).fill(color).move(viewportSize, -margin);
+            context.rect(margin, size).fill(color).move(viewportSize + this.shiftX, -margin + this.shiftY);
             // @ts-ignore
-            context.rect(margin, size).fill(color).move(-margin, -margin);
+            context.rect(margin, size).fill(color).move(-margin + this.shiftX, -margin + this.shiftY);
         }
     }
 
@@ -314,6 +331,11 @@ export class SVGDrawing {
     }
 
     private fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
+        // TODO: handle for all frames and shapes
+        // if (this.config.frameStyle) {
+        //     x = x + this.shiftX;
+        //     y = y + this.shiftY;
+        // }
         if (!this.maskCanvas) {
             const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
 
@@ -356,9 +378,9 @@ export class SVGDrawing {
                 if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin, color);
+                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin, color, this.shiftX, this.shiftY);
                 } else {
-                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin, color);
+                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin, color, this.shiftX, this.shiftY);
                 }
             }
         }
@@ -369,16 +391,18 @@ export class SVGDrawing {
         const size = this.config.moduleSize;
         const moduleCount = this.moduleCount;
 
+        // TODO: handle shift for all frames
+
         // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin, 0 + this.config.margin);
+        context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin, (moduleCount - 8) * size + this.config.margin);
+        context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).move((moduleCount - 8) * size + this.config.margin, 0 + this.config.margin);
+        context.rect(8 * size, 8 * size).fill(color).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect((moduleCount - 8 - 8) * size, size).fill(color).move(8 * size + this.config.margin, 6 * size + this.config.margin);
+        context.rect((moduleCount - 8 - 8) * size, size).fill(color).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin, 8 * size + this.config.margin);
+        context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY);
     }
 
     private drawPositionPatterns(context: object, gradient: string) {
@@ -542,7 +566,6 @@ export class SVGDrawing {
         const moduleSize = this.config.moduleSize;
         const moduleCount = this.moduleCount;
 
-                // TODO: fix rounded frames
         switch(shape) {
             case EyeFrameShape.SQUARE:
                 this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
@@ -639,16 +662,16 @@ export class SVGDrawing {
     private drawSquare(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string) {
         if (isRound) {
             // @ts-ignore
-            canvas.rect(height, width).radius(height / 4).fill(gradient).move(startX + this.config.margin, startY + this.config.margin);
+            canvas.rect(height, width).radius(height / 4).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
             return;
         }
         // @ts-ignore
-        canvas.rect(height, width).fill(gradient).move(startX + this.config.margin, startY + this.config.margin);
+        canvas.rect(height, width).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
     }
 
     private drawCircle(centerX: number, centerY: number, canvas: object, gradient: string, radiusX: number, radiusY?: number, isLarge?: boolean) {
         // @ts-ignore
-        canvas.circle().radius(radiusX).fill(gradient).move(centerX + this.config.margin - radiusX, centerY + this.config.margin - radiusX);
+        canvas.circle().radius(radiusX).fill(gradient).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY);
     }
 
     private drawKite(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRound?: boolean) {
@@ -705,9 +728,9 @@ export class SVGDrawing {
         const moduleSize = this.config.moduleSize;
 
         // @ts-ignore
-        canvas.circle().radius(width / 2).fill(gradient).move(startX + this.config.margin, startY + this.config.margin);
+        canvas.circle().radius(width / 2).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
         // @ts-ignore
-        canvas.circle().radius(width / 2 - moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff').move(startX + this.config.margin + moduleSize, startY + this.config.margin + moduleSize);
+        canvas.circle().radius(width / 2 - moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff').move(startX + this.config.margin + moduleSize + this.shiftX, startY + this.config.margin + moduleSize + this.shiftY);
     }
 
     private drawSquareEyeFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string) {
@@ -715,14 +738,14 @@ export class SVGDrawing {
         const radius = height / 4;
         if (isRound) {
             // @ts-ignore
-            canvas.rect(height, width).radius(radius).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : this.config.colorDark ? this.config.colorDark : '#000000').move(startX + this.config.margin, startY + this.config.margin);
+            canvas.rect(height, width).radius(radius).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : this.config.colorDark ? this.config.colorDark : '#000000').move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
             // @ts-ignore
-            canvas.rect(height - 1.5 * moduleSize, width - 1.5 * moduleSize).radius(radius).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize * 0.75 + this.config.margin, startY + moduleSize * 0.75 + this.config.margin);
+            canvas.rect(height - 1.5 * moduleSize, width - 1.5 * moduleSize).radius(radius).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize * 0.75 + this.config.margin + this.shiftX, startY + moduleSize * 0.75 + this.config.margin + this.shiftY);
         } else {
             // @ts-ignore
-            canvas.rect(height, width).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : this.config.colorDark ? this.config.colorDark : '#000000').move(startX + this.config.margin, startY + this.config.margin);
+            canvas.rect(height, width).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : this.config.colorDark ? this.config.colorDark : '#000000').move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
             // @ts-ignore
-            canvas.rect(height - 2 * moduleSize, width - 2 * moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize + this.config.margin, startY + moduleSize + this.config.margin);
+            canvas.rect(height - 2 * moduleSize, width - 2 * moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize + this.config.margin + this.shiftX, startY + moduleSize + this.config.margin + this.shiftY);
         }
 
     }
@@ -738,10 +761,53 @@ export class SVGDrawing {
         }
     }
 
+    private async drawSquareFrame(startX: number, startY: number, canvas: object, gradient: string | undefined, width: number, height: number) {
+        const moduleSize = this.config.moduleSize;
+        const backgroundColor = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+        const radius = moduleSize;
+        // @ts-ignore
+        canvas.rect(width, height).fill(gradient ? gradient : '#000000').radius(radius).move(startX, startY);
+        // @ts-ignore
+        canvas.rect(width - 2 * moduleSize, height - 2 * moduleSize).fill(backgroundColor).radius(radius).move(startX + moduleSize, startY + moduleSize);
+    }
+
     private async drawFrame(canvas: object, frameStyle: QRCodeFrame | undefined, frameColor: string | undefined, frameText: string | undefined) {
         if (!frameStyle || frameStyle === QRCodeFrame.NONE) {
             return;
         }
+
+        const color = frameColor ? frameColor : '#000000';
+        const moduleSize = this.config.moduleSize;
+        const rawSize = this.config.rawSize;
+        const size = rawSize + moduleSize * 2;
+        const text = frameText ? frameText : 'SCAN ME';
+        let canvasWidth: number = size + moduleSize,
+            canvasHeight: number = 1.265 * size,
+            borderX: number = 0,
+            borderY: number = 0,
+            padX: number = 0,
+            padY: number = 0,
+            padHeight: number = 0,
+            spaceX: number = 0,
+            spaceY: number = 0,
+            textX: number = 0,
+            textY: number = 0,
+            qrX: number = 0,
+            qrY: number = 0,
+            logoX: number = 0,
+            logoY: number = 0,
+            cornerRadius: number = 0;
+        if (frameStyle === QRCodeFrame.BANNER_TOP || frameStyle === QRCodeFrame.BANNER_BOTTOM) {
+            canvasHeight = 1.216 * size;
+        }
+        if (frameStyle === QRCodeFrame.BOX_TOP || frameStyle === QRCodeFrame.BOX_BOTTOM) {
+            canvasHeight = 1.27 * size;
+        }
+        const finalCanvas: Canvas = createCanvas(canvasWidth, canvasHeight, this.canvasType);
+        const finalContext = finalCanvas.getContext('2d');
+
+        this.drawSquareFrame(moduleSize / 2, moduleSize / 2, canvas, frameColor, size, size);
+
         return;
     }
 }

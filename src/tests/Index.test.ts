@@ -6,7 +6,7 @@ describe('QR code tests', () => {
     it('Main test', done => {
         const qrCodeGenerator = new QRCodeBuilder({
             text: 'http://www.beaconstac.com/',
-            backgroundImage: 'https://image.flaticon.com/teams/slug/google.jpg',
+            // backgroundImage: 'https://image.flaticon.com/teams/slug/google.jpg',
             // backgroundColor: '#999999',
             logoImage: 'https://static.beaconstac.com/assets/img/qr-code-logos/instagram.svg',
             canvasType: CanvasType.SVG,
@@ -14,12 +14,12 @@ describe('QR code tests', () => {
             eyeBallShape: EyeBallShape.ROUNDED,
             eyeFrameColor: '#287314',
             eyeBallColor: '#234',
-            dataPattern: DataPattern.KITE,
+            dataPattern: DataPattern.CIRCLE,
             colorDark: '#0b1257',
             // colorLight: '#999c14',
             dotScale: 0.96,
             // gradientType: GradientType.RADIAL,
-            // frameStyle: QRCodeFrame.BOX_BOTTOM,
+            frameStyle: QRCodeFrame.BOX_BOTTOM,
             // frameColor: '#0b1257',
             // frameText: 'SCAN ME',
             logoMargin: 4,
