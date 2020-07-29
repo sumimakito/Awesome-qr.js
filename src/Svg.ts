@@ -108,7 +108,7 @@ export class SVGDrawing {
             mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth, canvasHeight);
 
             // @ts-ignore
-            mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight);
+            mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight).fill('#ffffff');
 
             switch (frameStyle) {
                 case QRCodeFrame.BALLOON_BOTTOM:
@@ -148,7 +148,7 @@ export class SVGDrawing {
             mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth, canvasHeight);
 
             // @ts-ignore
-            mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight);
+            mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight).fill('#ffffff');
         }
 
         const gradient: string = this.config.colorDark;
@@ -260,7 +260,7 @@ export class SVGDrawing {
             ct.save();
 
             // @ts-ignore
-            context.image(this.config.backgroundImage).size(this.config.size, this.config.size).move(this.shiftX, this.shiftY);
+            context.image(cn.toDataURL()).size(this.config.size, this.config.size).move(this.shiftX, this.shiftY);
 
         });
     }
@@ -910,8 +910,15 @@ export class SVGDrawing {
             .font({ fill: '#fff', family: 'Roboto', size: size / 10, leading: 0 });
 
         return loadImage('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg').then(image => {
+
             // @ts-ignore
-            canvas.image('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg').size(size / 10, size / 10).move(logoX, logoY);
+            const cn = createCanvas(image.naturalHeight, image.naturalWidth);
+            const ct = cn.getContext('2d');
+            ct.drawImage(image, 0, 0);
+            ct.save();
+
+            // @ts-ignore
+            canvas.image(cn.toDataURL()).size(size / 10, size / 10).move(logoX, logoY);
         });
     }
 
