@@ -24,7 +24,8 @@ describe('QR code tests', () => {
             text: 'https://www.beaconstac.com',
             // backgroundImage: 'https://image.flaticon.com/teams/slug/google.jpg',
             // backgroundColor: '#999999',
-            logoImage: 'https://static.beaconstac.com/assets/img/qr-code-logos/instagram.svg',
+            logoImage: 'https://s3.amazonaws.com/beaconstac-content-qa/1529/cfdb6d40c166494293763baab96007f3',
+            // logoImage: 'https://static.beaconstac.com/assets/img/qr-code-logos/play-store.svg',
             canvasType: CanvasType.SVG,
             eyeFrameShape: EyeFrameShape.ROUNDED,
             eyeBallShape: EyeBallShape.ROUNDED,
@@ -38,10 +39,10 @@ describe('QR code tests', () => {
             frameStyle: QRCodeFrame.BALLOON_BOTTOM,
             frameColor: '#0b1257',
             // frameText: 'SCAN ME',
-            logoMargin: 4,
+            logoMargin: 10,
             logoScale: 0.25,
             margin: 80,
-            size: 512,
+            size: 1024,
             isVCard: false,
             useCanvas: false
         });

@@ -1,5 +1,5 @@
 /* tslint:disable:no-var-requires */
-import { Canvas, CanvasRenderingContext2D, createCanvas, registerFont } from 'canvas';
+import { Canvas, CanvasRenderingContext2D, createCanvas } from 'canvas';
 import { CanvasUtil } from './Common';
 import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, QRCodeFrame } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
@@ -86,7 +86,7 @@ export class SVGDrawing {
         const svgDocument = svgWindow.document
         const { SVG, registerWindow } = require('@svgdotjs/svg.js')
 
-        if (frameStyle) {
+        if (frameStyle && frameStyle !== QRCodeFrame.NONE) {
             const moduleSize = this.config.moduleSize;
             const rawSize = this.config.rawSize;
             const size = rawSize + moduleSize * 2;
@@ -177,11 +177,6 @@ export class SVGDrawing {
             });
     }
 
-    public draw(): Promise<Canvas | null> {
-
-        return Promise.resolve(null);
-    }
-
     private async drawLogoImage(context: object) {
         if (!this.config.logoImage) {
             return;
@@ -220,7 +215,7 @@ export class SVGDrawing {
             // @ts-ignore
             context.image('').size(logoSize, logoSize)
                 .attr({'xlink:href': cn.toDataURL()})
-                .move(centreCoordinate + logoMargin + this.config.margin + this.shiftX, centreCoordinate + logoMargin + this.config.margin + this.shiftY);
+                .move(centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftX, centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftY);
         });
     }
 
@@ -381,8 +376,6 @@ export class SVGDrawing {
         const color = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
         const size = this.config.moduleSize;
         const moduleCount = this.moduleCount;
-
-        // TODO: handle shift for all frames
 
         // @ts-ignore
         context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
