@@ -23,7 +23,7 @@ describe('QR code tests', () => {
             // text: vCardSampleData,
             text: 'https://www.beaconstac.com',
             // backgroundImage: 'https://image.flaticon.com/teams/slug/google.jpg',
-            backgroundColor: '#999999',
+            // backgroundColor: '#999999',
             logoImage: 'https://static.beaconstac.com/assets/img/qr-code-logos/instagram.svg',
             canvasType: CanvasType.SVG,
             eyeFrameShape: EyeFrameShape.ROUNDED,
@@ -43,7 +43,7 @@ describe('QR code tests', () => {
             margin: 80,
             size: 512,
             isVCard: false,
-            useCanvas: true
+            useCanvas: false
         });
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
             const fs = require('fs');

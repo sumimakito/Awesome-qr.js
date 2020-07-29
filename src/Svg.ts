@@ -102,7 +102,7 @@ export class SVGDrawing {
             mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth, canvasHeight);
 
             // @ts-ignore
-            mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight).fill('#ffffff');
+            mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff');
 
             switch (frameStyle) {
                 case QRCodeFrame.BALLOON_BOTTOM:
@@ -142,7 +142,7 @@ export class SVGDrawing {
             mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth, canvasHeight);
 
             // @ts-ignore
-            mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight).fill('#ffffff');
+            mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff');
         }
 
         const gradient: string = this.config.colorDark;
@@ -245,7 +245,8 @@ export class SVGDrawing {
             ct.save();
 
             // @ts-ignore
-            context.image('').size(this.config.size, this.config.size).move(this.shiftX, this.shiftY).attr({'xlink:href': cn.toDataURL()});
+            context.image('').size(this.config.size, this.config.size).move(this.shiftX, this.shiftY)
+                .attr({'xlink:href': cn.toDataURL(), 'opacity': 0.6});
 
         });
     }
@@ -321,6 +322,10 @@ export class SVGDrawing {
     }
 
     private fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
+
+        if (!bIsDark) {
+            return;
+        }
 
         if (!this.maskCanvas) {
             const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
