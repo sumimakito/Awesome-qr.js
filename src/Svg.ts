@@ -5,12 +5,6 @@ import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, QRCodeFrame } fro
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { isNode, loadImage } from './Util';
 
-if (isNode) {
-    const path = require('path');
-    const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
-    registerFont(fontPath, { family: 'Roboto' });
-}
-
 
 export class SVGDrawing {
     private static generateDrawingConfig(config: QRCodeConfig, qrModuleCount: number): QRDrawingConfig {
@@ -180,18 +174,7 @@ export class SVGDrawing {
             .then(() => {
                 // @ts-ignore
                 return mainCanvas.svg();
-            })
-        // this.drawPositionProtectors(mainCanvas);
-        // this.drawAlignProtectors(mainCanvas);
-        // this.drawPositionPatterns(mainCanvas, gradient);
-        // this.drawLogoImage(mainCanvas);
-
-        // const image = mainCanvas.image('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/icons/small-icons/logo.svg')
-        // image.size(100, 100).move(20, 20)
-        // mainCanvas.rect(100, 100).fill(gradient).move(this.config.margin / 10, this.config.margin / 10);
-
-
-        // return mainCanvas.svg();
+            });
     }
 
     public draw(): Promise<Canvas | null> {
@@ -233,9 +216,11 @@ export class SVGDrawing {
             ct.save();
 
             // @ts-ignore
-            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill('#ffffff').move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin+ this.shiftY).radius(10)
+            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill('#ffffff').move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin+ this.shiftY).radius(logoCornerRadius)
             // @ts-ignore
-            context.image(cn.toDataURL()).size(logoSize, logoSize).move(centreCoordinate + logoMargin + this.config.margin + this.shiftX, centreCoordinate + logoMargin + this.config.margin + this.shiftY);
+            context.image('').size(logoSize, logoSize)
+                .attr({'xlink:href': cn.toDataURL()})
+                .move(centreCoordinate + logoMargin + this.config.margin + this.shiftX, centreCoordinate + logoMargin + this.config.margin + this.shiftY);
         });
     }
 
@@ -260,7 +245,7 @@ export class SVGDrawing {
             ct.save();
 
             // @ts-ignore
-            context.image(cn.toDataURL()).size(this.config.size, this.config.size).move(this.shiftX, this.shiftY);
+            context.image('').size(this.config.size, this.config.size).move(this.shiftX, this.shiftY).attr({'xlink:href': cn.toDataURL()});
 
         });
     }
@@ -788,9 +773,9 @@ export class SVGDrawing {
             const path = require('path');
             const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto');
             const {setFontDir, setFontFamilyMappings, preloadFonts} = require('svgdom');
-            setFontDir(fontPath)
-            setFontFamilyMappings({'Roboto': 'Roboto-Regular.ttf'})
-            preloadFonts()
+            setFontDir(fontPath);
+            setFontFamilyMappings({'Roboto': 'Roboto-Regular.ttf'});
+            preloadFonts();
         }
 
 
@@ -918,7 +903,7 @@ export class SVGDrawing {
             ct.save();
 
             // @ts-ignore
-            canvas.image(cn.toDataURL()).size(size / 10, size / 10).move(logoX, logoY);
+            canvas.image('').size(size / 10, size / 10).move(logoX, logoY).attr({'xlink:href': cn.toDataURL()});
         });
     }
 

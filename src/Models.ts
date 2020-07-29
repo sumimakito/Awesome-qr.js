@@ -202,7 +202,7 @@ export class QRCode {
     }
 
     public toBuffer(): Buffer {
-        if (this.config.canvasType === CanvasType.SVG) {
+        if (this.config.canvasType === CanvasType.SVG && !this.config.useCanvas) {
             return this.svg;
         }
         let drawing = this.canvas.toBuffer();
@@ -210,9 +210,9 @@ export class QRCode {
             case CanvasType.PDF:
                 drawing = this.canvas.toBuffer('application/pdf');
                 break;
-            // case CanvasType.SVG:
-            //     drawing = this.canvas.toBuffer();
-            //     break;
+            case CanvasType.SVG:
+                drawing = this.canvas.toBuffer();
+                break;
             default:
                 throw { error: `Cannot convert to buffer for ${this.config.canvasType}` };
         }

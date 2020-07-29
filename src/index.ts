@@ -28,7 +28,8 @@ export class QRCodeBuilder {
             dotScale: 0.35,
             text: '',
             maskedDots: false,
-            isVCard: false
+            isVCard: false,
+            useCanvas: false
         };
         this.config = Object.assign({}, defaultConfig, config);
     }
@@ -173,6 +174,11 @@ export class QRCodeBuilder {
         return this;
     }
 
+    public setUseCanvas(useCanvas: boolean) {
+        this.config.useCanvas = useCanvas;
+        return this;
+    }
+
     public async build(format?: CanvasType): Promise<QRCode | never> {
         this.config.canvasType = format ? format : CanvasType.PNG;
         if (!this.config.text) {
@@ -196,15 +202,10 @@ export class QRCodeBuilder {
 
         const qrCode: QRCode = new QRCode(-1, this.config);
 
-        // for testing
-        // qrCode.canvas = await qrCode.drawing.draw();
-        // return Promise.resolve(qrCode);
-
-        if (this.config.canvasType !== CanvasType.SVG) {
+        if (this.config.canvasType !== CanvasType.SVG || this.config.useCanvas) {
             qrCode.canvas = await qrCode.drawing.draw();
             return Promise.resolve(qrCode);
         } else {
-            // qrCode.canvas = await qrCode.svgDrawing.draw();
             qrCode.svg = await qrCode.svgDrawing.drawSVG();
             return Promise.resolve(qrCode);
         }
