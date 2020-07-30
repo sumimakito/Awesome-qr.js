@@ -120,7 +120,7 @@ export class SVGDrawing {
                     this.shiftX = 1.5 * this.config.moduleSize;
                     this.shiftY = 1.5 * this.config.moduleSize;
                     break;
-                case QRCodeFrame.BOX_TOP:
+                case QRCodeFrame.BANNER_TOP:
                     this.shiftX = 1.5 * this.config.moduleSize;
                     this.shiftY = 1.5 * this.config.moduleSize  + size / 5 - 1;
                     break;
@@ -128,7 +128,7 @@ export class SVGDrawing {
                     this.shiftX = 1.5 * this.config.moduleSize;
                     this.shiftY = 1.5 * this.config.moduleSize;
                     break;
-                case QRCodeFrame.BANNER_TOP:
+                case QRCodeFrame.BOX_TOP:
                     this.shiftX = 1.5 * this.config.moduleSize;
                     this.shiftY = 2.5 * this.config.moduleSize + size / 5;
                     break
@@ -205,9 +205,14 @@ export class SVGDrawing {
 
         return loadImage(this.config.logoImage!, this.config.imageServerURL, this.config.imageServerRequestHeaders).then((image: any) => {
 
-            const cn = createCanvas(image.naturalHeight, image.naturalWidth);
+            // const cn = createCanvas(image.naturalHeight, image.naturalWidth);
+            // const ct = cn.getContext('2d');
+            // ct.drawImage(image, 0, 0);
+            // ct.save();
+
+            const cn = createCanvas(logoSize, logoSize);
             const ct = cn.getContext('2d');
-            ct.drawImage(image, 0, 0);
+            ct.drawImage(image, 0, 0, logoSize, logoSize);
             ct.save();
 
             // @ts-ignore
@@ -319,6 +324,10 @@ export class SVGDrawing {
 
     private fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
 
+        // if (!bIsDark) {
+        //     return;
+        // }
+
         if (!this.maskCanvas) {
             const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
 
@@ -375,15 +384,15 @@ export class SVGDrawing {
         const moduleCount = this.moduleCount;
 
         // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).attr({'opacity': 0.6}).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
+        context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).attr({'opacity': 0.6}).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY);
+        context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).attr({'opacity': 0.6}).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
+        context.rect(8 * size, 8 * size).fill(color).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect((moduleCount - 8 - 8) * size, size).fill(color).attr({'opacity': 0.6}).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY);
+        context.rect((moduleCount - 8 - 8) * size, size).fill(color).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect(size, (moduleCount - 8 - 8) * size).fill(color).attr({'opacity': 0.6}).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY);
+        context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY);
     }
 
     private drawPositionPatterns(context: object, gradient: string) {
@@ -642,17 +651,17 @@ export class SVGDrawing {
         const opacity = isMask ? 0.6 : 1;
         if (isRound) {
             // @ts-ignore
-            canvas.rect(height, width).radius(height / 4).fill(gradient).attr({'opacity': opacity}).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            canvas.rect(height, width).radius(height / 4).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
             return;
         }
         // @ts-ignore
-        canvas.rect(height, width).fill(gradient).attr({'opacity': opacity}).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+        canvas.rect(height, width).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
     }
 
     private drawCircle(centerX: number, centerY: number, canvas: object, gradient: string, radiusX: number, radiusY?: number, isMask?: boolean) {
         const opacity = isMask ? 0.6 : 1;
         // @ts-ignore
-        canvas.circle().radius(radiusX).fill(gradient).attr({'opacity': opacity}).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY);
+        canvas.circle().radius(radiusX).fill(gradient).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY);
     }
 
     private drawKite(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRound?: boolean, isMask?: boolean) {
@@ -663,7 +672,7 @@ export class SVGDrawing {
             [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY]];
         // @ts-ignore
         const polygon = context.polygon(coordinates)
-        polygon.fill(gradient).attr({'opacity': opacity})
+        polygon.fill(gradient)
     }
 
     private drawDiamond(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRight?: boolean, isMask?: boolean) {
@@ -686,7 +695,7 @@ export class SVGDrawing {
         ];
         // @ts-ignore
         const polygon = context.polygon(coordinates)
-        polygon.fill(gradient).attr({'opacity': opacity})
+        polygon.fill(gradient)
     }
 
     private drawLeafFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRight: boolean, gradient: string) {
@@ -780,7 +789,7 @@ export class SVGDrawing {
 
 
         switch (frameStyle) {
-            case QRCodeFrame.BOX_BOTTOM:
+            case QRCodeFrame.BANNER_BOTTOM:
                 cornerRadius = moduleSize;
                 borderX = moduleSize / 2;
                 borderY = moduleSize / 2;
@@ -791,7 +800,7 @@ export class SVGDrawing {
                 logoX = size / 3 - size / 9;
                 logoY = size + moduleSize * 1.5;
                 break;
-            case QRCodeFrame.BOX_TOP:
+            case QRCodeFrame.BANNER_TOP:
                 borderX = moduleSize / 2;
                 borderY = moduleSize / 2 + size / 5 - 1;
                 bannerX = moduleSize / 2;
@@ -801,7 +810,7 @@ export class SVGDrawing {
                 logoX = size / 3 - size / 9;
                 logoY = moduleSize * 2;
                 break;
-            case QRCodeFrame.BANNER_BOTTOM:
+            case QRCodeFrame.BOX_BOTTOM:
                 borderX = moduleSize / 2;
                 borderY = moduleSize / 2;
                 bannerX = moduleSize / 2;
@@ -811,7 +820,7 @@ export class SVGDrawing {
                 logoX = size / 3 - size / 9;
                 logoY = size + moduleSize * 3;
                 break;
-            case QRCodeFrame.BANNER_TOP:
+            case QRCodeFrame.BOX_TOP:
                 borderX = moduleSize / 2;
                 borderY = moduleSize * 1.5 + size / 5;
                 bannerX = moduleSize / 2;
@@ -871,7 +880,7 @@ export class SVGDrawing {
         canvas.rect(size, size / 5).fill(color).radius(moduleSize)
             .move(bannerX, bannerY);
 
-        if (frameStyle === QRCodeFrame.BOX_BOTTOM) {
+        if (frameStyle === QRCodeFrame.BANNER_BOTTOM) {
             // @ts-ignore
             canvas.rect(moduleSize, moduleSize * 2).fill(color)
                 .move(bannerX, bannerY - moduleSize);
@@ -880,7 +889,7 @@ export class SVGDrawing {
             canvas.rect(moduleSize, moduleSize * 2).fill(color)
                 .move(size - moduleSize / 2, bannerY - moduleSize);
         }
-        if (frameStyle === QRCodeFrame.BOX_TOP) {
+        if (frameStyle === QRCodeFrame.BANNER_TOP) {
             // @ts-ignore
             canvas.rect(moduleSize, moduleSize * 2).fill(color)
                 .move(bannerX, bannerY - moduleSize + size / 5);
