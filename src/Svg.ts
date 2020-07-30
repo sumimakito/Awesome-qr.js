@@ -234,9 +234,10 @@ export class SVGDrawing {
         return loadImage(backgroundImage, this.config.imageServerURL, this.config.imageServerRequestHeaders).then(image => {
 
             // @ts-ignore
-            const cn = createCanvas(image.naturalHeight, image.naturalWidth);
+            const cn = createCanvas(this.config.size, this.config.size);
             const ct = cn.getContext('2d');
-            ct.drawImage(image, 0, 0);
+            // @ts-ignore
+            ct.drawImage(image, 0, 0, image.width, image.height, 0, 0, this.config.size, this.config.size);
             ct.save();
 
             // @ts-ignore
@@ -318,28 +319,24 @@ export class SVGDrawing {
 
     private fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
 
-        if (!bIsDark) {
-            return;
-        }
-
         if (!this.maskCanvas) {
             const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
 
             switch (shape) {
                 case DataPattern.CIRCLE:
-                    this.drawCircle(x + w / 2, y + h / 2, canvas, color, h / 2);
+                    this.drawCircle(x + w / 2, y + h / 2, canvas, color, h / 2, h / 2, !bIsDark);
                     break;
                 case DataPattern.LEFT_DIAMOND:
-                    this.drawDiamond(x, y, canvas, color, w, h, false);
+                    this.drawDiamond(x, y, canvas, color, w, h, false, !bIsDark);
                     break;
                 case DataPattern.RIGHT_DIAMOND:
-                    this.drawDiamond(x, y, canvas, color, w, h, true);
+                    this.drawDiamond(x, y, canvas, color, w, h, true, !bIsDark);
                     break;
                 case DataPattern.KITE:
-                    this.drawKite(x, y, canvas, color, w, h, false);
+                    this.drawKite(x, y, canvas, color, w, h, false, !bIsDark);
                     break;
                 default:
-                    this.drawSquare(x, y, canvas, w, h, false, color);
+                    this.drawSquare(x, y, canvas, w, h, false, color, !bIsDark);
                     break;
             }
 
@@ -347,7 +344,7 @@ export class SVGDrawing {
             // TODO: mask canvas
             // canvas.drawImage(this.maskCanvas, x, y, w, h, x, y, w, h);
             const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';;
-            this.drawSquare(x, y, canvas, w, h, false, color);
+            this.drawSquare(x, y, canvas, w, h, false, color, !bIsDark);
         }
     }
 
@@ -378,15 +375,15 @@ export class SVGDrawing {
         const moduleCount = this.moduleCount;
 
         // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
+        context.rect(8 * size, 8 * size).fill(color).attr({'opacity': 0.6}).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY);
+        context.rect(8 * size, 8 * size).fill(color).attr({'opacity': 0.6}).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
+        context.rect(8 * size, 8 * size).fill(color).attr({'opacity': 0.6}).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect((moduleCount - 8 - 8) * size, size).fill(color).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY);
+        context.rect((moduleCount - 8 - 8) * size, size).fill(color).attr({'opacity': 0.6}).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY);
         // @ts-ignore
-        context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY);
+        context.rect(size, (moduleCount - 8 - 8) * size).fill(color).attr({'opacity': 0.6}).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY);
     }
 
     private drawPositionPatterns(context: object, gradient: string) {
@@ -641,32 +638,36 @@ export class SVGDrawing {
 
     }
 
-    private drawSquare(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string) {
+    private drawSquare(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string, isMask?: boolean) {
+        const opacity = isMask ? 0.6 : 1;
         if (isRound) {
             // @ts-ignore
-            canvas.rect(height, width).radius(height / 4).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            canvas.rect(height, width).radius(height / 4).fill(gradient).attr({'opacity': opacity}).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
             return;
         }
         // @ts-ignore
-        canvas.rect(height, width).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+        canvas.rect(height, width).fill(gradient).attr({'opacity': opacity}).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
     }
 
-    private drawCircle(centerX: number, centerY: number, canvas: object, gradient: string, radiusX: number, radiusY?: number, isLarge?: boolean) {
+    private drawCircle(centerX: number, centerY: number, canvas: object, gradient: string, radiusX: number, radiusY?: number, isMask?: boolean) {
+        const opacity = isMask ? 0.6 : 1;
         // @ts-ignore
-        canvas.circle().radius(radiusX).fill(gradient).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY);
+        canvas.circle().radius(radiusX).fill(gradient).attr({'opacity': opacity}).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY);
     }
 
-    private drawKite(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRound?: boolean) {
+    private drawKite(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRound?: boolean, isMask?: boolean) {
+        const opacity = isMask ? 0.6 : 1;
         const coordinates = [[startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
             [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
             [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
             [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY]];
         // @ts-ignore
         const polygon = context.polygon(coordinates)
-        polygon.fill(gradient)
+        polygon.fill(gradient).attr({'opacity': opacity})
     }
 
-    private drawDiamond(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRight?: boolean) {
+    private drawDiamond(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRight?: boolean, isMask?: boolean) {
+        const opacity = isMask ? 0.6 : 1;
         // const c1 = [[0,0], [100,50], [50,100]]
         const coordinates = isRight ? [
             [startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
@@ -685,7 +686,7 @@ export class SVGDrawing {
         ];
         // @ts-ignore
         const polygon = context.polygon(coordinates)
-        polygon.fill(gradient)
+        polygon.fill(gradient).attr({'opacity': opacity})
     }
 
     private drawLeafFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRight: boolean, gradient: string) {

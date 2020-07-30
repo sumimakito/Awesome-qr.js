@@ -22,7 +22,8 @@ describe('QR code tests', () => {
         const qrCodeGenerator = new QRCodeBuilder({
             // text: vCardSampleData,
             text: 'https://www.beaconstac.com',
-            // backgroundImage: 'https://image.flaticon.com/teams/slug/google.jpg',
+            backgroundImage: 'https://image.flaticon.com/teams/slug/google.jpg',
+            // backgroundImage: 'https://s3.amazonaws.com/beaconstac-content-qa/1529/d7b7d7d77bb44a4ca69aac251b5d184b',
             // backgroundColor: '#999999',
             logoImage: 'https://s3.amazonaws.com/beaconstac-content-qa/1529/cfdb6d40c166494293763baab96007f3',
             // logoImage: 'https://static.beaconstac.com/assets/img/qr-code-logos/play-store.svg',
@@ -31,7 +32,7 @@ describe('QR code tests', () => {
             eyeBallShape: EyeBallShape.ROUNDED,
             eyeFrameColor: '#287314',
             eyeBallColor: '#234',
-            dataPattern: DataPattern.SQUARE,
+            dataPattern: DataPattern.LEFT_DIAMOND,
             colorDark: '#0b1257',
             // colorLight: '#999c14',
             dotScale: 0.96,
@@ -42,7 +43,7 @@ describe('QR code tests', () => {
             logoMargin: 10,
             logoScale: 0.25,
             margin: 80,
-            size: 1024,
+            size: 512,
             isVCard: false,
             useCanvas: false
         });

@@ -157,7 +157,9 @@ export const CanvasUtil = {
         // context.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
         // context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
         // @ts-ignore
-        context.rect(5 * nWidth, 5 * nHeight).fill(color).move((centerX - 2) * nWidth + margin + shiftX, (centerY - 2) * nHeight + margin + shiftY);
+        context.rect(5 * nWidth, 5 * nHeight).fill(color)
+            .move((centerX - 2) * nWidth + margin + shiftX, (centerY - 2) * nHeight + margin + shiftY)
+            .attr({'opacity': 0.6});
     },
 
     drawAlign(context: CanvasRenderingContext2D, centerX: number, centerY: number, nWidth: number, nHeight: number) {
