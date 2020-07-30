@@ -37,13 +37,13 @@ describe('QR code tests', () => {
             // colorLight: '#999c14',
             dotScale: 0.96,
             // gradientType: GradientType.RADIAL,
-            frameStyle: QRCodeFrame.BALLOON_BOTTOM,
+            frameStyle: QRCodeFrame.BOX_TOP,
             frameColor: '#0b1257',
             // frameText: 'SCAN ME',
             logoMargin: 10,
             logoScale: 0.25,
             margin: 80,
-            size: 512,
+            size: 4096,
             isVCard: false,
             useCanvas: false
         });

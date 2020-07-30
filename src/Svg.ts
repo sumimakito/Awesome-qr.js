@@ -90,13 +90,13 @@ export class SVGDrawing {
             const moduleSize = this.config.moduleSize;
             const rawSize = this.config.rawSize;
             const size = rawSize + moduleSize * 2;
-            canvasHeight = 1.265 * size;
+            canvasHeight = 1.27 * size;
             canvasWidth = size + moduleSize;
             if (frameStyle === QRCodeFrame.BANNER_TOP || frameStyle === QRCodeFrame.BANNER_BOTTOM) {
-                canvasHeight = 1.216 * size;
+                canvasHeight = 1.25 * size;
             }
             if (frameStyle === QRCodeFrame.BOX_TOP || frameStyle === QRCodeFrame.BOX_BOTTOM) {
-                canvasHeight = 1.27 * size;
+                canvasHeight = 1.25 * size;
             }
 
             mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth, canvasHeight);
@@ -111,9 +111,9 @@ export class SVGDrawing {
                     break
                 case QRCodeFrame.BALLOON_TOP:
                     this.shiftX = 1.5 * this.config.moduleSize;
-                    this.shiftY = 3.5 * this.config.moduleSize + size / 6;
+                    this.shiftY = 3.5 * this.config.moduleSize + size / 5;
                     if (this.config.isVCard) {
-                        this.shiftY = 10 * moduleSize + size / 6;
+                        this.shiftY = 10 * moduleSize + size / 5;
                     }
                     break;
                 case QRCodeFrame.BOX_BOTTOM:
@@ -122,7 +122,7 @@ export class SVGDrawing {
                     break;
                 case QRCodeFrame.BOX_TOP:
                     this.shiftX = 1.5 * this.config.moduleSize;
-                    this.shiftY = 1.5 * this.config.moduleSize  + size / 6 - 1;
+                    this.shiftY = 1.5 * this.config.moduleSize  + size / 5 - 1;
                     break;
                 case QRCodeFrame.BANNER_BOTTOM:
                     this.shiftX = 1.5 * this.config.moduleSize;
@@ -130,7 +130,7 @@ export class SVGDrawing {
                     break;
                 case QRCodeFrame.BANNER_TOP:
                     this.shiftX = 1.5 * this.config.moduleSize;
-                    this.shiftY = 2.5 * this.config.moduleSize + size / 6;
+                    this.shiftY = 2.5 * this.config.moduleSize + size / 5;
                     break
                 default:
                     break;
@@ -793,7 +793,7 @@ export class SVGDrawing {
                 break;
             case QRCodeFrame.BOX_TOP:
                 borderX = moduleSize / 2;
-                borderY = moduleSize / 2 + size / 6 - 1;
+                borderY = moduleSize / 2 + size / 5 - 1;
                 bannerX = moduleSize / 2;
                 bannerY = moduleSize / 2;
                 textX = size / 3;
@@ -813,7 +813,7 @@ export class SVGDrawing {
                 break;
             case QRCodeFrame.BANNER_TOP:
                 borderX = moduleSize / 2;
-                borderY = moduleSize * 1.5 + size / 6;
+                borderY = moduleSize * 1.5 + size / 5;
                 bannerX = moduleSize / 2;
                 bannerY = moduleSize / 2;
                 textX = size / 3;
@@ -858,17 +858,17 @@ export class SVGDrawing {
         if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
             const coordinates = [[0, 0], [size / 24, size / 12], [-size / 24, size / 12]];
             // @ts-ignore
-            canvas.polygon(coordinates).fill(color).move(size / 2 - moduleSize, size - moduleSize / 1.5);
+            canvas.polygon(coordinates).fill(color).move(size / 2 - moduleSize, size - moduleSize / 2);
         }
         if (frameStyle === QRCodeFrame.BALLOON_TOP) {
             const coordinates = [[0, 0], [size / 24, 0], [0, size / 12], [-size / 24, 0]];
             // @ts-ignore
-            canvas.polygon(coordinates).fill(color).move(size / 2 - moduleSize, size / 6 - moduleSize / 2);
+            canvas.polygon(coordinates).fill(color).move(size / 2 - moduleSize, size / 5 - moduleSize / 2);
         }
 
         // Banner for frame text
         // @ts-ignore
-        canvas.rect(size, size / 6).fill(color).radius(moduleSize)
+        canvas.rect(size, size / 5).fill(color).radius(moduleSize)
             .move(bannerX, bannerY);
 
         if (frameStyle === QRCodeFrame.BOX_BOTTOM) {
@@ -883,11 +883,11 @@ export class SVGDrawing {
         if (frameStyle === QRCodeFrame.BOX_TOP) {
             // @ts-ignore
             canvas.rect(moduleSize, moduleSize * 2).fill(color)
-                .move(bannerX, bannerY - moduleSize + size / 6);
+                .move(bannerX, bannerY - moduleSize + size / 5);
 
             // @ts-ignore
             canvas.rect(moduleSize, moduleSize * 2).fill(color)
-                .move(size - moduleSize / 2, bannerY - moduleSize + size / 6);
+                .move(size - moduleSize / 2, bannerY - moduleSize + size / 5);
         }
         // @ts-ignore
         canvas.plain(text).move(textX, textY)
