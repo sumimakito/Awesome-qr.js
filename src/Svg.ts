@@ -780,10 +780,10 @@ export class SVGDrawing {
         if (isNode) {
             const path = require('path');
             const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto');
-            const {setFontDir, setFontFamilyMappings, preloadFonts} = require('svgdom');
-            setFontDir(fontPath);
-            setFontFamilyMappings({'Roboto': 'Roboto-Regular.ttf'});
-            preloadFonts();
+            // const {setFontDir, setFontFamilyMappings, preloadFonts} = require('svgdom');
+            // setFontDir(fontPath);
+            // setFontFamilyMappings({'Roboto': 'Roboto-Regular.ttf'});
+            // preloadFonts();
         }
 
 
@@ -898,6 +898,8 @@ export class SVGDrawing {
             canvas.rect(moduleSize, moduleSize * 2).fill(color)
                 .move(size - moduleSize / 2, bannerY - moduleSize + size / 5);
         }
+        // @ts-ignore
+        canvas.fontface('Roboto', `url(https://beaconstacqa.mobstac.com/static/fonts/Roboto-Regular.ttf)`);
         // @ts-ignore
         canvas.plain(text).move(textX, textY)
             .font({ fill: '#fff', family: 'Roboto', size: size / 10, leading: 0 });
