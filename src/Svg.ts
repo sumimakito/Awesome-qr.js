@@ -329,7 +329,15 @@ export class SVGDrawing {
 
         if (!this.maskCanvas) {
             const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
-
+            // const color = bIsDark ? rgbToHex(getRGB({
+            //     red: 10,
+            //     green: 195,
+            //     blue: 205,
+            // },  {
+            //     red: 98,
+            //     green: 120,
+            //     blue: 220,
+            // }, y / this.config.size)) : '#ffffff99';
             switch (shape) {
                 case DataPattern.CIRCLE:
                     this.drawCircle(x + w / 2, y + h / 2, canvas, color, h / 2, h / 2, !bIsDark);
@@ -928,4 +936,29 @@ export class SVGDrawing {
     }
 
 }
+
+function getRGB(color1: any, color2: any, percent: any) {
+    const resultRed = color1.red + percent * (color2.red - color1.red);
+    const resultGreen = color1.green + percent * (color2.green - color1.green);
+    const resultBlue = color1.blue + percent * (color2.blue - color1.blue);
+    return `${resultRed},${resultGreen},${resultBlue}`;
+}
+
+function rgbToHex(rgb: any): string {
+    if (!rgb) {
+        return '';
+    }
+    const rgbArray = rgb.split(',').map((val: any) => {
+        return parseInt(val);
+    });
+    const r = rgbArray[0], g = rgbArray[1], b = rgbArray[2];
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+function componentToHex(c: any) {
+    const hex = c.toString(16);
+    return hex.length === 1 ? "0" + hex : hex;
+}
+
+
 
