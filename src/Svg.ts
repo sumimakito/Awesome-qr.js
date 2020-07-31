@@ -3,7 +3,7 @@ import { Canvas, CanvasRenderingContext2D, createCanvas } from 'canvas';
 import { CanvasUtil } from './Common';
 import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, QRCodeFrame } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
-import { isNode, loadImage } from './Util';
+import { cellPhoneSVGPath, isNode, loadImage } from './Util';
 
 
 export class SVGDrawing {
@@ -65,10 +65,10 @@ export class SVGDrawing {
         this.config = SVGDrawing.generateDrawingConfig(config, moduleCount);
         this.isPainted = false;
 
-        const { createSVGWindow } = require('svgdom')
-        const svgWindow = createSVGWindow()
-        const svgDocument = svgWindow.document
-        const { SVG, registerWindow } = require('@svgdotjs/svg.js')
+        const { createSVGWindow } = require('svgdom');
+        const svgWindow = createSVGWindow();
+        const svgDocument = svgWindow.document;
+        const { SVG, registerWindow } = require('@svgdotjs/svg.js');
 
         registerWindow(svgWindow, svgDocument);
         this.canvas = SVG(svgDocument.documentElement).size(config.size, config.size);
@@ -81,10 +81,10 @@ export class SVGDrawing {
         let canvasHeight: number;
         let canvasWidth: number;
 
-        const { createSVGWindow } = require('svgdom')
-        const svgWindow = createSVGWindow()
-        const svgDocument = svgWindow.document
-        const { SVG, registerWindow } = require('@svgdotjs/svg.js')
+        const { createSVGWindow } = require('svgdom');
+        const svgWindow = createSVGWindow();
+        const svgDocument = svgWindow.document;
+        const { SVG, registerWindow } = require('@svgdotjs/svg.js');
 
         if (frameStyle && frameStyle !== QRCodeFrame.NONE) {
             const moduleSize = this.config.moduleSize;
@@ -108,7 +108,7 @@ export class SVGDrawing {
                 case QRCodeFrame.BALLOON_BOTTOM:
                     this.shiftX = 1.5 * this.config.moduleSize;
                     this.shiftY = 1.5 * this.config.moduleSize;
-                    break
+                    break;
                 case QRCodeFrame.BALLOON_TOP:
                     this.shiftX = 1.5 * this.config.moduleSize;
                     this.shiftY = 3.5 * this.config.moduleSize + size / 5;
@@ -122,7 +122,7 @@ export class SVGDrawing {
                     break;
                 case QRCodeFrame.BANNER_TOP:
                     this.shiftX = 1.5 * this.config.moduleSize;
-                    this.shiftY = 1.5 * this.config.moduleSize  + size / 5 - 1;
+                    this.shiftY = 1.5 * this.config.moduleSize + size / 5 - 1;
                     break;
                 case QRCodeFrame.BANNER_BOTTOM:
                     this.shiftX = 1.5 * this.config.moduleSize;
@@ -131,7 +131,7 @@ export class SVGDrawing {
                 case QRCodeFrame.BOX_TOP:
                     this.shiftX = 1.5 * this.config.moduleSize;
                     this.shiftY = 2.5 * this.config.moduleSize + size / 5;
-                    break
+                    break;
                 default:
                     break;
             }
@@ -148,13 +148,12 @@ export class SVGDrawing {
         const gradient: string = this.config.colorDark;
 
 
-
         return this.drawFrame(mainCanvas, this.config.frameStyle, this.config.frameColor, this.config.frameText)
             .then(() => {
-                return this.addBackground(mainCanvas, this.config.size, this.config.backgroundImage, this.config.backgroundColor)
+                return this.addBackground(mainCanvas, this.config.size, this.config.backgroundImage, this.config.backgroundColor);
             })
             .then(() => {
-            return this.drawAlignPatterns(mainCanvas, gradient);
+                return this.drawAlignPatterns(mainCanvas, gradient);
             })
             .then(() => {
                 return this.drawPositionProtectors(mainCanvas);
@@ -216,10 +215,10 @@ export class SVGDrawing {
             ct.save();
 
             // @ts-ignore
-            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill('#ffffff').move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin+ this.shiftY).radius(logoCornerRadius)
+            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill('#ffffff').move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
             // @ts-ignore
             context.image('').size(logoSize, logoSize)
-                .attr({'xlink:href': cn.toDataURL()})
+                .attr({ 'xlink:href': cn.toDataURL() })
                 .move(centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftX, centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftY);
         });
     }
@@ -247,7 +246,7 @@ export class SVGDrawing {
 
             // @ts-ignore
             context.image('').size(this.config.size, this.config.size).move(this.shiftX, this.shiftY)
-                .attr({'xlink:href': cn.toDataURL(), 'opacity': 0.6});
+                .attr({ 'xlink:href': cn.toDataURL(), 'opacity': 0.6 });
 
         });
     }
@@ -352,7 +351,8 @@ export class SVGDrawing {
         } else {
             // TODO: mask canvas
             // canvas.drawImage(this.maskCanvas, x, y, w, h, x, y, w, h);
-            const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';;
+            const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
+            ;
             this.drawSquare(x, y, canvas, w, h, false, color, !bIsDark);
         }
     }
@@ -360,7 +360,7 @@ export class SVGDrawing {
     private drawAlignProtectors(context: object) {
         const patternPosition = this.patternPosition;
         const moduleSize = this.config.moduleSize;
-        const margin  = this.config.margin;
+        const margin = this.config.margin;
         const color = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
         const edgeCenter = patternPosition[patternPosition.length - 1];
         for (let i = 0; i < patternPosition.length; i++) {
@@ -554,7 +554,7 @@ export class SVGDrawing {
         const moduleSize = this.config.moduleSize;
         const moduleCount = this.moduleCount;
 
-        switch(shape) {
+        switch (shape) {
             case EyeFrameShape.SQUARE:
                 this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
                 this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
@@ -581,10 +581,10 @@ export class SVGDrawing {
                 this.drawLeafFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, true, color);
                 break;
             default:
-            this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
-            this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
-            this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false, color);
-            break;
+                this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                break;
         }
 
     }
@@ -611,17 +611,17 @@ export class SVGDrawing {
                 this.drawSquare(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false, color);
                 break;
             case EyeBallShape.LEFT_DIAMOND:
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color,3 * moduleSize, 3 * moduleSize, false);
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
                 break;
             case EyeBallShape.RIGHT_DIAMOND:
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color,3 * moduleSize, 3 * moduleSize, true);
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
                 this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
                 this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
                 break;
             case EyeBallShape.LEFT_LEAF:
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color,3 * moduleSize, 3 * moduleSize, false);
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
                 const radius2 = 3 * moduleSize / 2;
@@ -630,7 +630,7 @@ export class SVGDrawing {
                 this.drawCircle(2 * moduleSize + radius2, (moduleCount - 7 + 2) * moduleSize + radius2, context, color, radius2);
                 break;
             case EyeBallShape.RIGHT_LEAF:
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color,3 * moduleSize, 3 * moduleSize, true);
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
                 this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
                 this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
                 const radius3 = 3 * moduleSize / 2;
@@ -671,8 +671,8 @@ export class SVGDrawing {
             [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
             [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY]];
         // @ts-ignore
-        const polygon = context.polygon(coordinates)
-        polygon.fill(gradient)
+        const polygon = context.polygon(coordinates);
+        polygon.fill(gradient);
     }
 
     private drawDiamond(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRight?: boolean, isMask?: boolean) {
@@ -684,18 +684,18 @@ export class SVGDrawing {
             [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
             [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
             [startX + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
-            [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY]
-                ] : [
+            [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
+        ] : [
             [startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
             [startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
             [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
             [startX + width + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
             [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
-            [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY]
+            [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
         ];
         // @ts-ignore
-        const polygon = context.polygon(coordinates)
-        polygon.fill(gradient)
+        const polygon = context.polygon(coordinates);
+        polygon.fill(gradient);
     }
 
     private drawLeafFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRight: boolean, gradient: string) {
@@ -775,7 +775,7 @@ export class SVGDrawing {
         const text = frameText ? frameText : 'SCAN ME';
 
         let borderX = 0, borderY = 0, bannerX = 0, bannerY = 0,
-        textX = 0, textY = 0, logoX = 0, logoY = 0, cornerRadius = 0;
+            textX = 0, textY = 0, logoX = 0, logoY = 0, cornerRadius = 0;
 
         if (isNode) {
             const path = require('path');
@@ -787,7 +787,6 @@ export class SVGDrawing {
         }
 
 
-
         switch (frameStyle) {
             case QRCodeFrame.BANNER_BOTTOM:
                 cornerRadius = moduleSize;
@@ -796,7 +795,7 @@ export class SVGDrawing {
                 bannerX = moduleSize / 2;
                 bannerY = size + moduleSize / 2 - 1;
                 textX = size / 3;
-                textY = size+ 1 * moduleSize + size / 10;
+                textY = size + 1 * moduleSize + size / 10;
                 logoX = size / 3 - size / 9;
                 logoY = size + moduleSize * 1.5;
                 break;
@@ -806,7 +805,7 @@ export class SVGDrawing {
                 bannerX = moduleSize / 2;
                 bannerY = moduleSize / 2;
                 textX = size / 3;
-                textY =  1.5 * moduleSize + size / 10;
+                textY = 1.5 * moduleSize + size / 10;
                 logoX = size / 3 - size / 9;
                 logoY = moduleSize * 2;
                 break;
@@ -826,7 +825,7 @@ export class SVGDrawing {
                 bannerX = moduleSize / 2;
                 bannerY = moduleSize / 2;
                 textX = size / 3;
-                textY =  1.5 * moduleSize + size / 10;
+                textY = 1.5 * moduleSize + size / 10;
                 logoX = size / 3 - size / 9;
                 logoY = moduleSize * 2;
                 break;
@@ -852,7 +851,7 @@ export class SVGDrawing {
                 bannerX = moduleSize / 2;
                 bannerY = moduleSize / 2;
                 textX = size / 3;
-                textY =  this.config.isVCard ? moduleSize * 2.5 + size / 10 : moduleSize * 1.5 + size / 10;
+                textY = this.config.isVCard ? moduleSize * 2.5 + size / 10 : moduleSize * 1.5 + size / 10;
                 logoX = size / 3 - size / 9;
                 logoY = this.config.isVCard ? moduleSize * 3 : moduleSize * 2;
                 break;
@@ -914,6 +913,14 @@ export class SVGDrawing {
 
             // @ts-ignore
             canvas.image('').size(size / 10, size / 10).move(logoX, logoY).attr({'xlink:href': cn.toDataURL()});
+
+            // TODO: Use SVG embed
+            // const cellphone = cellPhoneSVGPath.replace('<<x-axis>>', logoX)
+            //     .replace('<<y-axis>>', logoY)
+            //     .replace('<<width>>', size / 10)
+            //     .replace('<<height>>', size / 10);
+            // // @ts-ignore
+            // return canvas.svg(cellphone);
         });
     }
 
