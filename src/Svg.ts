@@ -3,7 +3,7 @@ import { Canvas, CanvasRenderingContext2D, createCanvas } from 'canvas';
 import { CanvasUtil } from './Common';
 import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, QRCodeFrame } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
-import { cellPhoneSVGPath, isNode, loadImage } from './Util';
+import { isNode, loadImage } from './Util';
 
 
 export class SVGDrawing {
@@ -898,7 +898,10 @@ export class SVGDrawing {
                 .move(size - moduleSize / 2, bannerY - moduleSize + size / 5);
         }
         // @ts-ignore
-        canvas.fontface('Roboto', `url(https://beaconstacqa.mobstac.com/static/fonts/Roboto-Regular.ttf)`);
+        canvas.defs().style(`
+            @import url('https://fonts.googleapis.com/css?family=Roboto:400');
+    `);
+        // canvas.fontface('Roboto', `url(https://beaconstacqa.mobstac.com/static/fonts/Roboto-Regular.ttf)`);
         // @ts-ignore
         canvas.plain(text).move(textX, textY)
             .font({ fill: '#fff', family: 'Roboto', size: size / 10, leading: 0 });
@@ -912,7 +915,7 @@ export class SVGDrawing {
             ct.save();
 
             // @ts-ignore
-            canvas.image('').size(size / 10, size / 10).move(logoX, logoY).attr({'xlink:href': cn.toDataURL()});
+            canvas.image('').size(size / 10, size / 10).move(logoX, logoY).attr({ 'xlink:href': cn.toDataURL() });
 
             // TODO: Use SVG embed
             // const cellphone = cellPhoneSVGPath.replace('<<x-axis>>', logoX)
