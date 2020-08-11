@@ -1,7 +1,8 @@
 /* tslint:disable:no-var-requires */
 import { Canvas, CanvasRenderingContext2D, createCanvas } from 'canvas';
 import { CanvasUtil } from './Common';
-import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, QRCodeFrame } from './Enums';
+import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame } from './Enums';
+import { QRCode } from './Models';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { isNode, loadImage } from './Util';
 
@@ -57,6 +58,9 @@ export class SVGDrawing {
     private shiftX = 0;
     private shiftY = 0;
 
+    private canvasQR: Canvas;
+    private qrConfig?: any;
+
     constructor(moduleCount: number, patternPosition: number[], config: QRCodeConfig, isDark: any, modules: Array<Array<boolean | null>>) {
         this.moduleCount = moduleCount;
         this.patternPosition = patternPosition;
@@ -64,6 +68,8 @@ export class SVGDrawing {
         this.modules = modules;
         this.config = SVGDrawing.generateDrawingConfig(config, moduleCount);
         this.isPainted = false;
+        this.qrConfig = config;
+        this.canvasQR = createCanvas(config.size, config.size, 'svg');
 
         const { createSVGWindow } = require('svgdom');
         const svgWindow = createSVGWindow();
@@ -74,7 +80,7 @@ export class SVGDrawing {
         this.canvas = SVG(svgDocument.documentElement).size(config.size, config.size);
     }
 
-    public drawSVG(): Promise<any> {
+    public async drawSVG(): Promise<any> {
         const frameStyle = this.config.frameStyle;
 
         let mainCanvas: object;
@@ -85,6 +91,12 @@ export class SVGDrawing {
         const svgWindow = createSVGWindow();
         const svgDocument = svgWindow.document;
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
+
+        if (this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+            const QR = new QRCode(-1, this.qrConfig);
+            this.canvasQR = await QR.drawing.draw();
+        }
+
 
         if (frameStyle && frameStyle !== QRCodeFrame.NONE) {
             const moduleSize = this.config.moduleSize;
@@ -174,6 +186,30 @@ export class SVGDrawing {
                 // @ts-ignore
                 return mainCanvas.svg();
             });
+    }
+
+    private async getColorFromCanvas(canvas: Canvas, x: number, y: number) {
+        const context = canvas.getContext('2d');
+        let p, hex;
+        try {
+            p = await context.getImageData(x, y, 1, 1).data;
+            hex = '#' + ('000000' + this.rgbToHex(p[0], p[1], p[2])).slice(-6);
+            return hex;
+        } catch (e) {
+            console.log('error!')
+            console.error(e);
+        }
+
+        return '#000';
+
+        // return hex;
+    }
+
+    private rgbToHex(r: number, g: number, b: number) {
+        if (r > 255 || g > 255 || b > 255) {
+            console.error('Invalid color component');
+        }
+        return ((r << 16) | (g << 8) | b).toString(16);
     }
 
     private async drawLogoImage(context: object) {
@@ -321,11 +357,15 @@ export class SVGDrawing {
         }
     }
 
-    private fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
+    private async fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
 
         // if (!bIsDark) {
         //     return;
         // }
+
+        if (this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+            const gr = await (this.getColorFromCanvas(this.canvasQR, x, y));
+        }
 
         if (!this.maskCanvas) {
             const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
@@ -962,28 +1002,28 @@ export class SVGDrawing {
 
 }
 
-function getRGB(color1: any, color2: any, percent: any) {
-    const resultRed = color1.red + percent * (color2.red - color1.red);
-    const resultGreen = color1.green + percent * (color2.green - color1.green);
-    const resultBlue = color1.blue + percent * (color2.blue - color1.blue);
-    return `${resultRed},${resultGreen},${resultBlue}`;
-}
-
-function rgbToHex(rgb: any): string {
-    if (!rgb) {
-        return '';
-    }
-    const rgbArray = rgb.split(',').map((val: any) => {
-        return parseInt(val);
-    });
-    const r = rgbArray[0], g = rgbArray[1], b = rgbArray[2];
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-}
-
-function componentToHex(c: any) {
-    const hex = c.toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
-}
+// function getRGB(color1: any, color2: any, percent: any) {
+//     const resultRed = color1.red + percent * (color2.red - color1.red);
+//     const resultGreen = color1.green + percent * (color2.green - color1.green);
+//     const resultBlue = color1.blue + percent * (color2.blue - color1.blue);
+//     return `${resultRed},${resultGreen},${resultBlue}`;
+// }
+//
+// function rgbToHex(rgb: any): string {
+//     if (!rgb) {
+//         return '';
+//     }
+//     const rgbArray = rgb.split(',').map((val: any) => {
+//         return parseInt(val);
+//     });
+//     const r = rgbArray[0], g = rgbArray[1], b = rgbArray[2];
+//     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+// }
+//
+// function componentToHex(c: any) {
+//     const hex = c.toString(16);
+//     return hex.length === 1 ? "0" + hex : hex;
+// }
 
 
 
