@@ -750,26 +750,16 @@ export class SVGDrawing {
         const moduleSize = this.config.moduleSize;
         const r = startX + width;
         const b = startY + height;
-
-        height = height - moduleSize;
-        width = width - moduleSize;
         const radius = moduleSize * 2;
 
-        if (isRight) {
-            // @ts-ignore
-            canvas.path(`M0 0 L${width - radius / 2} 0 L${width - radius / 2} ${height - radius / 2} A${radius} ${radius} 0 0 1 ${width - radius} ${height}
-                            L${- radius / 2} ${height}
-                            L${- radius / 2} ${radius / 2} A${radius} ${radius} 0 0 1 0 0`).fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize });
+        if (!isRight) {
+            this.drawDiamond(startX, startY, canvas, gradient, width, height, false);
+            this.drawCircularFrame(startX, startY, canvas, width, height, false, gradient);
+            this.drawDiamond(startX + moduleSize, startY + moduleSize, canvas, '#fff', width - moduleSize * 2, height - moduleSize * 2, false);
         } else {
-            // @ts-ignore
-            canvas.path(`M0 0 L${width - radius} 0 A${radius} ${radius} 0 0 1 ${width - radius / 2} ${radius}
-                            L${width - radius / 2} ${height} L${width - radius / 2} ${height + moduleSize / 8}
-                            L0 ${height} A${radius} ${radius} 0 0 1 ${- radius / 2} ${height - radius / 2}
-                            L${- radius / 2} 0 z`).fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize });
+            this.drawDiamond(startX, startY, canvas, gradient, width, height, true);
+            this.drawCircularFrame(startX, startY, canvas, width, height, false, gradient);
+            this.drawDiamond(startX + moduleSize, startY + moduleSize, canvas, '#fff', width - moduleSize * 2, height - moduleSize * 2, true);
         }
 
     }
@@ -777,40 +767,25 @@ export class SVGDrawing {
     private drawCircularFrame(startX: number, startY: number, canvas: object, width: number, height: number, isLarge: boolean, gradient: string) {
         const moduleSize = this.config.moduleSize;
 
-
-        height = height - moduleSize;
-        width = width - moduleSize;
-
-        const radius = height / 2;
-
         // @ts-ignore
-        canvas.path(`M0 0 A${radius} ${radius} 0 0 1 0 ${height} A${radius} ${radius} 0 0 1 0 0`).fill('none')
-            .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-            .stroke({ color: gradient, width: this.config.moduleSize, linecap: 'round', linejoin: 'round' });
+        canvas.circle().radius(width / 2).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+        // @ts-ignore
+        canvas.circle().radius(width / 2 - moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff').move(startX + this.config.margin + moduleSize + this.shiftX, startY + this.config.margin + moduleSize + this.shiftY);
     }
 
     private drawSquareEyeFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string) {
         const moduleSize = this.config.moduleSize;
-        // const radius = height / 4;
-
-        height = height - moduleSize;
-        width = width - moduleSize;
-
         const radius = height / 4;
-
         if (isRound) {
             // @ts-ignore
-            canvas.path(`M0 0 L${width - radius} 0 A${radius} ${radius} 0 0 1 ${width - radius / 2} ${radius}
-                            L${width - radius / 2} ${height - radius / 2} A${radius} ${radius} 0 0 1 ${width - radius} ${height}
-                            L0 ${height} A${radius} ${radius} 0 0 1 ${- radius / 2} ${height - radius / 2}
-                            L${- radius / 2} ${radius / 2} A${radius} ${radius} 0 0 1 0 0`).fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize / 1.5, linecap: 'round', linejoin: 'round' });
+            canvas.rect(height, width).radius(radius).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : this.config.colorDark ? this.config.colorDark : '#000000').move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            // @ts-ignore
+            canvas.rect(height - 1.5 * moduleSize, width - 1.5 * moduleSize).radius(radius).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize * 0.75 + this.config.margin + this.shiftX, startY + moduleSize * 0.75 + this.config.margin + this.shiftY);
         } else {
             // @ts-ignore
-            canvas.path(`M0 0 L${width} 0 L${width} ${height} L0 ${height} z`).fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize});
+            canvas.rect(height, width).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : this.config.colorDark ? this.config.colorDark : '#000000').move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            // @ts-ignore
+            canvas.rect(height - 2 * moduleSize, width - 2 * moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize + this.config.margin + this.shiftX, startY + moduleSize + this.config.margin + this.shiftY);
         }
 
     }
