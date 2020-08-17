@@ -1,12 +1,13 @@
 /* tslint:disable:no-var-requires */
-import { Canvas, CanvasRenderingContext2D, createCanvas } from 'canvas';
+import { Canvas, CanvasGradient, CanvasPattern, CanvasRenderingContext2D, createCanvas } from 'canvas';
 import { CanvasUtil } from './Common';
-import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, QRCodeFrame } from './Enums';
+import { DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { isNode, loadImage } from './Util';
 
 
 export class SVGDrawing {
+
     private static generateDrawingConfig(config: QRCodeConfig, qrModuleCount: number): QRDrawingConfig {
         const dotScale = config.dotScale;
 
@@ -57,6 +58,8 @@ export class SVGDrawing {
     private shiftX = 0;
     private shiftY = 0;
 
+    private canvasQR: Canvas;
+
     constructor(moduleCount: number, patternPosition: number[], config: QRCodeConfig, isDark: any, modules: Array<Array<boolean | null>>) {
         this.moduleCount = moduleCount;
         this.patternPosition = patternPosition;
@@ -64,6 +67,13 @@ export class SVGDrawing {
         this.modules = modules;
         this.config = SVGDrawing.generateDrawingConfig(config, moduleCount);
         this.isPainted = false;
+
+        this.canvasQR = createCanvas(config.size, config.size);
+        const ctx = this.canvasQR.getContext('2d');
+
+        this.setupCanvasForGradient(ctx, config.size);
+
+
 
         const { createSVGWindow } = require('svgdom');
         const svgWindow = createSVGWindow();
@@ -74,7 +84,7 @@ export class SVGDrawing {
         this.canvas = SVG(svgDocument.documentElement).size(config.size, config.size);
     }
 
-    public drawSVG(): Promise<any> {
+    public async drawSVG(): Promise<any> {
         const frameStyle = this.config.frameStyle;
 
         let mainCanvas: object;
@@ -85,6 +95,7 @@ export class SVGDrawing {
         const svgWindow = createSVGWindow();
         const svgDocument = svgWindow.document;
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
+
 
         if (frameStyle && frameStyle !== QRCodeFrame.NONE) {
             const moduleSize = this.config.moduleSize;
@@ -176,6 +187,59 @@ export class SVGDrawing {
             });
     }
 
+    private setupCanvasForGradient(ctx: CanvasRenderingContext2D, size: number) {
+
+        let gradient: string | CanvasGradient | CanvasPattern = this.config.colorDark ? this.config.colorDark : '#000000';
+
+        if (this.config.gradientType) {
+            switch (this.config.gradientType) {
+                case GradientType.LINEAR:
+                case GradientType.HORIZONTAL:
+                    gradient = ctx.createLinearGradient(0, 0, this.config.moduleSize * this.moduleCount, 0);
+                    gradient.addColorStop(0, this.config.colorDark);
+                    gradient.addColorStop(1, this.config.colorLight);
+                    break;
+                case GradientType.VERTICAL:
+                    gradient = ctx.createLinearGradient(0, 0, 0, this.config.moduleSize * this.moduleCount);
+                    gradient.addColorStop(0, this.config.colorDark);
+                    gradient.addColorStop(1, this.config.colorLight);
+                    break;
+                case GradientType.RADIAL:
+                    gradient = ctx.createRadialGradient(
+                        (this.config.moduleSize * this.moduleCount) / 2,
+                        (this.config.moduleSize * this.moduleCount) / 2,
+                        (this.config.moduleSize * this.moduleCount) / 6,
+                        (this.config.moduleSize * this.moduleCount) / 2,
+                        (this.config.moduleSize * this.moduleCount) / 2,
+                        (this.config.moduleSize * this.moduleCount) / 2,
+                    );
+                    gradient.addColorStop(0, this.config.colorLight);
+                    gradient.addColorStop(1, this.config.colorDark);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+    }
+
+    private async getColorFromCanvas(canvas: Canvas, x: number, y: number) {
+        const context = canvas.getContext('2d');
+
+        const p = await context.getImageData(x, y, 1, 1).data;
+        const hex = '#' + ('000000' + this.rgbToHex(p[0], p[1], p[2])).slice(-6);
+        return hex;
+    }
+
+    private rgbToHex(r: number, g: number, b: number) {
+        if (r > 255 || g > 255 || b > 255) {
+            console.error('Invalid color component');
+        }
+        return ((r << 16) | (g << 8) | b).toString(16);
+    }
+
     private async drawLogoImage(context: object) {
         if (!this.config.logoImage) {
             return;
@@ -246,7 +310,7 @@ export class SVGDrawing {
 
             // @ts-ignore
             context.image('').size(this.config.size, this.config.size).move(this.shiftX, this.shiftY)
-                .attr({ 'xlink:href': cn.toDataURL(), 'opacity': 0.6 });
+                .attr({ 'xlink:href': cn.toDataURL()});
 
         });
     }
@@ -321,23 +385,16 @@ export class SVGDrawing {
         }
     }
 
-    private fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
+    private async fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
 
         // if (!bIsDark) {
         //     return;
         // }
+        const gradient = await (this.getColorFromCanvas(this.canvasQR, x, y));
 
         if (!this.maskCanvas) {
-            const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
-            // const color = bIsDark ? rgbToHex(getRGB({
-            //     red: 10,
-            //     green: 195,
-            //     blue: 205,
-            // },  {
-            //     red: 98,
-            //     green: 120,
-            //     blue: 220,
-            // }, y / this.config.size)) : '#ffffff99';
+            const color = bIsDark ? gradient : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
+
             switch (shape) {
                 case DataPattern.CIRCLE:
                     this.drawCircle(x + w / 2, y + h / 2, canvas, color, h / 2, h / 2, !bIsDark);
@@ -359,7 +416,7 @@ export class SVGDrawing {
         } else {
             // TODO: mask canvas
             // canvas.drawImage(this.maskCanvas, x, y, w, h, x, y, w, h);
-            const color = bIsDark ? this.config.colorDark : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
+            const color = bIsDark ? gradient : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
             ;
             this.drawSquare(x, y, canvas, w, h, false, color, !bIsDark);
         }
@@ -403,7 +460,7 @@ export class SVGDrawing {
         context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY);
     }
 
-    private drawPositionPatterns(context: object, gradient: string) {
+    private async drawPositionPatterns(context: object, gradient: string) {
         const color = gradient;
 
         const moduleSize = this.config.moduleSize;
@@ -415,8 +472,9 @@ export class SVGDrawing {
         const eyeFrameShape = this.config.eyeFrameShape ? this.config.eyeFrameShape : EyeFrameShape.SQUARE;
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
 
-        this.drawEyeFrames(context, eyeFrameShape, eyeFrameColor);
-        this.drawEyeBalls(context, eyeBallShape, eyeBallColor);
+        await this.drawEyeFrames(context, eyeFrameShape, eyeFrameColor);
+        await this.drawEyeBalls(context, eyeBallShape);
+
 
 
         for (let i = 0; i < moduleCount - 15; i += 2) {
@@ -424,23 +482,33 @@ export class SVGDrawing {
             switch (dataPattern) {
                 case DataPattern.CIRCLE:
                     const radius = moduleSize / 2;
+                    gradient = await this.getColorFromCanvas(this.canvasQR, (8 + i) * moduleSize + radius, 6 * moduleSize + radius);
                     this.drawCircle((8 + i) * moduleSize + radius, 6 * moduleSize + radius, context, gradient, radius, radius, false);
+                    gradient = await this.getColorFromCanvas(this.canvasQR, 6 * moduleSize + radius, (8 + i) * moduleSize + radius);
                     this.drawCircle(6 * moduleSize + radius, (8 + i) * moduleSize + radius, context, gradient, radius, radius, false);
                     break;
                 case DataPattern.KITE:
+                    gradient = await this.getColorFromCanvas(this.canvasQR, (8 + i) * moduleSize, 6 * moduleSize);
                     this.drawKite((8 + i) * moduleSize, 6 * moduleSize, context, gradient, moduleSize, moduleSize, false);
+                    gradient = await this.getColorFromCanvas(this.canvasQR, 6 * moduleSize, (8 + i) * moduleSize);
                     this.drawKite(6 * moduleSize, (8 + i) * moduleSize, context, gradient, moduleSize, moduleSize, false);
                     break;
                 case DataPattern.LEFT_DIAMOND:
+                    gradient = await this.getColorFromCanvas(this.canvasQR, (8 + i) * moduleSize, 6 * moduleSize);
                     this.drawDiamond((8 + i) * moduleSize, 6 * moduleSize, context, gradient, moduleSize, moduleSize, false);
+                    gradient = await this.getColorFromCanvas(this.canvasQR, 6 * moduleSize, (8 + i) * moduleSize);
                     this.drawDiamond(6 * moduleSize, (8 + i) * moduleSize, context, gradient, moduleSize, moduleSize, false);
                     break;
                 case DataPattern.RIGHT_DIAMOND:
+                    gradient = await this.getColorFromCanvas(this.canvasQR, (8 + i) * moduleSize, 6 * moduleSize);
                     this.drawDiamond((8 + i) * moduleSize, 6 * moduleSize, context, gradient, moduleSize, moduleSize, true);
+                    gradient = await this.getColorFromCanvas(this.canvasQR, 6 * moduleSize, (8 + i) * moduleSize);
                     this.drawDiamond(6 * moduleSize, (8 + i) * moduleSize, context, gradient, moduleSize, moduleSize, true);
                     break;
                 default:
+                    gradient = await this.getColorFromCanvas(this.canvasQR, (8 + i) * moduleSize, 6 * moduleSize);
                     this.drawSquare((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, false, gradient);
+                    gradient = await this.getColorFromCanvas(this.canvasQR, 6 * moduleSize, (8 + i) * moduleSize);
                     this.drawSquare(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize, false, gradient);
 
             }
@@ -455,16 +523,16 @@ export class SVGDrawing {
                 if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-                    this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
+                    await this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 } else {
-                    this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
+                    await this.drawAlign(context, agnX, agnY, moduleSize, moduleSize, dataPattern);
                 }
             }
         }
     }
 
 
-    private drawAlign(context: object, centerX: number, centerY: number, nWidth: number, nHeight: number, shape: DataPattern) {
+    private async drawAlign(context: object, centerX: number, centerY: number, nWidth: number, nHeight: number, shape: DataPattern) {
         let drawShape;
         let boolFlag: boolean = false;
         drawShape = this.drawSquare.bind(this);
@@ -495,13 +563,15 @@ export class SVGDrawing {
         let y = shape === DataPattern.CIRCLE ? (centerY - 2) * nHeight + nHeight / 2 : (centerY - 2) * nHeight;
         const height = shape === DataPattern.CIRCLE ? nHeight / 2 : nHeight;
         const width = shape === DataPattern.CIRCLE ? nWidth / 2 : nWidth;
+        let gr = await (this.getColorFromCanvas(this.canvasQR, x, y));
+
         for (let i = 0; i < 4; i++) {
             if (shape === DataPattern.SQUARE) {
                 // @ts-ignore
-                drawShape(x, y, context, width, height, boolFlag, this.config.colorDark);
+                drawShape(x, y, context, width, height, boolFlag, gr);
             } else {
                 // @ts-ignore
-                drawShape(x, y, context, this.config.colorDark, width, height, boolFlag);
+                drawShape(x, y, context, gr, width, height, boolFlag);
             }
 
             y += nHeight;
@@ -509,13 +579,16 @@ export class SVGDrawing {
 
         x = shape === DataPattern.CIRCLE ? (centerX + 2) * nWidth + nWidth / 2 : (centerX + 2) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY - 2 + 1) * nHeight + nHeight / 2 : (centerY - 2 + 1) * nHeight;
+
+       gr = await (this.getColorFromCanvas(this.canvasQR, x, y));
+
         for (let i = 0; i < 4; i++) {
             if (shape === DataPattern.SQUARE) {
                 // @ts-ignore
-                drawShape(x, y, context, width, height, boolFlag, this.config.colorDark);
+                drawShape(x, y, context, width, height, boolFlag, gr);
             } else {
                 // @ts-ignore
-                drawShape(x, y, context, this.config.colorDark, width, height, boolFlag);
+                drawShape(x, y, context, gr, width, height, boolFlag);
             }
 
             y += nHeight;
@@ -523,132 +596,215 @@ export class SVGDrawing {
 
         x = shape === DataPattern.CIRCLE ? (centerX - 2 + 1) * nWidth + nWidth / 2 : (centerX - 2 + 1) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY - 2) * nHeight + nHeight / 2 : (centerY - 2) * nHeight;
+
+        gr = await (this.getColorFromCanvas(this.canvasQR, x, y));
+
         for (let i = 0; i < 4; i++) {
             if (shape === DataPattern.SQUARE) {
                 // @ts-ignore
-                drawShape(x, y, context, width, height, boolFlag, this.config.colorDark);
+                drawShape(x, y, context, width, height, boolFlag, gr);
             } else {
                 // @ts-ignore
-                drawShape(x, y, context, this.config.colorDark, width, height, boolFlag);
+                drawShape(x, y, context, gr, width, height, boolFlag);
             }
             x += nWidth;
         }
 
         x = shape === DataPattern.CIRCLE ? (centerX - 2) * nWidth + nWidth / 2 : (centerX - 2) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY + 2) * nHeight + nHeight / 2 : (centerY + 2) * nHeight;
+
+        gr = await (this.getColorFromCanvas(this.canvasQR, x, y));
+
         for (let i = 0; i < 4; i++) {
             if (shape === DataPattern.SQUARE) {
                 // @ts-ignore
-                drawShape(x, y, context, width, height, boolFlag, this.config.colorDark);
+                drawShape(x, y, context, width, height, boolFlag, gr);
             } else {
                 // @ts-ignore
-                drawShape(x, y, context, this.config.colorDark, width, height, boolFlag);
+                drawShape(x, y, context, gr, width, height, boolFlag);
             }
             x += nWidth;
         }
 
         x = shape === DataPattern.CIRCLE ? centerX * nWidth + nWidth / 2 : centerX * nWidth;
         y = shape === DataPattern.CIRCLE ? centerY * nHeight + nHeight / 2 : centerY * nHeight;
+
+        gr = await (this.getColorFromCanvas(this.canvasQR, x, y));
+
         if (shape === DataPattern.SQUARE) {
             // @ts-ignore
-            drawShape(x, y, context, width, height, boolFlag, this.config.colorDark);
+            drawShape(x, y, context, width, height, boolFlag, gr);
         } else {
             // @ts-ignore
-            drawShape(x, y, context, this.config.colorDark, width, height, boolFlag);
+            drawShape(x, y, context, gr, width, height, boolFlag);
         }
     }
 
-    private drawEyeFrames(context: object, shape: EyeFrameShape, color: string) {
+    private async drawEyeFrames(context: object, shape: EyeFrameShape, color: string) {
         const moduleSize = this.config.moduleSize;
         const moduleCount = this.moduleCount;
 
         switch (shape) {
             case EyeFrameShape.SQUARE:
-                this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
-                this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
-                this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false, color);
                 break;
             case EyeFrameShape.ROUNDED:
-                this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, true, color);
-                this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, true, color);
-                this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, true, color);
+                await this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, true, color);
+                await this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, true, color);
+                await this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, true, color);
                 break;
             case EyeFrameShape.CIRCLE:
-                this.drawCircularFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
-                this.drawCircularFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
-                this.drawCircularFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawCircularFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawCircularFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawCircularFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false, color);
                 break;
             case EyeFrameShape.LEFT_LEAF:
-                this.drawLeafFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
-                this.drawLeafFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
-                this.drawLeafFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawLeafFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawLeafFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawLeafFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false, color);
                 break;
             case EyeFrameShape.RIGHT_LEAF:
-                this.drawLeafFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, true, color);
-                this.drawLeafFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, true, color);
-                this.drawLeafFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, true, color);
+                await this.drawLeafFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, true, color);
+                await this.drawLeafFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, true, color);
+                await this.drawLeafFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, true, color);
                 break;
             default:
-                this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
-                this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
-                this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false, color);
+                await this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false, color);
                 break;
         }
 
     }
 
-    private drawEyeBalls(context: object, shape: EyeBallShape, color: string) {
+    private async drawEyeBalls(context: object, shape: EyeBallShape) {
         const moduleSize = this.config.moduleSize;
         const moduleCount = this.moduleCount;
+
+        let color = this.config.eyeBallColor ? this.config.eyeBallColor : this.config.colorDark ? this.config.colorDark : '#000';
 
         switch (shape) {
             case EyeBallShape.CIRCLE:
                 const radius1 = 3 * moduleSize / 2;
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, 2 * moduleSize, 2 * radius1, 2 * radius1);
+                }
                 this.drawCircle(2 * moduleSize + radius1, 2 * moduleSize + radius1, context, color, radius1);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, (moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, 2 * radius1, 2 * radius1);
+                }
                 this.drawCircle((moduleCount - 7 + 2) * moduleSize + radius1, 2 * moduleSize + radius1, context, color, radius1);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, 2 * radius1, 2 * radius1);
+                }
                 this.drawCircle(2 * moduleSize + radius1, (moduleCount - 7 + 2) * moduleSize + radius1, context, color, radius1);
                 break;
             case EyeBallShape.ROUNDED:
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawSquare(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true, color);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, (moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawSquare((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true, color);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawSquare(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, true, color);
                 break;
             case EyeBallShape.SQUARE:
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawSquare(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false, color);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, (moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawSquare((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false, color);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawSquare(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false, color);
                 break;
             case EyeBallShape.LEFT_DIAMOND:
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, (moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
                 break;
             case EyeBallShape.RIGHT_DIAMOND:
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, (moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
                 break;
             case EyeBallShape.LEFT_LEAF:
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
-                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
-                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
                 const radius2 = 3 * moduleSize / 2;
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawCircle(2 * moduleSize + radius2, 2 * moduleSize + radius2, context, color, radius2);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, (moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
+                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawCircle((moduleCount - 7 + 2) * moduleSize + radius2, 2 * moduleSize + radius2, context, color, radius2);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
+                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, false);
                 this.drawCircle(2 * moduleSize + radius2, (moduleCount - 7 + 2) * moduleSize + radius2, context, color, radius2);
                 break;
             case EyeBallShape.RIGHT_LEAF:
-                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
-                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
-                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
                 const radius3 = 3 * moduleSize / 2;
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
+                this.drawDiamond(2 * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
                 this.drawCircle(2 * moduleSize + radius3, 2 * moduleSize + radius3, context, color, radius3);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, (moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
+                this.drawDiamond((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
                 this.drawCircle((moduleCount - 7 + 2) * moduleSize + radius3, 2 * moduleSize + radius3, context, color, radius3);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
+                this.drawDiamond(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, color, 3 * moduleSize, 3 * moduleSize, true);
                 this.drawCircle(2 * moduleSize + radius3, (moduleCount - 7 + 2) * moduleSize + radius3, context, color, radius3);
                 break;
             default:
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawSquare(2 * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false, color);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, (moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawSquare((moduleCount - 7 + 2) * moduleSize, 2 * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false, color);
+                if (!this.config.eyeBallColor && this.config.gradientType && this.config.gradientType !== GradientType.NONE) {
+                    color = await this.getGradientFromCanvas(context, 2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, 3 * moduleSize, 3 * moduleSize);
+                }
                 this.drawSquare(2 * moduleSize, (moduleCount - 7 + 2) * moduleSize, context, 3 * moduleSize, 3 * moduleSize, false, color);
                 break;
         }
@@ -706,84 +862,80 @@ export class SVGDrawing {
         polygon.fill(gradient);
     }
 
-    private drawLeafFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRight: boolean, gradient: string) {
+    private async drawLeafFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRight: boolean, gradient: string) {
         const moduleSize = this.config.moduleSize;
         const r = startX + width;
         const b = startY + height;
-
-        height = height - moduleSize;
-        width = width - moduleSize;
         const radius = moduleSize * 2;
 
-        if (isRight) {
-            // @ts-ignore
-            canvas.path(`M0 0 L${width - radius / 2} 0 L${width - radius / 2} ${height - radius / 2} A${radius} ${radius} 0 0 1 ${width - radius} ${height}
-                            L${- radius / 2} ${height}
-                            L${- radius / 2} ${radius / 2} A${radius} ${radius} 0 0 1 0 0`).fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize });
+        gradient = this.config.eyeFrameColor ? this.config.eyeFrameColor : await this.getGradientFromCanvas(canvas, startX, startY, width,height);
+
+        if (!isRight) {
+            this.drawDiamond(startX, startY, canvas, gradient, width, height, false);
+            await this.drawCircularFrame(startX, startY, canvas, width, height, false, gradient);
+            this.drawDiamond(startX + moduleSize, startY + moduleSize, canvas, this.config.backgroundColor ? this.config.backgroundColor : '#ffffff', width - moduleSize * 2, height - moduleSize * 2, false);
         } else {
-            // @ts-ignore
-            canvas.path(`M0 0 L${width - radius} 0 A${radius} ${radius} 0 0 1 ${width - radius / 2} ${radius}
-                            L${width - radius / 2} ${height} L${width - radius / 2} ${height + moduleSize / 8}
-                            L0 ${height} A${radius} ${radius} 0 0 1 ${- radius / 2} ${height - radius / 2}
-                            L${- radius / 2} 0 z`).fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize });
+            this.drawDiamond(startX, startY, canvas, gradient, width, height, true);
+            await this.drawCircularFrame(startX, startY, canvas, width, height, false, gradient);
+            this.drawDiamond(startX + moduleSize, startY + moduleSize, canvas, this.config.backgroundColor ? this.config.backgroundColor : '#ffffff', width - moduleSize * 2, height - moduleSize * 2, true);
         }
 
     }
 
-    private drawCircularFrame(startX: number, startY: number, canvas: object, width: number, height: number, isLarge: boolean, gradient: string) {
+    private async drawCircularFrame(startX: number, startY: number, canvas: object, width: number, height: number, isLarge: boolean, gradient: string) {
         const moduleSize = this.config.moduleSize;
 
-
-        height = height - moduleSize;
-        width = width - moduleSize;
-
-        const radius = height / 2;
+        gradient = this.config.eyeFrameColor ? this.config.eyeFrameColor : await this.getGradientFromCanvas(canvas, startX, startY, width,height);
 
         // @ts-ignore
-        canvas.path(`M0 0 A${radius} ${radius} 0 0 1 0 ${height} A${radius} ${radius} 0 0 1 0 0`).fill('none')
-            .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-            .stroke({ color: gradient, width: this.config.moduleSize, linecap: 'round', linejoin: 'round' });
+        canvas.circle().radius(width / 2).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+        // @ts-ignore
+        canvas.circle().radius(width / 2 - moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff').move(startX + this.config.margin + moduleSize + this.shiftX, startY + this.config.margin + moduleSize + this.shiftY);
     }
 
-    private drawSquareEyeFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string) {
+    private async getGradientFromCanvas(canvas: object, startX: number, startY: number, width: number, height: number) {
+        let gradient = this.config.colorDark ? this.config.colorDark : '#000';
+        if (this.config.gradientType === GradientType.HORIZONTAL || this.config.gradientType === GradientType.LINEAR) {
+            const col1 = await this.getColorFromCanvas(this.canvasQR, startX, startY);
+            const col2 = await this.getColorFromCanvas(this.canvasQR, startX + width, startY);
+            // @ts-ignore
+            gradient = canvas.gradient('linear', (add) => {
+                add.stop(0, col1)
+                add.stop(1, col2)
+            });
+        } else if (this.config.gradientType === GradientType.VERTICAL) {
+            const col1 = await this.getColorFromCanvas(this.canvasQR, startX, startY);
+            const col2 = await this.getColorFromCanvas(this.canvasQR, startX, startY + height);
+            // @ts-ignore
+            gradient = canvas.gradient('linear', (add) => {
+                add.stop(0, col1)
+                add.stop(1, col2)
+            }).from(0, 0).to(0, 1);
+        } else if (this.config.gradientType === GradientType.RADIAL) {
+
+        }
+
+        return gradient;
+    }
+
+    private async drawSquareEyeFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string) {
         const moduleSize = this.config.moduleSize;
-        // const radius = height / 4;
-
-        height = height - moduleSize;
-        width = width - moduleSize;
-
         const radius = height / 4;
+
+        gradient = this.config.eyeFrameColor ? this.config.eyeFrameColor : await this.getGradientFromCanvas(canvas, startX, startY, width,height);
 
         if (isRound) {
             // @ts-ignore
-            canvas.path(`M0 0 L${width - radius} 0 A${radius} ${radius} 0 0 1 ${width - radius / 2} ${radius}
-                            L${width - radius / 2} ${height - radius / 2} A${radius} ${radius} 0 0 1 ${width - radius} ${height}
-                            L0 ${height} A${radius} ${radius} 0 0 1 ${- radius / 2} ${height - radius / 2}
-                            L${- radius / 2} ${radius / 2} A${radius} ${radius} 0 0 1 0 0`).fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize / 1.5, linecap: 'round', linejoin: 'round' });
+            canvas.rect(height, width).radius(radius).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            // @ts-ignore
+            canvas.rect(height - 1.5 * moduleSize, width - 1.5 * moduleSize).radius(radius).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize * 0.75 + this.config.margin + this.shiftX, startY + moduleSize * 0.75 + this.config.margin + this.shiftY);
         } else {
             // @ts-ignore
-            canvas.path(`M0 0 L${width} 0 L${width} ${height} L0 ${height} z`).fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize});
+            canvas.rect(height, width).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            // @ts-ignore
+            canvas.rect(height - 2 * moduleSize, width - 2 * moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize + this.config.margin + this.shiftX, startY + moduleSize + this.config.margin + this.shiftY);
         }
 
-    }
-
-    private get canvasType(): 'svg' | 'pdf' | undefined {
-        switch (this.config.canvasType) {
-            case CanvasType.SVG:
-                return CanvasType.SVG;
-            case CanvasType.PDF:
-                return CanvasType.PDF;
-            default:
-                return;
-        }
     }
 
     private async drawSquareFrame(startX: number, startY: number, canvas: object, gradient: string | undefined, width: number, height: number) {
@@ -828,7 +980,7 @@ export class SVGDrawing {
                 bannerX = moduleSize / 2;
                 bannerY = size + moduleSize / 2 - 1;
                 textX = size / 3;
-                textY = size + 1 * moduleSize + size / 10;
+                textY = size + 1.5 * moduleSize + size / 10;
                 logoX = size / 3 - size / 9;
                 logoY = size + moduleSize * 1.5;
                 break;
@@ -838,7 +990,7 @@ export class SVGDrawing {
                 bannerX = moduleSize / 2;
                 bannerY = moduleSize / 2;
                 textX = size / 3;
-                textY = 1.5 * moduleSize + size / 10;
+                textY = 2 * moduleSize + size / 10;
                 logoX = size / 3 - size / 9;
                 logoY = moduleSize * 2;
                 break;
@@ -848,7 +1000,7 @@ export class SVGDrawing {
                 bannerX = moduleSize / 2;
                 bannerY = size + moduleSize * 1.5;
                 textX = size / 3;
-                textY = size + moduleSize * 2.5 + size / 10;
+                textY = size + moduleSize * 3 + size / 10;
                 logoX = size / 3 - size / 9;
                 logoY = size + moduleSize * 3;
                 break;
@@ -858,7 +1010,7 @@ export class SVGDrawing {
                 bannerX = moduleSize / 2;
                 bannerY = moduleSize / 2;
                 textX = size / 3;
-                textY = 1.5 * moduleSize + size / 10;
+                textY = 2 * moduleSize + size / 10;
                 logoX = size / 3 - size / 9;
                 logoY = moduleSize * 2;
                 break;
@@ -868,7 +1020,7 @@ export class SVGDrawing {
                 bannerX = moduleSize / 2;
                 bannerY = size + moduleSize * 2.5;
                 textX = size / 3;
-                textY = size + 3.5 * moduleSize + size / 10;
+                textY = size + 4 * moduleSize + size / 10;
                 logoX = size / 3 - size / 9;
                 logoY = size + moduleSize * 4;
 
@@ -884,7 +1036,7 @@ export class SVGDrawing {
                 bannerX = moduleSize / 2;
                 bannerY = moduleSize / 2;
                 textX = size / 3;
-                textY = this.config.isVCard ? moduleSize * 2.5 + size / 10 : moduleSize * 1.5 + size / 10;
+                textY = this.config.isVCard ? moduleSize * 3 + size / 10 : moduleSize * 2 + size / 10;
                 logoX = size / 3 - size / 9;
                 logoY = this.config.isVCard ? moduleSize * 3 : moduleSize * 2;
                 break;
@@ -937,7 +1089,7 @@ export class SVGDrawing {
         // canvas.fontface('Roboto', `url(https://beaconstacqa.mobstac.com/static/fonts/Roboto-Regular.ttf)`);
         // @ts-ignore
         canvas.plain(text).move(textX, textY)
-            .font({ fill: '#fff', family: 'Roboto', size: size / 10, leading: 0 });
+            .font({ fill: '#fff', family: 'Roboto', size: size / 10, leading: 0 }).attr({y: textY});
 
         return loadImage('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg').then(image => {
 
@@ -960,29 +1112,6 @@ export class SVGDrawing {
         });
     }
 
-}
-
-function getRGB(color1: any, color2: any, percent: any) {
-    const resultRed = color1.red + percent * (color2.red - color1.red);
-    const resultGreen = color1.green + percent * (color2.green - color1.green);
-    const resultBlue = color1.blue + percent * (color2.blue - color1.blue);
-    return `${resultRed},${resultGreen},${resultBlue}`;
-}
-
-function rgbToHex(rgb: any): string {
-    if (!rgb) {
-        return '';
-    }
-    const rgbArray = rgb.split(',').map((val: any) => {
-        return parseInt(val);
-    });
-    const r = rgbArray[0], g = rgbArray[1], b = rgbArray[2];
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-}
-
-function componentToHex(c: any) {
-    const hex = c.toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
 }
 
 
