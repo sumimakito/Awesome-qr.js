@@ -871,13 +871,20 @@ export class SVGDrawing {
         gradient = this.config.eyeFrameColor ? this.config.eyeFrameColor : await this.getGradientFromCanvas(canvas, startX, startY, width,height);
 
         if (!isRight) {
-            this.drawDiamond(startX, startY, canvas, gradient, width, height, false);
-            await this.drawCircularFrame(startX, startY, canvas, width, height, false, gradient);
-            this.drawDiamond(startX + moduleSize, startY + moduleSize, canvas, this.config.backgroundColor ? this.config.backgroundColor : '#ffffff', width - moduleSize * 2, height - moduleSize * 2, false);
+            // @ts-ignore
+            canvas.path(`M0 0 L${width - radius / 2} 0 L${width - radius / 2} ${height - radius / 2} A${radius} ${radius} 0 0 1 ${width - radius} ${height}
+                            L${- radius / 2} ${height}
+                            L${- radius / 2} ${radius / 2} A${radius} ${radius} 0 0 1 0 0`).fill('none')
+                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
+                .stroke({ color: gradient, width: this.config.moduleSize });
         } else {
-            this.drawDiamond(startX, startY, canvas, gradient, width, height, true);
-            await this.drawCircularFrame(startX, startY, canvas, width, height, false, gradient);
-            this.drawDiamond(startX + moduleSize, startY + moduleSize, canvas, this.config.backgroundColor ? this.config.backgroundColor : '#ffffff', width - moduleSize * 2, height - moduleSize * 2, true);
+            // @ts-ignore
+            canvas.path(`M0 0 L${width - radius} 0 A${radius} ${radius} 0 0 1 ${width - radius / 2} ${radius}
+                            L${width - radius / 2} ${height} L${width - radius / 2} ${height + moduleSize / 8}
+                            L0 ${height} A${radius} ${radius} 0 0 1 ${- radius / 2} ${height - radius / 2}
+                            L${- radius / 2} 0 z`).fill('none')
+                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
+                .stroke({ color: gradient, width: this.config.moduleSize });
         }
 
     }
@@ -887,10 +894,16 @@ export class SVGDrawing {
 
         gradient = this.config.eyeFrameColor ? this.config.eyeFrameColor : await this.getGradientFromCanvas(canvas, startX, startY, width,height);
 
+
+        height = height - moduleSize;
+        width = width - moduleSize;
+
+        const radius = height / 2;
+
         // @ts-ignore
-        canvas.circle().radius(width / 2).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
-        // @ts-ignore
-        canvas.circle().radius(width / 2 - moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff').move(startX + this.config.margin + moduleSize + this.shiftX, startY + this.config.margin + moduleSize + this.shiftY);
+        canvas.path(`M0 0 A${radius} ${radius} 0 0 1 0 ${height} A${radius} ${radius} 0 0 1 0 0`).fill('none')
+            .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
+            .stroke({ color: gradient, width: this.config.moduleSize, linecap: 'round', linejoin: 'round' });
     }
 
     private async getGradientFromCanvas(canvas: object, startX: number, startY: number, width: number, height: number) {
@@ -920,20 +933,28 @@ export class SVGDrawing {
 
     private async drawSquareEyeFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string) {
         const moduleSize = this.config.moduleSize;
-        const radius = height / 4;
+        // const radius = height / 4;
 
         gradient = this.config.eyeFrameColor ? this.config.eyeFrameColor : await this.getGradientFromCanvas(canvas, startX, startY, width,height);
 
+        height = height - moduleSize;
+        width = width - moduleSize;
+
+        const radius = height / 4;
+
         if (isRound) {
             // @ts-ignore
-            canvas.rect(height, width).radius(radius).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
-            // @ts-ignore
-            canvas.rect(height - 1.5 * moduleSize, width - 1.5 * moduleSize).radius(radius).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize * 0.75 + this.config.margin + this.shiftX, startY + moduleSize * 0.75 + this.config.margin + this.shiftY);
+            canvas.path(`M0 0 L${width - radius} 0 A${radius} ${radius} 0 0 1 ${width - radius / 2} ${radius}
+                            L${width - radius / 2} ${height - radius / 2} A${radius} ${radius} 0 0 1 ${width - radius} ${height}
+                            L0 ${height} A${radius} ${radius} 0 0 1 ${- radius / 2} ${height - radius / 2}
+                            L${- radius / 2} ${radius / 2} A${radius} ${radius} 0 0 1 0 0`).fill('none')
+                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
+                .stroke({ color: gradient, width: this.config.moduleSize / 1.5, linecap: 'round', linejoin: 'round' });
         } else {
             // @ts-ignore
-            canvas.rect(height, width).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
-            // @ts-ignore
-            canvas.rect(height - 2 * moduleSize, width - 2 * moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize + this.config.margin + this.shiftX, startY + moduleSize + this.config.margin + this.shiftY);
+            canvas.path(`M0 0 L${width} 0 L${width} ${height} L0 ${height} z`).fill('none')
+                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
+                .stroke({ color: gradient, width: this.config.moduleSize});
         }
 
     }
