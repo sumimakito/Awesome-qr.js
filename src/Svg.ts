@@ -264,8 +264,6 @@ export class SVGDrawing {
         const coordinate = 0.5 * (this.config.size - logoSize);
         const centreCoordinate = coordinate - logoMargin - mainMargin;
 
-        const color = '#ffffff99';
-
         return loadImage(this.config.logoImage!, this.config.imageServerURL, this.config.imageServerRequestHeaders).then((image: any) => {
 
             // const cn = createCanvas(image.naturalHeight, image.naturalWidth);
@@ -280,6 +278,7 @@ export class SVGDrawing {
 
             // @ts-ignore
             context.rect(logoSize + logoMargin, logoSize + logoMargin).fill('#ffffff').move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
+
             // @ts-ignore
             context.image('').size(logoSize, logoSize)
                 .attr({ 'xlink:href': cn.toDataURL() })
@@ -294,7 +293,7 @@ export class SVGDrawing {
             context.rect(size, size).fill(color).move(this.shiftX, this.shiftY).radius(this.config.moduleSize);
             return;
         }
-
+        this.config.backgroundColor = '';
         return this.addBackgroundImage(context, size, backgroundImage!);
     }
 
@@ -321,15 +320,26 @@ export class SVGDrawing {
         const viewportSize = this.config.viewportSize;
 
         if (this.config.whiteMargin) {
-            const color = '#ffffff99';
-            // @ts-ignore
-            context.rect(size, margin).fill(color).move(-margin + this.shiftX, -margin + this.shiftY);
-            // @ts-ignore
-            context.rect(size, margin).fill(color).move(-margin + this.shiftX, viewportSize + this.shiftY);
-            // @ts-ignore
-            context.rect(margin, size).fill(color).move(viewportSize + this.shiftX, -margin + this.shiftY);
-            // @ts-ignore
-            context.rect(margin, size).fill(color).move(-margin + this.shiftX, -margin + this.shiftY);
+            const color = this.config.useOpacity ? '#ffffff' : '#ffffff99';
+            if (this.config.useOpacity) {
+                // @ts-ignore
+                context.rect(size, margin).fill(color).move(-margin + this.shiftX, -margin + this.shiftY);
+                // @ts-ignore
+                context.rect(size, margin).fill(color).move(-margin + this.shiftX, viewportSize + this.shiftY);
+                // @ts-ignore
+                context.rect(margin, size).fill(color).move(viewportSize + this.shiftX, -margin + this.shiftY);
+                // @ts-ignore
+                context.rect(margin, size).fill(color).move(-margin + this.shiftX, -margin + this.shiftY);
+            } else {
+                // @ts-ignore
+                context.rect(size, margin).fill(color).move(-margin + this.shiftX, -margin + this.shiftY).attr({opacity: 0.6});
+                // @ts-ignore
+                context.rect(size, margin).fill(color).move(-margin + this.shiftX, viewportSize + this.shiftY).attr({opacity: 0.6});
+                // @ts-ignore
+                context.rect(margin, size).fill(color).move(viewportSize + this.shiftX, -margin + this.shiftY).attr({opacity: 0.6});
+                // @ts-ignore
+                context.rect(margin, size).fill(color).move(-margin + this.shiftX, -margin + this.shiftY).attr({opacity: 0.6});
+            }
         }
     }
 
@@ -393,7 +403,7 @@ export class SVGDrawing {
         const gradient = await (this.getColorFromCanvas(this.canvasQR, x, y));
 
         if (!this.maskCanvas) {
-            const color = bIsDark ? gradient : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
+            const color = bIsDark ? gradient : this.config.backgroundColor ? this.config.backgroundColor : this.config.useOpacity ? '#ffffff' : '#ffffff99';
 
             switch (shape) {
                 case DataPattern.CIRCLE:
@@ -416,8 +426,7 @@ export class SVGDrawing {
         } else {
             // TODO: mask canvas
             // canvas.drawImage(this.maskCanvas, x, y, w, h, x, y, w, h);
-            const color = bIsDark ? gradient : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
-            ;
+            const color = bIsDark ? gradient : this.config.backgroundColor ? this.config.backgroundColor : this.config.useOpacity ? '#ffffff' : '#ffffff99';
             this.drawSquare(x, y, canvas, w, h, false, color, !bIsDark);
         }
     }
@@ -426,7 +435,7 @@ export class SVGDrawing {
         const patternPosition = this.patternPosition;
         const moduleSize = this.config.moduleSize;
         const margin = this.config.margin;
-        const color = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
+        const color = this.config.backgroundColor ? this.config.backgroundColor : this.config.useOpacity ? '#ffffff' : '#ffffff99';
         const edgeCenter = patternPosition[patternPosition.length - 1];
         for (let i = 0; i < patternPosition.length; i++) {
             for (let j = 0; j < patternPosition.length; j++) {
@@ -435,29 +444,42 @@ export class SVGDrawing {
                 if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin, color, this.shiftX, this.shiftY);
+                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin, color, this.shiftX, this.shiftY, this.config.useOpacity);
                 } else {
-                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin, color, this.shiftX, this.shiftY);
+                    CanvasUtil.drawSVGAlignProtector(context, agnX, agnY, moduleSize, moduleSize, margin, color, this.shiftX, this.shiftY, this.config.useOpacity);
                 }
             }
         }
     }
 
     private drawPositionProtectors(context: object) {
-        const color = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff99';
+        const color = this.config.backgroundColor ? this.config.backgroundColor : this.config.useOpacity ? '#ffffff' : '#ffffff99';
         const size = this.config.moduleSize;
         const moduleCount = this.moduleCount;
 
-        // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
-        // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY);
-        // @ts-ignore
-        context.rect(8 * size, 8 * size).fill(color).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
-        // @ts-ignore
-        context.rect((moduleCount - 8 - 8) * size, size).fill(color).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY);
-        // @ts-ignore
-        context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY);
+        if (this.config.useOpacity) {
+            // @ts-ignore
+            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY).attr({opacity: 0.6});
+            // @ts-ignore
+            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY).attr({opacity: 0.6});
+            // @ts-ignore
+            context.rect(8 * size, 8 * size).fill(color).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY).attr({opacity: 0.6});
+            // @ts-ignore
+            context.rect((moduleCount - 8 - 8) * size, size).fill(color).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY).attr({opacity: 0.6});
+            // @ts-ignore
+            context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY).attr({opacity: 0.6});
+        } else {
+            // @ts-ignore
+            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
+            // @ts-ignore
+            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY);
+            // @ts-ignore
+            context.rect(8 * size, 8 * size).fill(color).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
+            // @ts-ignore
+            context.rect((moduleCount - 8 - 8) * size, size).fill(color).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY);
+            // @ts-ignore
+            context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY);
+        }
     }
 
     private async drawPositionPatterns(context: object, gradient: string) {
@@ -812,36 +834,54 @@ export class SVGDrawing {
     }
 
     private drawSquare(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string, isMask?: boolean) {
-        const opacity = isMask ? 0.6 : 1;
+        const op = isMask ? 0.6 : 1;
         if (isRound) {
-            // @ts-ignore
-            canvas.rect(height, width).radius(height / 4).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            if (this.config.useOpacity) {
+                // @ts-ignore
+                canvas.rect(height, width).radius(height / 4).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).attr({opacity: op});
+            } else {
+                // @ts-ignore
+                canvas.rect(height, width).radius(height / 4).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            }
             return;
         }
-        // @ts-ignore
-        canvas.rect(height, width).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+        if (this.config.useOpacity) {
+            // @ts-ignore
+            canvas.rect(height, width).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).attr({opacity: op});
+        } else {
+            // @ts-ignore
+            canvas.rect(height, width).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+        }
     }
 
     private drawCircle(centerX: number, centerY: number, canvas: object, gradient: string, radiusX: number, radiusY?: number, isMask?: boolean) {
-        const opacity = isMask ? 0.6 : 1;
-        // @ts-ignore
-        canvas.circle().radius(radiusX).fill(gradient).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY);
+        const op = isMask ? 0.6 : 1;
+        if (this.config.useOpacity) {
+            // @ts-ignore
+            canvas.circle().radius(radiusX).fill(gradient).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY).attr({opacity: op});
+        } else {
+            // @ts-ignore
+            canvas.circle().radius(radiusX).fill(gradient).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY);
+        }
     }
 
     private drawKite(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRound?: boolean, isMask?: boolean) {
-        const opacity = isMask ? 0.6 : 1;
+        const op = isMask ? 0.6 : 1;
         const coordinates = [[startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
             [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
             [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
             [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY]];
         // @ts-ignore
         const polygon = context.polygon(coordinates);
-        polygon.fill(gradient);
+        if (this.config.useOpacity) {
+            polygon.fill(gradient).attr({opacity: op});
+        } else {
+            polygon.fill(gradient);
+        }
     }
 
     private drawDiamond(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRight?: boolean, isMask?: boolean) {
-        const opacity = isMask ? 0.6 : 1;
-        // const c1 = [[0,0], [100,50], [50,100]]
+        const op = isMask ? 0.6 : 1;
         const coordinates = isRight ? [
             [startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
             [startX + width + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
@@ -859,7 +899,11 @@ export class SVGDrawing {
         ];
         // @ts-ignore
         const polygon = context.polygon(coordinates);
-        polygon.fill(gradient);
+        if (this.config.useOpacity) {
+            polygon.fill(gradient).attr({opacity: op});
+        } else {
+            polygon.fill(gradient);
+        }
     }
 
     private async drawLeafFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRight: boolean, gradient: string) {

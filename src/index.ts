@@ -29,7 +29,8 @@ export class QRCodeBuilder {
             text: '',
             maskedDots: false,
             isVCard: false,
-            useCanvas: false
+            useCanvas: false,
+            useOpacity: true
         };
         this.config = Object.assign({}, defaultConfig, config);
     }
@@ -176,6 +177,11 @@ export class QRCodeBuilder {
 
     public setUseCanvas(useCanvas: boolean) {
         this.config.useCanvas = useCanvas;
+        return this;
+    }
+
+    public setUseOpacity(useOpacity: boolean) {
+        this.config.useOpacity = useOpacity;
         return this;
     }
 
