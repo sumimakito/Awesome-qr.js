@@ -184,6 +184,9 @@ export class QRCodeBuilder {
         if (!this.config.text) {
             return Promise.reject('Setting text is necessary to generate the QRCode');
         }
+        if (this.config.frameText && this.config.frameText.length > 12) {
+            return Promise.reject('Frame text length exceeded');
+        }
         // Limit logo margin and size based on overall size
         if (this.config.logoMargin > 10) {
             this.config.logoMargin = 10;
