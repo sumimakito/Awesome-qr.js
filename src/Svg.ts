@@ -580,7 +580,7 @@ export class SVGDrawing {
         x = shape === DataPattern.CIRCLE ? (centerX + 2) * nWidth + nWidth / 2 : (centerX + 2) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY - 2 + 1) * nHeight + nHeight / 2 : (centerY - 2 + 1) * nHeight;
 
-       gr = await (this.getColorFromCanvas(this.canvasQR, x, y));
+        gr = await (this.getColorFromCanvas(this.canvasQR, x, y));
 
         for (let i = 0; i < 4; i++) {
             if (shape === DataPattern.SQUARE) {
@@ -978,7 +978,7 @@ export class SVGDrawing {
         const moduleSize = this.config.moduleSize;
         const rawSize = this.config.rawSize;
         const size = rawSize + moduleSize * 2;
-        const text = frameText ? frameText : 'SCAN ME';
+        const text = frameText ? frameText.toUpperCase() : 'SCAN ME';
 
         let borderX = 0, borderY = 0, bannerX = 0, bannerY = 0,
             textX = 0, textY = 0, logoX = 0, logoY = 0, cornerRadius = 0;
@@ -1108,9 +1108,27 @@ export class SVGDrawing {
             @import url('https://fonts.googleapis.com/css?family=Roboto:400');
     `);
         // canvas.fontface('Roboto', `url(https://beaconstacqa.mobstac.com/static/fonts/Roboto-Regular.ttf)`);
+        if (this.config.isVCard) {
+            // @ts-ignore
+            textX = canvas.width()/2 + 5.1 * moduleSize;
+            textY = textY + (moduleSize * 2.5)
+        } else {
+            // @ts-ignore
+            textX = canvas.width()/2 + 1.5 * moduleSize;
+        }
         // @ts-ignore
         canvas.plain(text).move(textX, textY)
-            .font({ fill: '#fff', family: 'Roboto', size: size / 10, leading: 0 }).attr({y: textY});
+            .font({ fill: '#fff', family: 'Roboto', size: this.config.size / 10, leading: 0, anchor: 'middle'}).attr({y: textY});
+
+        if (this.config.isVCard) {
+            // @ts-ignore
+            logoX = (canvas.width()/2 - canvas.node.childNodes[canvas.node.childNodes.length - 1].getComputedTextLength()/2) - (this.config.size/13);
+            logoY = logoY + (moduleSize * 3.2)
+        } else {
+            // @ts-ignore
+            logoX = (canvas.width()/2 - canvas.node.childNodes[canvas.node.childNodes.length - 1].getComputedTextLength()/2) - (this.config.size/12);
+            logoY = logoY + (moduleSize * 0.3)
+        }
 
         return loadImage('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg').then(image => {
 

@@ -606,7 +606,7 @@ export class Drawing {
         const moduleSize = this.config.moduleSize;
         const rawSize = this.config.rawSize;
         const size = rawSize + moduleSize * 2;
-        const text = frameText ? frameText : 'SCAN ME';
+        const text = frameText ? frameText.toUpperCase() : 'SCAN ME';
         let canvasWidth: number = size + moduleSize,
             canvasHeight: number = 1.265 * size,
             borderX: number = 0,
@@ -800,6 +800,7 @@ export class Drawing {
         const fontSize = this.config.size / 10;
         finalContext.font = `${fontSize}px "Roboto"`;
 
+        textX = finalCanvas.width/2 + 1.1 * moduleSize;
         if (this.config.isVCard) {
             textX = textX + moduleSize * 3;
             textY = textY + moduleSize;
@@ -807,10 +808,16 @@ export class Drawing {
             logoY = logoY + moduleSize * 2;
         }
 
-        finalContext.fillText(text, textX + 1.1 * moduleSize, textY);
+        finalContext.fillText(text, textX, textY);
         finalContext.drawImage(canvas, qrX, qrY, rawSize, rawSize);
         return loadImage('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg').then(image => {
 
+            if (this.config.isVCard) {
+                logoX = (finalCanvas.width/2 - finalContext.measureText(text).width/2) - (this.config.size/13);
+                logoY = logoY + (this.config.size * 0.01)
+            } else {
+                logoX = (finalCanvas.width/2 - finalContext.measureText(text).width/2) - (this.config.size/12);
+            }
             finalContext.drawImage(image, logoX, logoY, size / 10, size / 10);
             finalContext.fillStyle = frameColor ? frameColor : '#000000';
             if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
