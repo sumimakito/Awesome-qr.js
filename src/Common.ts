@@ -152,10 +152,9 @@ export const CanvasUtil = {
         margin: number,
         color: string,
         shiftX: number,
-        shiftY: number
+        shiftY: number,
+        useOpacity = true
     ) {
-        // context.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
-        // context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
         // @ts-ignore
         context.rect(5 * nWidth, 5 * nHeight).fill(color)
             .move((centerX - 2) * nWidth + margin + shiftX, (centerY - 2) * nHeight + margin + shiftY);
