@@ -169,8 +169,8 @@ export class QRCode {
     public moduleCount: number = 0;
     public dataCache?: any[];
     public dataList: QR8bitByte[] = [];
-    public drawing: Drawing;
-    public svgDrawing: SVGDrawing;
+    public drawing: any;
+    // public svgDrawing: SVGDrawing;
     // @ts-ignore
     public canvas: Canvas;
     public svg: any = '';
@@ -183,8 +183,11 @@ export class QRCode {
         this.errorCorrectLevel = config.correctLevel;
         this.addData(config.text);
         this.make();
-        this.drawing = new Drawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
-        this.svgDrawing = new SVGDrawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
+        if (this.config.canvasType !== CanvasType.SVG || this.config.useCanvas) {
+            this.drawing = new Drawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
+        } else {
+            this.drawing = new SVGDrawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
+        }
     }
 
     get patternPosition() {
