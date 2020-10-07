@@ -1,6 +1,6 @@
 {
     "name": "mobstac-awesome-qr",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "description": "MobStac Awesome QR code library",
     "homepage": "https://github.com/mobstac/mobstac-awesome-qr",
     "bugs": "https://github.com/mobstac/mobstac-awesome-qr/issues",
@@ -63,7 +63,9 @@
     "dependencies": {
         "@svgdotjs/svg.js": "^3.0.16",
         "@types/node": "11.13.0",
-        "canvas": "2.5.0",
+        "canvas": "2.5.0"
+    },
+    "peerDependencies": {
         "svgdom": "^0.1.8"
     }
 }
