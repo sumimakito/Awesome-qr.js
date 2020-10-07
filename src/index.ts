@@ -7,8 +7,7 @@ import {
     QRCodeFrame,
     QRErrorCorrectLevel,
 } from './Enums';
-import { Drawing, QRCode } from './Models';
-import { SVGDrawing } from './Svg';
+import { QRCode } from './Models';
 import { QRCodeConfig } from './Types';
 
 export class QRCodeBuilder {
@@ -216,7 +215,7 @@ export class QRCodeBuilder {
             qrCode.canvas = await qrCode.drawing.draw();
             return Promise.resolve(qrCode);
         } else {
-            qrCode.svg = await qrCode.drawing.drawSVG();
+            qrCode.svg = await qrCode.svgDrawing.drawSVG();
             return Promise.resolve(qrCode);
         }
     }
