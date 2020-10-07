@@ -27,10 +27,10 @@ const config = {
     logoImage: 'https://static.beaconstac.com/assets/img/qr-code-logos/play-store.svg',
     // logoImage: 'https://s3.amazonaws.com/beaconstac-content-qa/1593/930997b9951845639b3d4f33a3580026',
     canvasType: CanvasType.SVG,
-    eyeFrameShape: EyeFrameShape.RIGHT_LEAF,
+    // eyeFrameShape: EyeFrameShape.RIGHT_LEAF,
     eyeBallShape: EyeBallShape.RIGHT_LEAF,
-    eyeFrameColor: '#287314',
-    eyeBallColor: '#234',
+    // eyeFrameColor: '#287314',
+    // eyeBallColor: '#234',
     dataPattern: DataPattern.RIGHT_DIAMOND,
     colorDark: '#571010',
     colorLight: '#d31e1e',
@@ -50,18 +50,18 @@ const config = {
 };
 
 describe('QR code tests', () => {
-    // it('Main test SVG', done => {
-    //     const qrCodeGenerator = new QRCodeBuilder(config);
-    //
-    //     qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-    //         const fs = require('fs');
-    //         fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
-    //         done();
-    //     }).catch(err => {
-    //         console.error(err);
-    //         done();
-    //     });
-    // });
+    it('Main test SVG', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config);
+
+        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
+            const fs = require('fs');
+            fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+        }).catch(err => {
+            console.error(err);
+            done();
+        });
+    });
 
     it('Main test PDF', done => {
         const qrCodeGenerator = new QRCodeBuilder(config);
