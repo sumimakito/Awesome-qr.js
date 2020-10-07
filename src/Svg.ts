@@ -986,16 +986,9 @@ export class SVGDrawing {
 
         if (isRound) {
             // @ts-ignore
-            canvas.path(`M0 0 
-            h${width - radius * 2} 
-            a${radius},${radius} 0 0 1 ${radius},${radius} 
-            v${height - radius * 2} 
-            a${radius},${radius} 0 0 1 -${radius},${radius} 
-            h-${width - radius * 2} 
-            a${radius},${radius} 0 0 1 -${radius},-${radius} 
-            v-${height - radius * 2} 
-            a${radius},${radius} 0 0 1 ${radius},-${radius}`)
-                .fill('none')
+            canvas.rect(height, width).radius(radius).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            // @ts-ignore
+            canvas.rect(height - 1.5 * moduleSize, width - 1.5 * moduleSize).radius(radius).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize * 0.75 + this.config.margin + this.shiftX, startY + moduleSize * 0.75 + this.config.margin + this.shiftY);
         } else {
             // @ts-ignore
             canvas.rect(height, width).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
