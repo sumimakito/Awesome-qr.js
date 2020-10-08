@@ -1,4 +1,12 @@
-import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame, QRErrorCorrectLevel } from './Enums';
+import {
+    CanvasType,
+    DataPattern,
+    EyeBallShape,
+    EyeFrameShape,
+    GradientType,
+    QRCodeFrame,
+    QRErrorCorrectLevel,
+} from './Enums';
 import { QRCode } from './Models';
 import { QRCodeConfig } from './Types';
 
@@ -12,7 +20,7 @@ export class QRCodeBuilder {
             typeNumber: 4,
             colorDark: '#000000',
             colorLight: '#ffffff',
-            correctLevel: QRErrorCorrectLevel.M,
+            correctLevel: QRErrorCorrectLevel.H,
             backgroundDimming: 'rgba(0,0,0,0)',
             logoScale: 0.15,
             logoMargin: 800/12/4, // 1/4 of margin
@@ -20,7 +28,9 @@ export class QRCodeBuilder {
             dotScale: 0.35,
             text: '',
             maskedDots: false,
-            isVCard: false
+            isVCard: false,
+            useCanvas: false,
+            useOpacity: true
         };
         this.config = Object.assign({}, defaultConfig, config);
     }
@@ -165,10 +175,23 @@ export class QRCodeBuilder {
         return this;
     }
 
+    public setUseCanvas(useCanvas: boolean) {
+        this.config.useCanvas = useCanvas;
+        return this;
+    }
+
+    public setUseOpacity(useOpacity: boolean) {
+        this.config.useOpacity = useOpacity;
+        return this;
+    }
+
     public async build(format?: CanvasType): Promise<QRCode | never> {
         this.config.canvasType = format ? format : CanvasType.PNG;
         if (!this.config.text) {
             return Promise.reject('Setting text is necessary to generate the QRCode');
+        }
+        if (this.config.frameText && this.config.frameText.length > 12) {
+            return Promise.reject('Frame text length exceeded');
         }
         // Limit logo margin and size based on overall size
         if (this.config.logoMargin > 10) {
@@ -184,8 +207,16 @@ export class QRCodeBuilder {
             this.config.logoScale = 0.15;
             this.config.logoMargin = (this.config.logoMargin > 5) ? 5 : this.config.logoMargin;
         }
+
+
         const qrCode: QRCode = new QRCode(-1, this.config);
-        qrCode.canvas = await qrCode.drawing.draw();
-        return Promise.resolve(qrCode);
+
+        if (this.config.canvasType !== CanvasType.SVG || this.config.useCanvas) {
+            qrCode.canvas = await qrCode.drawing.draw();
+            return Promise.resolve(qrCode);
+        } else {
+            qrCode.svg = await qrCode.svgDrawing.drawSVG();
+            return Promise.resolve(qrCode);
+        }
     }
 }
