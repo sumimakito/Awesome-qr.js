@@ -218,5 +218,6 @@ export class QRCodeBuilder {
         //     qrCode.svg = await qrCode.svgDrawing.drawSVG();
         //     return Promise.resolve(qrCode);
         // }
+
     }
 }

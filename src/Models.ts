@@ -17,11 +17,11 @@ import { isNode, loadImage } from './Util';
 
 import { SVGDrawing } from './Svg';
 
-// if (isNode) {
-//     const path = require('path');
-//     const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
-//     registerFont(fontPath, { family: 'Roboto' });
-// }
+if (isNode) {
+    const path = require('path');
+    const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
+    registerFont(fontPath, { family: 'Roboto' });
+}
 
 
 export class QRPolynomial {
