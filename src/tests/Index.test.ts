@@ -38,7 +38,7 @@ const config = {
     gradientType: GradientType.VERTICAL,
     // frameStyle: QRCodeFrame.BOX_BOTTOM,
     frameColor: '#0b1257',
-    // frameText: 'SCAN ME',
+    frameText: 'SCAN ME',
     logoMargin: 10,
     logoScale: 0.25,
     margin: 80,
@@ -50,18 +50,18 @@ const config = {
 };
 
 describe('QR code tests', () => {
-    it('Main test SVG', done => {
-        const qrCodeGenerator = new QRCodeBuilder(config);
-
-        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            const fs = require('fs');
-            fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
+    // it('Main test SVG', done => {
+    //     const qrCodeGenerator = new QRCodeBuilder(config);
+    //
+    //     qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
+    //         const fs = require('fs');
+    //         fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+    //         done();
+    //     }).catch(err => {
+    //         console.error(err);
+    //         done();
+    //     });
+    // });
 
     it('Main test PDF', done => {
         const qrCodeGenerator = new QRCodeBuilder(config);

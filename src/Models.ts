@@ -17,11 +17,11 @@ import { isNode, loadImage } from './Util';
 
 import { SVGDrawing } from './Svg';
 
-if (isNode) {
-    const path = require('path');
-    const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
-    registerFont(fontPath, { family: 'Roboto' });
-}
+// if (isNode) {
+//     const path = require('path');
+//     const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
+//     registerFont(fontPath, { family: 'Roboto' });
+// }
 
 
 export class QRPolynomial {
@@ -170,7 +170,7 @@ export class QRCode {
     public dataCache?: any[];
     public dataList: QR8bitByte[] = [];
     public drawing: Drawing;
-    public svgDrawing: SVGDrawing;
+    // public svgDrawing: SVGDrawing;
     // @ts-ignore
     public canvas: Canvas;
     public svg: any = '';
@@ -184,7 +184,7 @@ export class QRCode {
         this.addData(config.text);
         this.make();
         this.drawing = new Drawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
-        this.svgDrawing = new SVGDrawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
+        // this.svgDrawing = new SVGDrawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
     }
 
     get patternPosition() {
