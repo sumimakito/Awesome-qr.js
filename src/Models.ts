@@ -170,7 +170,8 @@ export class QRCode {
     public dataCache?: any[];
     public dataList: QR8bitByte[] = [];
     public drawing: Drawing;
-    // public svgDrawing: SVGDrawing;
+    // for dashboard comment this out
+    public svgDrawing: SVGDrawing;
     // @ts-ignore
     public canvas: Canvas;
     public svg: any = '';
@@ -184,7 +185,8 @@ export class QRCode {
         this.addData(config.text);
         this.make();
         this.drawing = new Drawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
-        // this.svgDrawing = new SVGDrawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
+        // for dashboard comment this out
+        this.svgDrawing = new SVGDrawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
     }
 
     get patternPosition() {

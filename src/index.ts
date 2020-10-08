@@ -211,13 +211,14 @@ export class QRCodeBuilder {
 
         const qrCode: QRCode = new QRCode(-1, this.config);
 
-        // if (this.config.canvasType !== CanvasType.SVG || this.config.useCanvas) {
+        // for dashboard use only is block comment out else
+        if (this.config.canvasType !== CanvasType.SVG || this.config.useCanvas) {
             qrCode.canvas = await qrCode.drawing.draw();
             return Promise.resolve(qrCode);
-        // } else {
-        //     qrCode.svg = await qrCode.svgDrawing.drawSVG();
-        //     return Promise.resolve(qrCode);
-        // }
+        } else {
+            qrCode.svg = await qrCode.svgDrawing.drawSVG();
+            return Promise.resolve(qrCode);
+        }
 
     }
 }
