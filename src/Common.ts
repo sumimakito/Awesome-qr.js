@@ -155,9 +155,17 @@ export const CanvasUtil = {
         shiftY: number,
         useOpacity = true
     ) {
-        // @ts-ignore
-        context.rect(5 * nWidth, 5 * nHeight).fill(color)
-            .move((centerX - 2) * nWidth + margin + shiftX, (centerY - 2) * nHeight + margin + shiftY);
+        if (useOpacity) {
+            // @ts-ignore
+            context.rect(5 * nWidth, 5 * nHeight).fill(color)
+                .move((centerX - 2) * nWidth + margin + shiftX, (centerY - 2) * nHeight + margin + shiftY)
+                .attr({opacity: 0.6});
+        } else {
+            // @ts-ignore
+            context.rect(5 * nWidth, 5 * nHeight).fill(color)
+                .move((centerX - 2) * nWidth + margin + shiftX, (centerY - 2) * nHeight + margin + shiftY);
+        }
+
     },
 
     drawAlign(context: CanvasRenderingContext2D, centerX: number, centerY: number, nWidth: number, nHeight: number) {

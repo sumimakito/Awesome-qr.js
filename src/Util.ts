@@ -85,6 +85,25 @@ export const loadImage = (src: string, imageServerURL?: string | undefined, imag
     });
 };
 
+export const isSvgFile = (src: string) => {
+    if (isNode) {
+        return new Promise((resolve, reject) => {
+            const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+            const http = new XMLHttpRequest();
+            http.open('HEAD', src);
+            http.onreadystatechange = function() {
+                if (this.readyState === this.DONE) {
+                    resolve(this.getResponseHeader('content-type').indexOf('svg') !== -1)
+                }
+            };
+            http.send();
+        });
+    } else {
+        return new Promise((resolve, reject) => {
+            reject(false)
+        });
+    }
+};
 
 export const cellPhoneSVGPath = `<?xml version="1.0" encoding="iso-8859-1"?>
 <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="<<x-axis>>" y="<<y-axis>>"

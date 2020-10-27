@@ -1,10 +1,10 @@
 /* tslint:disable:no-var-requires */
 import { Canvas, CanvasGradient, CanvasPattern, CanvasRenderingContext2D, createCanvas } from 'canvas';
 import { CanvasUtil } from './Common';
-import { DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame } from './Enums';
+import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
-import { isNode, loadImage } from './Util';
-
+import { cellPhoneSVGPath, isNode, isSvgFile, loadImage } from './Util';
+const fetch = require("node-fetch");
 
 export class SVGDrawing {
 
@@ -264,6 +264,84 @@ export class SVGDrawing {
         const coordinate = 0.5 * (this.config.size - logoSize);
         const centreCoordinate = coordinate - logoMargin - mainMargin;
 
+        // ----------------------------------- Local testing ----------------------------------------
+
+        // const fs = require('fs');
+        //
+        // try {
+        //     const data = fs.readFileSync(__dirname + '/tests/phone-receiver.' + CanvasType.SVG.toLowerCase(), 'utf8');
+        //     // console.log(data);
+        //     // @ts-ignore
+        //     context.svg(data.replace(/x="[a-z0-9_-]{1,15}"/, ``).replace(/y="[a-z0-9_-]{1,15}"/, ``).replace('<svg', `<svg width="${logoSize}" height="${logoSize}" x="${centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftX}" y="${centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftY}"`));
+        //     // console.log(data);
+        // } catch(e) {
+        //     console.log('Error:', e.stack);
+        // }
+
+        return isSvgFile(this.config.logoImage).then((isSvg: any) => {
+            if (isSvg) {
+                return fetch(this.config.logoImage)
+                    .then((r: { text: () => void; }) => r.text())
+                    .then((text: any) => {
+
+                        const color = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+                        // @ts-ignore
+                        context.rect(logoSize + logoMargin, logoSize + logoMargin).fill(color).move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
+
+                        text = text.substring(text.indexOf('<svg'));
+                        text = text.substring(0, text.indexOf('</svg>') + 6);
+                        let extraText = '';
+                        const headSvg = text.substring(0, text.indexOf('>') + 1);
+                        if (headSvg.indexOf(' viewBox') === -1) {
+                            let width = 0, height = 0;
+                            if (headSvg.indexOf(' width') !== -1) {
+                                const widthIndex = headSvg.indexOf('"',headSvg.indexOf('width'));
+                                width = text.substring(widthIndex + 1, headSvg.indexOf('"', widthIndex + 1));
+                            }
+                            if (headSvg.indexOf(' height') !== -1) {
+                                const heightIndex = headSvg.indexOf('"',headSvg.indexOf('height'));
+                                height = text.substring(heightIndex + 1, headSvg.indexOf('"', heightIndex + 1))
+                            }
+                            if (width || height) {
+                                width = width ? width : height;
+                                height = height ? height : width;
+                            } else {
+                                width = centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftX + logoSize;
+                                height = centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftY + logoSize
+                            }
+                            extraText += ` viewBox="0 0 ${width - logoMargin} ${height - logoMargin}"`
+                        }
+                        if (headSvg.indexOf('x=') !== -1 || headSvg.indexOf('x =') !== -1) {
+                            text = text.replace(/x\s*=\s*"[+.a-zA-Z0-9_-]{1,100}"/, ``);
+                        }
+                        if (headSvg.indexOf('y=') !== -1 || headSvg.indexOf('y =') !== -1) {
+                            text = text.replace(/y\s*=\s*"[+.a-zA-Z0-9_-]{1,100}"/, ``);
+                        }
+                        if (headSvg.indexOf(' width') !== -1) {
+                            text = text.replace(/width\s*=\s*"[+.a-zA-Z0-9_-]{1,100}"/, ``);
+                        }
+                        if (headSvg.indexOf(' height') !== -1) {
+                            text = text.replace(/height\s*=\s*"[+.a-zA-Z0-9_-]{1,100}"/, ``);
+                        }
+                        try {
+                            // @ts-ignore
+                            context.svg(text
+                                .replace('<svg', `<svg fill='#000'` + extraText + ` x="${centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftX}" y="${centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftY}" width="${logoSize}" height="${logoSize}"`));
+                        } catch (e) {
+                            console.log(e);
+                            // console.log('here')
+                            return this.loadNonSvgLogo(logoSize, centreCoordinate, logoMargin, logoCornerRadius, context);
+                        }
+
+                    })
+                    .catch(console.error.bind(console));
+            } else {
+                return this.loadNonSvgLogo(logoSize, centreCoordinate, logoMargin, logoCornerRadius, context)
+            }
+        });
+    }
+
+    private async loadNonSvgLogo(logoSize: number, centreCoordinate: number, logoMargin: number, logoCornerRadius: number, context: any) {
         return loadImage(this.config.logoImage!, this.config.imageServerURL, this.config.imageServerRequestHeaders).then((image: any) => {
 
             // const cn = createCanvas(image.naturalHeight, image.naturalWidth);
@@ -276,8 +354,19 @@ export class SVGDrawing {
             ct.drawImage(image, 0, 0, logoSize, logoSize);
             ct.save();
 
+            // const color = this.config.backgroundColor ? this.config.backgroundColor : this.config.useOpacity ? '#ffffff' : '#ffffff99';
+            //
+            // if (this.config.useOpacity) {
+            //     // @ts-ignore
+            //     context.rect(logoSize + logoMargin, logoSize + logoMargin).fill(color).attr({opacity: 0.6}).move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
+            // } else {
+            //     // @ts-ignore
+            //     context.rect(logoSize + logoMargin, logoSize + logoMargin).fill(color).move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
+            // }
+            //
+            const colorNew = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
             // @ts-ignore
-            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill('#ffffff').move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
+            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill(colorNew).move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
 
             // @ts-ignore
             context.image('').size(logoSize, logoSize)
@@ -288,9 +377,11 @@ export class SVGDrawing {
 
     private async addBackground(context: object, size: number, backgroundImage?: string, backgroundColor?: string) {
         if (!backgroundImage) {
-            const color = backgroundColor ? backgroundColor : '#ffffff';
-            // @ts-ignore
-            context.rect(size, size).fill(color).move(this.shiftX, this.shiftY).radius(this.config.moduleSize);
+            if (backgroundColor) {
+                const color = backgroundColor ? backgroundColor : '#ffffff';
+                // @ts-ignore
+                context.rect(size, size).fill(color).move(this.shiftX, this.shiftY).radius(this.config.moduleSize);
+            }
             return;
         }
         this.config.backgroundColor = '';
@@ -405,6 +496,10 @@ export class SVGDrawing {
         if (!this.maskCanvas) {
             const color = bIsDark ? gradient : this.config.backgroundColor ? this.config.backgroundColor : this.config.useOpacity ? '#ffffff' : '#ffffff99';
 
+            if (!this.config.backgroundImage && !bIsDark) {
+                return ;
+            }
+
             switch (shape) {
                 case DataPattern.CIRCLE:
                     this.drawCircle(x + w / 2, y + h / 2, canvas, color, h / 2, h / 2, !bIsDark);
@@ -432,6 +527,9 @@ export class SVGDrawing {
     }
 
     private drawAlignProtectors(context: object) {
+        if (!this.config.backgroundImage && !this.config.backgroundColor) {
+            return;
+        }
         const patternPosition = this.patternPosition;
         const moduleSize = this.config.moduleSize;
         const margin = this.config.margin;
@@ -456,6 +554,15 @@ export class SVGDrawing {
         const color = this.config.backgroundColor ? this.config.backgroundColor : this.config.useOpacity ? '#ffffff' : '#ffffff99';
         const size = this.config.moduleSize;
         const moduleCount = this.moduleCount;
+
+        // h${width - moduleSize}
+        // v${height - moduleSize}
+        // h-${width - moduleSize}
+        // v-${height - moduleSize}`)
+
+        if (!this.config.backgroundImage) {
+            return ;
+        }
 
         if (this.config.useOpacity) {
             // @ts-ignore
@@ -838,30 +945,71 @@ export class SVGDrawing {
         if (isRound) {
             if (this.config.useOpacity) {
                 // @ts-ignore
-                canvas.rect(height, width).radius(height / 4).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).attr({opacity: op});
+                // canvas.path(`M0 0
+                //     h${width - height / 4 * 2.5}
+                //     a${height / 4},${height / 4} 0 0 1 ${height / 4},${height / 4}
+                //     v${height - height / 4 * 2.5}
+                //     a${height / 4},${height / 4} 0 0 1 -${height / 4},${height / 4}
+                //     h-${width - height / 4 * 2.5}
+                //     a${height / 4},${height / 4} 0 0 1 -${height / 4},-${height / 4}
+                //     v-${height - height / 4 * 2.5}
+                //     a${height / 4},${height / 4} 0 0 1 ${height / 4},-${height / 4}`)
+                canvas.rect(height, width).radius(height / 4)
+                    .fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).attr({opacity: op});
             } else {
                 // @ts-ignore
-                canvas.rect(height, width).radius(height / 4).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+                // canvas.path(`M0 0
+                //     h${width - height / 4 * 2.5}
+                //     a${height / 4},${height / 4} 0 0 1 ${height / 4},${height / 4}
+                //     v${height - height / 4 * 2.5}
+                //     a${height / 4},${height / 4} 0 0 1 -${height / 4},${height / 4}
+                //     h-${width - height / 4 * 2.5}
+                //     a${height / 4},${height / 4} 0 0 1 -${height / 4},-${height / 4}
+                //     v-${height - height / 4 * 2.5}
+                //     a${height / 4},${height / 4} 0 0 1 ${height / 4},-${height / 4}`)
+                    canvas.rect(height, width).radius(height / 4)
+                    .fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
             }
             return;
         }
         if (this.config.useOpacity) {
             // @ts-ignore
-            canvas.rect(height, width).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).attr({opacity: op});
+            canvas.path(`M0 0
+            h${width}
+            v${height}
+            h-${width}
+            v-${height} Z`)
+            // canvas.rect(height, width)
+                .fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).attr({opacity: op});
         } else {
             // @ts-ignore
-            canvas.rect(height, width).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            canvas.path(`M0 0
+            h${width}
+            v${height}
+            h-${width}
+            v-${height} Z`)
+            // canvas.rect(height, width)
+                .fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
         }
     }
 
     private drawCircle(centerX: number, centerY: number, canvas: object, gradient: string, radiusX: number, radiusY?: number, isMask?: boolean) {
         const op = isMask ? 0.6 : 1;
         if (this.config.useOpacity) {
+
             // @ts-ignore
-            canvas.circle().radius(radiusX).fill(gradient).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY).attr({opacity: op});
+            canvas.path(`M 0, 0
+            a ${radiusX},${radiusX} 0 1 1 ${radiusX * 2},0
+            a ${radiusX},${radiusX} 0 1 1 -${radiusX * 2},0`)
+            // canvas.circle().radius(radiusX)
+            .fill(gradient).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY).attr({opacity: op});
         } else {
             // @ts-ignore
-            canvas.circle().radius(radiusX).fill(gradient).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY);
+            canvas.path(`M 0, 0
+            a ${radiusX},${radiusX} 0 1 1 ${radiusX * 2},0
+            a ${radiusX},${radiusX} 0 1 1 -${radiusX * 2},0`)
+            // canvas.circle().radius(radiusX)
+            .fill(gradient).move(centerX + this.config.margin - radiusX + this.shiftX, centerY + this.config.margin - radiusX + this.shiftY);
         }
     }
 
@@ -873,6 +1021,7 @@ export class SVGDrawing {
             [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY]];
         // @ts-ignore
         const polygon = context.polygon(coordinates);
+        // M 50 0 100 100 50 200 0 100 Z
         if (this.config.useOpacity) {
             polygon.fill(gradient).attr({opacity: op});
         } else {
@@ -882,27 +1031,48 @@ export class SVGDrawing {
 
     private drawDiamond(startX: number, startY: number, context: object, gradient: string, width: number, height: number, isRight?: boolean, isMask?: boolean) {
         const op = isMask ? 0.6 : 1;
-        const coordinates = isRight ? [
-            [startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
-            [startX + width + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
-            [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
-            [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
-            [startX + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
-            [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
-        ] : [
-            [startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
-            [startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
-            [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
-            [startX + width + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
-            [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
-            [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
-        ];
-        // @ts-ignore
-        const polygon = context.polygon(coordinates);
-        if (this.config.useOpacity) {
-            polygon.fill(gradient).attr({opacity: op});
+        // const coordinates = isRight ? [
+        //     [startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
+        //     [startX + width + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
+        //     [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
+        //     [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
+        //     [startX + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
+        //     [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
+        // ] : [
+        //     [startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
+        //     [startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
+        //     [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
+        //     [startX + width + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
+        //     [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
+        //     [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
+        // ];
+        const d = width/2;
+        // const polygon = context.polygon(coordinates);
+        // if (this.config.useOpacity) {
+        //     polygon.fill(gradient).attr({opacity: op});
+        // } else {
+        //     polygon.fill(gradient);
+        // }
+        if (isRight) {
+            if (this.config.useOpacity) {
+                // @ts-ignore
+                context.path(`M${d*2} ${d}h${d}v${d}l-${d} ${d}H${d}v-${d}`)
+                    .fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).attr({opacity: op});
+            } else {
+                // @ts-ignore
+                context.path(`M${d*2} ${d}h${d}v${d}l-${d} ${d}H${d}v-${d}`)
+                    .fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            }
         } else {
-            polygon.fill(gradient);
+            if (this.config.useOpacity) {
+                // @ts-ignore
+                context.path(`M0 0h${d}l${d} ${d}v${d}h-${d}l-${d}-${d}`)
+                    .fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).attr({opacity: op});
+            } else {
+                // @ts-ignore
+                context.path(`M0 0h${d}l${d} ${d}v${d}h-${d}l-${d}-${d}`)
+                    .fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            }
         }
     }
 
@@ -947,10 +1117,18 @@ export class SVGDrawing {
 
         gradient = this.config.eyeFrameColor ? this.config.eyeFrameColor : await this.getGradientFromCanvas(canvas, startX, startY, width,height);
 
+
         // @ts-ignore
-        canvas.circle().radius(width / 2).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
-        // @ts-ignore
-        canvas.circle().radius(width / 2 - moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff').move(startX + this.config.margin + moduleSize + this.shiftX, startY + this.config.margin + moduleSize + this.shiftY);
+        canvas.path(`M 0, 0
+        a ${width/2 - moduleSize},${width/2 - moduleSize} 0 1,1 ${width - moduleSize},0
+        a ${width/2 - moduleSize},${width/2 - moduleSize} 0 1,1 -${width - moduleSize},0`)
+            .fill('none')
+            .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
+            .stroke({ color: gradient, width: this.config.moduleSize });
+        // // @ts-ignore
+        // canvas.circle().radius(width / 2).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+        // // @ts-ignore
+        // canvas.circle().radius(width / 2 - moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff').move(startX + this.config.margin + moduleSize + this.shiftX, startY + this.config.margin + moduleSize + this.shiftY);
     }
 
     private async getGradientFromCanvas(canvas: object, startX: number, startY: number, width: number, height: number) {
@@ -986,14 +1164,35 @@ export class SVGDrawing {
 
         if (isRound) {
             // @ts-ignore
-            canvas.rect(height, width).radius(radius).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
-            // @ts-ignore
-            canvas.rect(height - 1.5 * moduleSize, width - 1.5 * moduleSize).radius(radius).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize * 0.75 + this.config.margin + this.shiftX, startY + moduleSize * 0.75 + this.config.margin + this.shiftY);
+            canvas.path(`M0 0
+            h${width - radius * 2.5}
+            a${radius},${radius} 0 0 1 ${radius},${radius}
+            v${height - radius * 2.5}
+            a${radius},${radius} 0 0 1 -${radius},${radius}
+            h-${width - radius * 2.5}
+            a${radius},${radius} 0 0 1 -${radius},-${radius}
+            v-${height - radius * 2.5}
+            a${radius},${radius} 0 0 1 ${radius},-${radius}`)
+                .fill('none')
+                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
+                .stroke({ color: gradient, width: this.config.moduleSize });
+            // canvas.rect(height, width).radius(radius).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            // // @ts-ignore
+            // canvas.rect(height - 1.5 * moduleSize, width - 1.5 * moduleSize).radius(radius).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize * 0.75 + this.config.margin + this.shiftX, startY + moduleSize * 0.75 + this.config.margin + this.shiftY);
         } else {
             // @ts-ignore
-            canvas.rect(height, width).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
-            // @ts-ignore
-            canvas.rect(height - 2 * moduleSize, width - 2 * moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize + this.config.margin + this.shiftX, startY + moduleSize + this.config.margin + this.shiftY);
+            canvas.path(`M0 0
+            h${width - moduleSize}
+            v${height - moduleSize}
+            h-${width - moduleSize}
+            v-${height - moduleSize} z`)
+                .fill('none')
+                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
+                .stroke({ color: gradient, width: this.config.moduleSize });
+            // // @ts-ignore
+            // canvas.rect(height, width).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
+            // // @ts-ignore
+            // canvas.rect(height - 2 * moduleSize, width - 2 * moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize + this.config.margin + this.shiftX, startY + moduleSize + this.config.margin + this.shiftY);
         }
 
     }
@@ -1169,25 +1368,32 @@ export class SVGDrawing {
             logoY = logoY + (moduleSize * 0.3)
         }
 
-        return loadImage('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg').then(image => {
+        const cellphone = cellPhoneSVGPath.replace('<<x-axis>>', String(logoX))
+            .replace('<<y-axis>>', String(logoY))
+            .replace('<<width>>', String(size / 10))
+            .replace('<<height>>', String(size / 10));
+        // @ts-ignore
+        return canvas.svg(cellphone);
 
-            // @ts-ignore
-            const cn = createCanvas(image.naturalHeight, image.naturalWidth);
-            const ct = cn.getContext('2d');
-            ct.drawImage(image, 0, 0);
-            ct.save();
-
-            // @ts-ignore
-            canvas.image('').size(size / 10, size / 10).move(logoX, logoY).attr({ 'xlink:href': cn.toDataURL() });
-
-            // TODO: Use SVG embed
-            // const cellphone = cellPhoneSVGPath.replace('<<x-axis>>', logoX)
-            //     .replace('<<y-axis>>', logoY)
-            //     .replace('<<width>>', size / 10)
-            //     .replace('<<height>>', size / 10);
-            // // @ts-ignore
-            // return canvas.svg(cellphone);
-        });
+        // return loadImage('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg').then(image => {
+        //
+        //     // @ts-ignore
+        //     const cn = createCanvas(image.naturalHeight, image.naturalWidth);
+        //     const ct = cn.getContext('2d');
+        //     ct.drawImage(image, 0, 0);
+        //     ct.save();
+        //
+        //     // @ts-ignore
+        //     canvas.image('').size(size / 10, size / 10).move(logoX, logoY).attr({ 'xlink:href': cn.toDataURL() });
+        //
+        //     // TODO: Use SVG embed
+        //     // const cellphone = cellPhoneSVGPath.replace('<<x-axis>>', logoX)
+        //     //     .replace('<<y-axis>>', logoY)
+        //     //     .replace('<<width>>', size / 10)
+        //     //     .replace('<<height>>', size / 10);
+        //     // // @ts-ignore
+        //     // return canvas.svg(cellphone);
+        // });
     }
 
 }
