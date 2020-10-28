@@ -991,10 +991,14 @@ export class Drawing {
             }
             default: {
                 context.fillStyle = color;
-                this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false);
-                this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false);
-                this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false);
+                context.strokeStyle = color;
+                const cornerRadius = moduleSize;
+                context.lineWidth = cornerRadius;
+                this.drawSquareEyeFrame(0 + cornerRadius / 4 + moduleSize/4, 0 + cornerRadius / 4 + moduleSize/4, context, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, false);
+                this.drawSquareEyeFrame((moduleCount - 7) * moduleSize + cornerRadius / 4 + moduleSize/4, 0 + cornerRadius / 4 + moduleSize/4, context, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, false);
+                this.drawSquareEyeFrame(0 + cornerRadius / 4 + moduleSize/4, (moduleCount - 7) * moduleSize + cornerRadius / 4 + moduleSize/4, context, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, false);
                 context.fillStyle = this.config.colorDark;
+                context.strokeStyle = this.config.colorDark;
                 break;
             }
         }
@@ -1034,8 +1038,8 @@ export class Drawing {
 
     private drawSquareEyeFrame(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound: boolean) {
         const moduleSize = this.config.moduleSize;
-        context.fillRect(startX, startY, width, height);
-        context.clearRect(startX + 1 * moduleSize, startY + 1 * moduleSize, width - 2 * moduleSize, height - 2 * moduleSize);
+        context.strokeRect(startX, startY, width, height);
+        // context.clearRect(startX + 1 * moduleSize, startY + 1 * moduleSize, width - 2 * moduleSize, height - 2 * moduleSize);
 
     }
 
