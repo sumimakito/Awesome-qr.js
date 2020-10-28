@@ -1,5 +1,5 @@
 --require ts-node/register
 --require source-map-support/register
 --full-trace
---timeout 5000
+--timeout 10000
 src/**/*.test.ts
