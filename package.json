@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --config webpack.config.js",
-    "prepublish": "tsc"
+    "prepublish": "webpack --config webpack.config.js && tsc"
   },
   "repository": {
     "type": "git",
