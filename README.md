@@ -1,11 +1,11 @@
-# Awesome-qr.js
+# Awesome-qr.js <!-- omit in toc -->
 
 [![npm version](https://badge.fury.io/js/awesome-qr.svg)](https://badge.fury.io/js/awesome-qr)
 [![license](https://img.shields.io/github/license/SumiMakito/Awesome-qr.js.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
 An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
-## Gallery
+## Gallery <!-- omit in toc -->
 
 > These QR codes were made with Awesome-qr.js 🤗
 
@@ -16,6 +16,36 @@ An awesome<del>(simple)</del> QR code generator written in JavaScript.
     	<td valign="top"><img src="art/gallery-3.gif" width="350"></td>
   	</tr>
 </table>
+
+## Contents <!-- omit in toc -->
+
+- [Getting Started](#getting-started)
+  - [Node.js](#nodejs)
+  - [Browsers](#browsers)
+- [Options](#options)
+  - [text](#text)
+  - [size](#size)
+  - [margin](#margin)
+  - [typeNumber](#typenumber)
+  - [correctLevel](#correctlevel)
+  - [colorDark](#colordark)
+  - [colorLight](#colorlight)
+  - [autoColor](#autocolor)
+  - [backgroundImage](#backgroundimage)
+  - [backgroundDimming](#backgrounddimming)
+  - [gifBackground](#gifbackground)
+  - [whiteMargin](#whitemargin)
+  - [dotScale](#dotscale)
+  - [logoImage](#logoimage)
+  - [logoScale](#logoscale)
+  - [logoMargin](#logomargin)
+  - [logoCornerRadius](#logocornerradius)
+- [Sponsors](#sponsors)
+- [Changelog](#changelog)
+- [Special thanks](#special-thanks)
+- [AwesomeQRCode: Designed for Android](#awesomeqrcode-designed-for-android)
+- [Other versions](#other-versions)
+- [Copyright &amp; License](#copyright--license)
 
 ## Getting Started
 
@@ -141,7 +171,7 @@ Error correction level of the QR code.
 
 `string?, CSS <color>, default: "#000000"`
 
-> For more information about CSS &lt;color&gt;, please refer to [<color> - CSS: Cascading Style Sheets | MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value)
+> For more information about CSS &lt;color&gt;, please refer to [&lt;color&gt; - CSS: Cascading Style Sheets | MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value)
 
 Color of the blocks on the QR code.
 
