@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/awesome-qr.svg)](https://badge.fury.io/js/awesome-qr)
 [![license](https://img.shields.io/github/license/SumiMakito/Awesome-qr.js.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-An awesome<del>(simple)</del> QR code generator written in JavaScript.
+An awesome but simple QR code generator written in JavaScript.
 
 ## Gallery <!-- omit in toc -->
 
@@ -51,7 +51,7 @@ An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
 ### Node.js
 
-Type definitions are included in the npm package.
+_Type definitions are included in the npm package._
 
 > **Please read ⚠️**
 >
