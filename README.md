@@ -5,26 +5,6 @@
 
 An awesome<del>(simple)</del> QR code generator written in JavaScript.
 
-[点此阅读简体中文版本文档](README-zh_CN.md)
-
-## Live demo
-
-Check out our [**brand-new** live demo](https://www.bitcat.cc/webapp/awesome-qr/index.html).
-
-Or you can also access the live demo by typing `bitcat.cc/awesome` in the browser on your smartphone.
-
-## Compatibility
-
-> Awesome-qr.js is compatible with following browsers.
-
-- Chrome 4+ (Chrome for Android 53+)
-- Firefox 3.6+ (Firefox for Android 49+)
-- Opera 9+ (Opera Mobile 10+)
-- Safari 4+ (iOS Safari 3.2+)
-- Android Browser 3+
-- Edge 12+
-- IE 9+
-
 ## Gallery
 
 > These QR codes were made with Awesome-qr.js 🤗
@@ -37,7 +17,7 @@ Or you can also access the live demo by typing `bitcat.cc/awesome` in the browse
   	</tr>
 </table>
 
-## Play with Awesome-qr.js
+## Getting Started
 
 ### Node.js
 
@@ -97,221 +77,149 @@ reader.onload = function () {
 reader.readAsDataURL(file);
 ```
 
-### More examples
+## Options
 
-#### 1. With a background image
+> _Options_ is an object that you can pass to the generator to customize your QR code.
 
-##### α. Use in Node.js (on server side)
-
-```javascript
-let request = require("request");
-let AwesomeQR = require("awesome-qr");
-const { Image } = require("canvas");
-
-let options = {
-  url: "https://avatars3.githubusercontent.com/u/5277268?s=460&v=4",
-  method: "GET",
-  encoding: null,
-  // ^ this is necessary since we are not going to
-  //   get the image as a string.
+```ts
+Options {
+  text: string;
+  size?: number;
+  margin?: number;
+  typeNumber?: number;
+  correctLevel?: number;
+  dotScale?: number;
+  colorDark?: string;
+  colorLight?: string;
+  autoColor?: boolean;
+  backgroundImage?: string | Buffer;
+  backgroundDimming?: string;
+  gifBackground?: ArrayBuffer;
+  whiteMargin?: boolean;
+  logoImage?: string | Buffer;
+  logoScale?: number;
+  logoMargin?: number;
+  logoCornerRadius?: number;
 };
-
-request.get(options, (error, response, body) => {
-  if (!error && response.statusCode === 200) {
-    // load the background image
-    let backgroundImage = new Image();
-    backgroundImage.src = body;
-
-    new AwesomeQR().create({
-      text: "Makito loves Kafuu Chino.",
-      size: 500,
-      backgroundImage: backgroundImage,
-      autoColor: true,
-      callback: (data) => {
-        if (data === undefined) {
-          console.log("failed to generate the QR code");
-        } else {
-          // play with binary PNG data
-        }
-      },
-    });
-  } else {
-    console.log("failed to get the background image");
-  }
-});
 ```
 
-> Note: Background images **other than PNG** is **not supported** under Node.js mode. You may get a `Error: Image given has not completed loading` error if you are using other image formats.
+### text
 
-##### β. Use in the browser
+`string`
 
-```javascript
-var img = new Image();
-img.crossOrigin = "Anonymous";
-img.onload = () => {
-  AwesomeQR.create({
-    text: "Makito loves Kafuu Chino.",
-    size: 800,
-    margin: 20,
-    backgroundImage: img,
-    bindElement: "qrcode",
-  });
-};
-img.src = "https://avatars3.githubusercontent.com/u/5277268?s=460&v=4";
-```
+Text to be encoded in the QR code.
 
-> Note that the Image loads images asynchronously; that is to say, you will need to set a callback in order to use the image after it has finished loading. For more information, please follow the issue [#8](https://github.com/SumiMakito/Awesome-qr.js/issues/8).
+### size
 
-#### 2. With a logo image at center
+`number?, default: 800`
 
-##### α. Use in Node.js (on server side)
+Size of the QR code in pixel.
 
-Not yet supported.
+### margin
 
-##### β. Use in the browser
+`number?, default: 20`
 
-```javascript
-var logo = new Image();
-logo.crossOrigin = "Anonymous";
-logo.onload = () => {
-  AwesomeQR.create({
-    text: "Makito loves Kafuu Chino.",
-    size: 800,
-    margin: 20,
-    logoImage: logo,
-    bindElement: "qrcode",
-  });
-};
-logo.src = "https://avatars3.githubusercontent.com/u/5277268?s=460&v=4";
-```
+Size of margins around the QR code body in pixel.
 
-#### 3. Use a GIF image as background
+### typeNumber
 
-##### α. Use in Node.js (on server side)
+`number?, default: 4`
 
-Not yet supported.
+> For more information, please refer to [Types of QR Code | QRcode.com | DENSO WAVE](https://www.qrcode.com/en/codes/).
 
-##### β. Use in the browser
+Type number of the QR code.
 
-Note that the option `gifBackground` only accepts ArrayBuffer, which represents a GIF image's data. Some conversions need to be done before generating the QR code.
+### correctLevel
 
-```javascript
-// initialize a FileReader
-var r = new FileReader();
+`number?, default: QRErrorCorrectLevel.M = 0`
 
-// set up an onload listener
-r.onload = function (e) {
-  // get the ArrayBuffer
-  var ab = e.target.result;
+> For more information, please refer to [Error correction feature | QRcode.com | DENSO WAVE](https://www.qrcode.com/en/about/error_correction.html).
 
-  AwesomeQR.create({
-    text: "Makito loves Kafuu Chino.",
-    size: 800,
-    margin: 20,
-    gifBackground: ab,
-    // ^ use the ArrayBuffer
-    bindElement: "qrcode",
-  });
-};
+Error correction level of the QR code.
 
-// read as ArrayBuffer
-r.readAsArrayBuffer(file);
-```
+### colorDark
 
-> When `gifBackground` is in use, the `backgroundImage` option will be ignored.
+`string?, CSS <color>, default: "#000000"`
 
-It usually takes a longer time to decode and encode the GIF, and generate an animated QR code, but it depends on the size of the input file.
+> For more information about CSS &lt;color&gt;, please refer to [<color> - CSS: Cascading Style Sheets | MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value)
 
-### Options
+Color of the blocks on the QR code.
 
-#### Basic
+### colorLight
 
-| Option       | Client-side (browsers) | Server-side (Node.js) |
-| :----------- | :--------------------- | :-------------------- |
-| text         | Required               | Required              |
-| size         | Required               | Required              |
-| margin       | Optional               | Optional              |
-| dotScale     | Optional               | Optional              |
-| maskedDots   | Optional               | Not supported         |
-| correctLevel | Optional               | Optional              |
-| whiteMargin  | Optional               | Optional              |
-| bindElement  | Optional               | Not supported         |
-| callback     | Optional               | Optional              |
+`string?, CSS <color>, default: "#ffffff"`
 
-> At here, you can use `bindElement` to specify the id (without the leading #) of the element you want to fill the generated QR code image into. Element can be a `<div>` or a `<img>`.
+Color of the empty areas on the QR code.
 
-> The option `maskedDots` is experimental.
+### autoColor
 
-#### Color scheme
+`boolean?, default: true`
 
-| Option     | Client-side (browsers) | Server-side (Node.js) |
-| :--------- | :--------------------- | :-------------------- |
-| colorDark  | Optional               | Optional              |
-| colorLight | Optional               | Optional              |
-| autoColor  | Optional               | Optional              |
+Automatically calculate the _colorDark_ value from the QR code's background.
 
-> If `autoColor` is set, `colorDark` and `colorLight` will be ignored.
+### backgroundImage
 
-#### Background image
+`(string|Buffer)?, default: undefined`
 
-| Option            | Client-side (browsers) | Server-side (Node.js) |
-| :---------------- | :--------------------- | :-------------------- |
-| backgroundImage   | Optional               | Optional              |
-| backgroundDimming | Optional               | Optional              |
-| gifBackground     | Optional               | Not supported         |
+Background image to be used in the QR code.
 
-> If `gifBackground` is set, `backgroundImage` will be ignored.
+Accepts a `data:` string in web browsers or a Buffer in Node.js.
 
-#### Logo image
+### backgroundDimming
 
-| Option           | Client-side (browsers) | Server-side (Node.js) |
-| :--------------- | :--------------------- | :-------------------- |
-| logoImage        | Optional               | Not supported         |
-| logoScale        | Optional               | Not supported         |
-| logoMargin       | Optional               | Not supported         |
-| logoCornerRadius | Optional               | Not supported         |
+`string?, CSS <color>, default: "rgba(0, 0, 0, 0)"`
 
-> Actual size for the logo will be `logoScale*(size-2*margin)`.
+Color of the dimming mask above the background image.
 
-#### Post-processing
+### gifBackground
 
-| Option            | Client-side (browsers) | Server-side (Node.js) |
-| :---------------- | :--------------------- | :-------------------- |
-| binarize          | Optional               | Not supported         |
-| binarizeThreshold | Optional               | Not supported         |
+`ArrayBuffer?, default: undefined`
 
-> Value of `binarizeThreshold` should be an integer greater than 0 and less than 255.
+GIF background image to be used in the QR code.
 
-#### Extra: Default option
+### whiteMargin
 
-Awesome-qr.js will use the values below for the missing fields in the custom option.
+`boolean?, default: true`
 
-```
-{
-	size: 800,
-	margin: 20,
-	dotScale: 0.35,
-	whiteMargin: true,
-	colorDark: "#000000",
-	colorLight: "#ffffff",
-	autoColor: true,
-	maskedDots: false,
-	correctLevel: QRErrorCorrectLevel.M,
-	backgroundImage: undefined,
-	backgroundDimming: 'rgba(0,0,0,0)',
-	gifBackground: undefined,
-	logoImage: undefined,
-	logoScale: 0.2,
-	logoMargin: 6,
-	logoCornerRadius: 8,
-	binarize: false,
-	binarizeThreshold: 128,
-	callback: undefined,
-	bindElement: undefined
-}
-```
+Use a white margin instead of a transparent one which reveals the background of the QR code on margins.
 
-### Sponsors
+### dotScale
+
+`number?, default: 0.35`
+
+Ratio of the real size to the full size of the blocks.
+
+This can be helpful when you want to make more parts of the background visible.
+
+### logoImage
+
+`(string|Buffer)?, default: undefined`
+
+Logo image to be displayed at the center of the QR code.
+
+Accepts a `data:` string in web browsers or a Buffer in Node.js.
+
+When set to `undefined` or `null`, the logo is disabled.
+
+### logoScale
+
+`number?, default: 0.2`
+
+Ratio of the logo size to the QR code size.
+
+### logoMargin
+
+`number?, default: 6`
+
+Size of margins around the logo image in pixels.
+
+### logoCornerRadius
+
+`number?, default: 8`
+
+Corner radius of the logo image in pixels.
+
+## Sponsors
 
 It is those generous sponsors who supports this project makes the Awesome-qr.js more awesome!
 
@@ -321,79 +229,11 @@ I'd like to express my sincere appreciation to all the generous sponsors.
 
 Since sponsors' names will not show up here without their permissions, the list above only shows a part of all the sponsors. If you wish to have your name shown up here, please feel free to contact me.
 
-### Support me
+## Changelog
 
-If you really like Awesome-qr.js, please consider making a donation to support me. Thanks!
+[Check the full changelog](CHANGELOG.md)
 
-You can find me by searching `sumimakito` in Alipay on Android/iOS devices, or click the links below.
-
-- [PayPal](https://www.paypal.me/makito)
-- [Alipay](https://qr.alipay.com/a6x02021re1jk4ftcymlw79)
-
-Also, you can try to scan the following QR code with Alipay or WeChat.
-
-<img src="https://raw.githubusercontent.com/SumiMakito/Misc/master/alipay-2.jpg" width="300">
-
-<img src="https://raw.githubusercontent.com/SumiMakito/Misc/master/wechat-2.png" width="300">
-
-### Changelog
-
-##### Ver. 1.2.0
-
-- Added the support for Node.js.
-
-##### Ver. 1.1.0
-
-- Added the support for GIF backgrounds.
-
-##### Ver. 1.0.10
-
-- Fixed a bug in the core library which would cause the too-early overflow.
-
-##### Ver. 1.0.9
-
-- Fixed a bug which would leave an empty space on the simple QRCode image which has no alignment patterns.
-
-![](art/bug-fix-1.0.9.png)
-
-##### Ver. 1.0.8
-
-- Fixed a bug which would leave white stripes between neighboring blocks while drawing QRCode at scale `1.0`.
-
-![](art/bug-fix-1.0.8.png)
-
-##### Ver. 1.0.7
-
-- Minor fixes.
-
-##### Ver. 1.0.6
-
-- Fixed an issue related to the coordinate system.
-
-##### Ver. 1.0.5
-
-- Now you may use Awesome-qr.js with [require.js](http://requirejs.org/).
-- New feature: Embedding a logo image in the QR code.
-- Added some features which previously only available on Android platform.
-
-##### Ver. 1.0.4
-
-- Compatibility improved.
-
-##### Ver. 1.0.3
-
-- Now generated QR codes can be automatically filled into specified elements.
-
-##### Ver. 1.0.2, 1.0.1
-
-- Published to npmjs.
-- Now background images can be binarized.
-
-##### Ver 1.0.0
-
-- Initial release.
-
-### Special thanks
+## Special thanks
 
 Awesome-qr.js is inspired by [EFQRCode by EyreFree](https://github.com/EyreFree/EFQRCode).
 
@@ -401,22 +241,22 @@ EFQRCode is a tool to generate QRCode image or recognize QRCode from image, in S
 
 If your application is in need of generating pretty QR codes in Swift, take a look at EFQRCode. It should help.
 
-### AwesomeQRCode: Designed for Android
+## AwesomeQRCode: Designed for Android
 
 Also, if you are developing Android apps, you can take a look at [AwesomeQRCode](https://github.com/SumiMakito/AwesomeQRCode), which is designed for Android projects.
 
-### Other versions
+## Other versions
 
 - Vue 2.x component: [Vue-qr](https://github.com/Binaryify/vue-qr)
 
-### Copyright &amp; License
+## Copyright &amp; License
 
-Copyright &copy; 2017 Sumi Makito
+Copyright &copy; 2017-2020 Sumi Makito
 
-Licensed under Apache License 2.0 License.
+Awesome-qr.js is licensed under Apache License 2.0 License.
 
 ```
-Copyright (c) 2017 Sumi Makito, https://www.keep.moe
+Copyright (c) 2017-2020 Sumi Makito, https://www.keep.moe
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
