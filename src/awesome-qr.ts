@@ -3,24 +3,142 @@ import { decompressFrames, parseGIF } from "./gifuct-js";
 import { QRCodeModel, QRErrorCorrectLevel, QRUtil } from "./qrcode";
 import GIFEncoder from "./gif.js/GIFEncoder";
 
+export * from "./qrcode";
+
 export type Options = {
+  /**
+   * Text to be encoded in the QR code.
+   */
   text: string;
+
+  /**
+   * Size of the QR code in pixel.
+   *
+   * @defaultValue 800
+   */
   size?: number;
+
+  /**
+   * Size of margins around the QR code body in pixel.
+   *
+   * @defaultValue 20
+   */
   margin?: number;
-  typeNumber?: number;
-  colorDark?: string;
-  colorLight?: string;
+
+  /**
+   * Error correction level of the QR code.
+   *
+   * Accepts a value provided by _QRErrorCorrectLevel_.
+   *
+   * For more information, please refer to {@link https://www.qrcode.com/en/about/error_correction.html}.
+   *
+   * @defaultValue 0
+   */
   correctLevel?: number;
-  backgroundImage?: string | Buffer;
-  backgroundDimming?: string;
-  gifBackground?: ArrayBuffer;
-  logoImage?: string | Buffer;
-  logoScale?: number;
-  logoMargin?: number;
-  logoCornerRadius?: number;
-  whiteMargin?: boolean;
-  dotScale?: number;
+
+  /**
+   * Color of the blocks on the QR code.
+   *
+   * Accepts a CSS &lt;color&gt;.
+   *
+   * For more information about CSS &lt;color&gt;, please refer to {@link https://developer.mozilla.org/en-US/docs/Web/CSS/color_value}.
+   *
+   * @defaultValue "#000000"
+   */
+  colorDark?: string;
+
+  /**
+   * Color of the empty areas on the QR code.
+   *
+   * Accepts a CSS &lt;color&gt;.
+   *
+   * For more information about CSS &lt;color&gt;, please refer to {@link https://developer.mozilla.org/en-US/docs/Web/CSS/color_value}.
+   *
+   * @defaultValue "#ffffff"
+   */
+  colorLight?: string;
+
+  /**
+   * Automatically calculate the _colorLight_ value from the QR code's background.
+   *
+   * @defaultValue true
+   */
   autoColor?: boolean;
+
+  /**
+   * Background image to be used in the QR code.
+   *
+   * Accepts a `data:` string in web browsers or a Buffer in Node.js.
+   *
+   * @defaultValue undefined
+   */
+  backgroundImage?: string | Buffer;
+
+  /**
+   * Color of the dimming mask above the background image.
+   *
+   * Accepts a CSS &lt;color&gt;.
+   *
+   * For more information about CSS &lt;color&gt;, please refer to {@link https://developer.mozilla.org/en-US/docs/Web/CSS/color_value}.
+   *
+   * @defaultValue "rgba(0, 0, 0, 0)"
+   */
+  backgroundDimming?: string;
+
+  /**
+   * GIF background image to be used in the QR code.
+   *
+   * @defaultValue undefined
+   */
+  gifBackground?: ArrayBuffer;
+
+  /**
+   * Use a white margin instead of a transparent one which reveals the background of the QR code on margins.
+   *
+   * @defaultValue true
+   */
+  whiteMargin?: boolean;
+
+  /**
+   * Ratio of the real size to the full size of the blocks.
+   *
+   * This can be helpful when you want to make more parts of the background visible.
+   *
+   * @deafultValue 0.35
+   */
+  dotScale?: number;
+
+  /**
+   * Logo image to be displayed at the center of the QR code.
+   *
+   * Accepts a `data:` string in web browsers or a Buffer in Node.js.
+   *
+   * When set to `undefined` or `null`, the logo is disabled.
+   *
+   * @defaultValue undefined
+   */
+  logoImage?: string;
+
+  /**
+   * Ratio of the logo size to the QR code size.
+   *
+   * @defaultValue 0.2
+   */
+  logoScale?: number;
+
+  /**
+   * Size of margins around the logo image in pixels.
+   *
+   * @defaultValue 6
+   */
+  logoMargin?: number;
+
+  /**
+   * Corner radius of the logo image in pixels.
+   *
+   * @defaultValue 8
+   */
+  logoCornerRadius?: number;
 };
 
 export class AwesomeQR {
@@ -35,7 +153,6 @@ export class AwesomeQR {
     text: "",
     size: 800,
     margin: 20,
-    typeNumber: 4,
     colorDark: "#000000",
     colorLight: "#ffffff",
     correctLevel: QRErrorCorrectLevel.M,

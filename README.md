@@ -26,7 +26,6 @@ An awesome but simple QR code generator written in JavaScript.
   - [text](#text)
   - [size](#size)
   - [margin](#margin)
-  - [typeNumber](#typenumber)
   - [correctLevel](#correctlevel)
   - [colorDark](#colordark)
   - [colorLight](#colorlight)
@@ -150,14 +149,6 @@ Size of the QR code in pixel.
 `number?, default: 20`
 
 Size of margins around the QR code body in pixel.
-
-### typeNumber
-
-`number?, default: 4`
-
-> For more information, please refer to [Types of QR Code | QRcode.com | DENSO WAVE](https://www.qrcode.com/en/codes/).
-
-Type number of the QR code.
 
 ### correctLevel
 
