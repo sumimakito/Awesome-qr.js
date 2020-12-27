@@ -22,7 +22,7 @@ export declare type Options = {
      *
      * Accepts a value provided by _QRErrorCorrectLevel_.
      *
-     * For more information, please refer to {@link https://www.qrcode.com/en/about/error_correction.html}.
+     * For more information, please refer to [https://www.qrcode.com/en/about/error_correction.html](https://www.qrcode.com/en/about/error_correction.html).
      *
      * @defaultValue 0
      */
@@ -32,7 +32,7 @@ export declare type Options = {
      *
      * Accepts a CSS &lt;color&gt;.
      *
-     * For more information about CSS &lt;color&gt;, please refer to {@link https://developer.mozilla.org/en-US/docs/Web/CSS/color_value}.
+     * For more information about CSS &lt;color&gt;, please refer to [https://developer.mozilla.org/en-US/docs/Web/CSS/color_value](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value).
      *
      * @defaultValue "#000000"
      */
@@ -42,7 +42,7 @@ export declare type Options = {
      *
      * Accepts a CSS &lt;color&gt;.
      *
-     * For more information about CSS &lt;color&gt;, please refer to {@link https://developer.mozilla.org/en-US/docs/Web/CSS/color_value}.
+     * For more information about CSS &lt;color&gt;, please refer to [https://developer.mozilla.org/en-US/docs/Web/CSS/color_value](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value).
      *
      * @defaultValue "#ffffff"
      */
@@ -66,7 +66,7 @@ export declare type Options = {
      *
      * Accepts a CSS &lt;color&gt;.
      *
-     * For more information about CSS &lt;color&gt;, please refer to {@link https://developer.mozilla.org/en-US/docs/Web/CSS/color_value}.
+     * For more information about CSS &lt;color&gt;, please refer to [https://developer.mozilla.org/en-US/docs/Web/CSS/color_value](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value).
      *
      * @defaultValue "rgba(0, 0, 0, 0)"
      */
