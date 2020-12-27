@@ -1,6 +1,6 @@
 {
   "name": "awesome-qr",
-  "version": "2.0.0-beta.3",
+  "version": "2.0.0-beta.4",
   "description": "An awesome but simple QR code generator written in JavaScript.",
   "main": "./lib/awesome-qr.js",
   "types": "./lib/awesome-qr.d.ts",

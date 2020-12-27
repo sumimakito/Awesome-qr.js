@@ -1943,7 +1943,7 @@ var AwesomeQR = /** @class */ (function () {
     AwesomeQR.CorrectLevel = qrcode_1.QRErrorCorrectLevel;
     AwesomeQR._defaultOptions = {
         text: "",
-        size: 800,
+        size: 400,
         margin: 20,
         colorDark: "#000000",
         colorLight: "#ffffff",
@@ -1955,7 +1955,7 @@ var AwesomeQR = /** @class */ (function () {
         logoMargin: 6,
         logoCornerRadius: 8,
         whiteMargin: true,
-        dotScale: 0.35,
+        dotScale: 0.4,
         autoColor: true,
     };
     return AwesomeQR;

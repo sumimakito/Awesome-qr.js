@@ -8,7 +8,7 @@ export declare type Options = {
     /**
      * Size of the QR code in pixel.
      *
-     * @defaultValue 800
+     * @defaultValue 400
      */
     size?: number;
     /**
@@ -88,7 +88,7 @@ export declare type Options = {
      *
      * This can be helpful when you want to make more parts of the background visible.
      *
-     * @deafultValue 0.35
+     * @deafultValue 0.4
      */
     dotScale?: number;
     /**

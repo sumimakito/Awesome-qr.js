@@ -140,7 +140,7 @@ Text to be encoded in the QR code.
 
 ### size
 
-`number?, default: 800`
+`number?, default: 400`
 
 Size of the QR code in pixel.
 
@@ -206,7 +206,7 @@ Use a white margin instead of a transparent one which reveals the background of 
 
 ### dotScale
 
-`number?, default: 0.35`
+`number?, default: 0.4`
 
 Ratio of the real size to the full size of the blocks.
 

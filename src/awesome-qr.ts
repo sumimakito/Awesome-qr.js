@@ -14,7 +14,7 @@ export type Options = {
   /**
    * Size of the QR code in pixel.
    *
-   * @defaultValue 800
+   * @defaultValue 400
    */
   size?: number;
 
@@ -104,7 +104,7 @@ export type Options = {
    *
    * This can be helpful when you want to make more parts of the background visible.
    *
-   * @deafultValue 0.35
+   * @deafultValue 0.4
    */
   dotScale?: number;
 
@@ -151,7 +151,7 @@ export class AwesomeQR {
 
   static _defaultOptions: Options = {
     text: "",
-    size: 800,
+    size: 400,
     margin: 20,
     colorDark: "#000000",
     colorLight: "#ffffff",
@@ -163,7 +163,7 @@ export class AwesomeQR {
     logoMargin: 6,
     logoCornerRadius: 8,
     whiteMargin: true,
-    dotScale: 0.35,
+    dotScale: 0.4,
     autoColor: true,
   };
 
