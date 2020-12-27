@@ -402,7 +402,7 @@ export class AwesomeQR {
       backgroundCanvasContext.fill();
     } else {
       backgroundCanvasContext.rect(0, 0, size, size);
-      backgroundCanvasContext.fillStyle = "#ffffff";
+      backgroundCanvasContext.fillStyle = this.options.colorLight!;
       backgroundCanvasContext.fill();
     }
 

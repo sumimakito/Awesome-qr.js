@@ -1733,7 +1733,7 @@ var AwesomeQR = /** @class */ (function () {
                         return [3 /*break*/, 4];
                     case 3:
                         backgroundCanvasContext.rect(0, 0, size, size);
-                        backgroundCanvasContext.fillStyle = "#ffffff";
+                        backgroundCanvasContext.fillStyle = this.options.colorLight;
                         backgroundCanvasContext.fill();
                         _b.label = 4;
                     case 4:

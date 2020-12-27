@@ -48,7 +48,7 @@ export declare class QRUtil {
     static getPatternPosition(typeNumber: number): number[];
     static getMask(maskPattern: number, i: number, j: number): boolean;
     static getErrorCorrectPolynomial(errorCorrectLength: number): QRPolynomial;
-    static getLengthInBits(mode: number, type: number): 8 | 14 | 11 | 12 | 10 | 9 | 16 | 13;
+    static getLengthInBits(mode: number, type: number): 14 | 11 | 12 | 8 | 10 | 9 | 16 | 13;
     static getLostPoint(qrCode: QRCodeModel): number;
 }
 export declare class QRMath {
