@@ -277,12 +277,10 @@ Also, if you are developing Android apps, you can take a look at [AwesomeQRCode]
 
 ## Copyright &amp; License
 
-Copyright &copy; 2017-2020 Sumi Makito
-
 Awesome-qr.js is licensed under Apache License 2.0 License.
 
 ```
-Copyright (c) 2017-2020 Sumi Makito, https://www.keep.moe
+Copyright (c) 2017-2020 Makito
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
