@@ -1,7 +1,6 @@
 # Awesome-qr.js <!-- omit in toc -->
 
-[![npm version](https://badge.fury.io/js/awesome-qr.svg)](https://badge.fury.io/js/awesome-qr)
-[![license](https://img.shields.io/github/license/SumiMakito/Awesome-qr.js.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+![](https://img.shields.io/npm/v/awesome-qr/latest) ![](https://img.shields.io/npm/v/awesome-qr/next) ![](https://img.shields.io/npm/v/awesome-qr/beta) [![license](https://img.shields.io/github/license/sumimakito/awesome-qr.js)](https://www.apache.org/licenses/LICENSE-2.0)
 
 An awesome but simple QR code generator written in JavaScript.
 
@@ -20,6 +19,7 @@ An awesome but simple QR code generator written in JavaScript.
 ## Contents <!-- omit in toc -->
 
 - [Getting Started](#getting-started)
+  - [React](#react)
   - [Node.js](#nodejs)
   - [Browsers](#browsers)
 - [Options](#options)
@@ -48,6 +48,10 @@ An awesome but simple QR code generator written in JavaScript.
 
 ## Getting Started
 
+### React
+
+Please use [react-awesome-qr](https://github.com/AwesomeQR/react-awesome-qr).
+
 ### Node.js
 
 _Type definitions are included in the npm package._
@@ -57,8 +61,8 @@ _Type definitions are included in the npm package._
 > Awesome-qr.js uses node-canvas as its drawing backend. You might need to take a look at [its documentation](https://github.com/Automattic/node-canvas#installation) to ensure that node-canvas works on your environment.
 
 ```shell
-yarn add awesome-qr // using Yarn
-npm install --save awesome-qr // using NPM
+yarn add awesome-qr@next // using Yarn
+npm install --save awesome-qr@next // using NPM
 ```
 
 > Awesome-qr.js prior to v2.0.0 **does not work well** in Node.js environment and Awesome-qr.js prior to v1.2.0 **does not work** in Node.js environment.
@@ -268,6 +272,7 @@ Also, if you are developing Android apps, you can take a look at [AwesomeQRCode]
 
 ## Other versions
 
+- React component: [react-awesome-qr](https://github.com/AwesomeQR/react-awesome-qr)
 - Vue 2.x component: [Vue-qr](https://github.com/Binaryify/vue-qr)
 
 ## Copyright &amp; License
