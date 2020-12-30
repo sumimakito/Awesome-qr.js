@@ -2,7 +2,7 @@ const path = require("path");
 
 module.exports = {
   mode: "production",
-  entry: "./src/awesome-qr.ts",
+  entry: "./src/index.ts",
   module: {
     rules: [
       {
@@ -23,6 +23,6 @@ module.exports = {
     library: "AwesomeQR",
   },
   optimization: {
-    minimize: false,
+    minimize: true,
   },
 };

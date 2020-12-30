@@ -3,8 +3,6 @@ import { decompressFrames, parseGIF } from "./gifuct-js";
 import { QRCodeModel, QRErrorCorrectLevel, QRUtil } from "./qrcode";
 import GIFEncoder from "./gif.js/GIFEncoder";
 
-export * from "./qrcode";
-
 export type Options = {
   /**
    * Text to be encoded in the QR code.
@@ -167,7 +165,7 @@ export class AwesomeQR {
     autoColor: true,
   };
 
-  constructor(options: Options) {
+  constructor(options: Partial<Options>) {
     const _options = Object.assign({}, options);
     (Object.keys(AwesomeQR._defaultOptions) as (keyof Options)[]).map((k) => {
       if (!(k in _options)) {
@@ -178,7 +176,7 @@ export class AwesomeQR {
         });
       }
     });
-    this.options = _options;
+    this.options = _options as Options;
     this.canvas = createCanvas(options.size!, options.size!);
     this.canvasContext = this.canvas.getContext("2d")!;
     this.qrCode = new QRCodeModel(-1, this.options.correctLevel!);

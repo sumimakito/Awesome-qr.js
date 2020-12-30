@@ -1,5 +1,4 @@
 /// <reference types="node" />
-export * from "./qrcode";
 export declare type Options = {
     /**
      * Text to be encoded in the QR code.
@@ -132,7 +131,7 @@ export declare class AwesomeQR {
         H: number;
     };
     static _defaultOptions: Options;
-    constructor(options: Options);
+    constructor(options: Partial<Options>);
     draw(): Promise<Buffer | ArrayBuffer | string | undefined>;
     private _clear;
     private static _prepareRoundedCornerClip;

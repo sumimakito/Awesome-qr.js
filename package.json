@@ -1,13 +1,13 @@
 {
   "name": "awesome-qr",
-  "version": "2.0.0-beta.4",
+  "version": "2.0.0-beta.15",
   "description": "An awesome but simple QR code generator written in JavaScript.",
-  "main": "./lib/awesome-qr.js",
-  "types": "./lib/awesome-qr.d.ts",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --config webpack.config.js",
-    "prepublish": "webpack --config webpack.config.js && tsc"
+    "build": "webpack --config webpack.config.js && tsc",
+    "prepublishOnly": "webpack --config webpack.config.js && tsc"
   },
   "repository": {
     "type": "git",
@@ -25,8 +25,8 @@
   },
   "homepage": "https://github.com/SumiMakito/Awesome-qr.js#readme",
   "dependencies": {
-    "buffer": "^5.6.0",
-    "canvas": "^2.6.1",
+    "buffer": "^6.0.3",
+    "canvas": "^2.6.1", 
     "js-binary-schema-parser": "^2.0.0"
   },
   "devDependencies": {
@@ -35,6 +35,5 @@
     "typescript": "^3.9.6",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12"
-  },
-  "optionalDependencies": {}
+  }
 }
