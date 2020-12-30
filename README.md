@@ -61,8 +61,8 @@ _Type definitions are included in the npm package._
 > Awesome-qr.js uses node-canvas as its drawing backend. You might need to take a look at [its documentation](https://github.com/Automattic/node-canvas#installation) to ensure that node-canvas works on your environment.
 
 ```shell
-yarn add awesome-qr@next // using Yarn
-npm install --save awesome-qr@next // using NPM
+yarn add awesome-qr // using Yarn
+npm install --save awesome-qr // using NPM
 ```
 
 > Awesome-qr.js prior to v2.0.0 **does not work well** in Node.js environment and Awesome-qr.js prior to v1.2.0 **does not work** in Node.js environment.
