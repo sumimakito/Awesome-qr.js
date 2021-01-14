@@ -27,6 +27,8 @@ An awesome but simple QR code generator written in JavaScript.
   - [size](#size)
   - [margin](#margin)
   - [correctLevel](#correctlevel)
+  - [maskPattern](#maskpattern)
+  - [version](#version)
   - [colorDark](#colordark)
   - [colorLight](#colorlight)
   - [autoColor](#autocolor)
@@ -119,9 +121,9 @@ Options {
   text: string;
   size?: number;
   margin?: number;
-  typeNumber?: number;
   correctLevel?: number;
-  dotScale?: number;
+  maskPattern?: number;
+  version?: number;
   colorDark?: string;
   colorLight?: string;
   autoColor?: boolean;
@@ -129,6 +131,7 @@ Options {
   backgroundDimming?: string;
   gifBackground?: ArrayBuffer;
   whiteMargin?: boolean;
+  dotScale?: number;
   logoImage?: string | Buffer;
   logoScale?: number;
   logoMargin?: number;
@@ -161,6 +164,38 @@ Size of margins around the QR code body in pixel.
 > For more information, please refer to [Error correction feature | QRcode.com | DENSO WAVE](https://www.qrcode.com/en/about/error_correction.html).
 
 Error correction level of the QR code.
+### maskPattern
+
+`number?, continue reading to learn more`
+
+**This is an advanced option.**
+
+Leave untouched to let the code decide which mask pattern to use.
+
+Specify the mask pattern to be used in QR code encoding.
+
+Accepts a value provided by _QRMaskPattern_.
+
+> To find out all eight mask patterns, please refer to [Wikipedia File:QR_Code_Mask_Patterns.svg](https://en.wikipedia.org/wiki/File:QR_Code_Mask_Patterns.svg)
+
+> For more information, please refer to [Reed–Solomon codes for coders: Masking](https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#Masking).
+
+### version
+
+`number?, continue reading to learn more`
+
+**This is an advanced option.**
+
+Leave untouched to let the code decide which version to use.
+
+Specify the version to be used in QR code encoding.
+
+Accepts an integer in range [1, 40].
+
+**⚠️ An error might occurs if the specified version does not have enough space for the input data.**
+
+> For more information, please refer to [Information capacity and versions of QR Code | QRcode.com | DENSO WAVE](https://www.qrcode.com/en/about/version.html).
+
 
 ### colorDark
 
