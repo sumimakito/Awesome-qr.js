@@ -1,5 +1,9 @@
 # Changelog
 
+## Ver. 2.0.1
+
+- Option now supports specifying QR mask pattern and QR version.
+
 ## Ver. 2.0.0
 
 - Use Webpack as module bundler.
