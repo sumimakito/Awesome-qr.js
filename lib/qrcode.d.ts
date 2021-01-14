@@ -13,6 +13,7 @@ export declare class QRCodeModel {
     moduleCount: number;
     dataCache?: number[];
     dataList: QR8bitByte[];
+    maskPattern?: number;
     constructor(typeNumber?: number, errorCorrectLevel?: number);
     addData(data: string): void;
     isDark(row: number, col: number): boolean | null;
@@ -36,6 +37,16 @@ export declare const QRErrorCorrectLevel: {
     M: number;
     Q: number;
     H: number;
+};
+export declare const QRMaskPattern: {
+    PATTERN000: number;
+    PATTERN001: number;
+    PATTERN010: number;
+    PATTERN011: number;
+    PATTERN100: number;
+    PATTERN101: number;
+    PATTERN110: number;
+    PATTERN111: number;
 };
 export declare class QRUtil {
     static PATTERN_POSITION_TABLE: number[][];

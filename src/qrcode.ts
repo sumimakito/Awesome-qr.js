@@ -15,6 +15,29 @@
 //
 //---------------------------------------------------------------------
 
+function checkQRVersion(version: number, sText: string, nCorrectLevel: number) {
+  const length = _getUTF8Length(sText);
+  const i = version - 1;
+  let nLimit = 0;
+
+  switch (nCorrectLevel) {
+    case QRErrorCorrectLevel.L:
+      nLimit = QRCodeLimitLength[i][0];
+      break;
+    case QRErrorCorrectLevel.M:
+      nLimit = QRCodeLimitLength[i][1];
+      break;
+    case QRErrorCorrectLevel.Q:
+      nLimit = QRCodeLimitLength[i][2];
+      break;
+    case QRErrorCorrectLevel.H:
+      nLimit = QRCodeLimitLength[i][3];
+      break;
+  }
+
+  return length <= nLimit;
+}
+
 function _getTypeNumber(sText: string, nCorrectLevel: number) {
   var nType = 1;
   var length = _getUTF8Length(sText);
@@ -119,6 +142,8 @@ export class QRCodeModel {
   dataCache?: number[];
   dataList: QR8bitByte[] = [];
 
+  maskPattern?: number;
+
   constructor(typeNumber = -1, errorCorrectLevel = QRErrorCorrectLevel.L) {
     this.typeNumber = typeNumber;
     this.errorCorrectLevel = errorCorrectLevel;
@@ -129,6 +154,12 @@ export class QRCodeModel {
   addData(data: string) {
     if (this.typeNumber <= 0) {
       this.typeNumber = _getTypeNumber(data, this.errorCorrectLevel);
+    } else if (this.typeNumber > 40) {
+      throw new Error(`Invalid QR version: ${this.typeNumber}`);
+    } else {
+      if (!checkQRVersion(this.typeNumber, data, this.errorCorrectLevel)) {
+        throw new Error(`Data is too long for QR version: ${this.typeNumber}`);
+      }
     }
     const newData = new QR8bitByte(data);
     this.dataList.push(newData);
@@ -145,6 +176,7 @@ export class QRCodeModel {
   getModuleCount() {
     return this.moduleCount;
   }
+
   make() {
     this.makeImpl(false, this.getBestMaskPattern());
   }
@@ -192,6 +224,10 @@ export class QRCodeModel {
   }
 
   getBestMaskPattern() {
+    if (Number.isInteger(this.maskPattern) && Object.values(QRMaskPattern).includes(this.maskPattern!)) {
+      return this.maskPattern!;
+    }
+
     let minLostPoint = 0;
     let pattern = 0;
     for (let i = 0; i < 8; i++) {
@@ -405,7 +441,7 @@ export class QRCodeModel {
 
 export const QRErrorCorrectLevel = { L: 1, M: 0, Q: 3, H: 2 };
 const QRMode = { MODE_NUMBER: 1 << 0, MODE_ALPHA_NUM: 1 << 1, MODE_8BIT_BYTE: 1 << 2, MODE_KANJI: 1 << 3 };
-const QRMaskPattern = {
+export const QRMaskPattern = {
   PATTERN000: 0,
   PATTERN001: 1,
   PATTERN010: 2,

@@ -27,6 +27,28 @@ export declare type Options = {
      */
     correctLevel?: number;
     /**
+     * **This is an advanced option.**
+     *
+     * Specify the mask pattern to be used in QR code encoding.
+     *
+     * Accepts a value provided by _QRMaskPattern_.
+     *
+     * To find out all eight mask patterns, please refer to [https://en.wikipedia.org/wiki/File:QR_Code_Mask_Patterns.svg](https://en.wikipedia.org/wiki/File:QR_Code_Mask_Patterns.svg)
+     *
+     * For more information, please refer to [https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#Masking](https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#Masking).
+     */
+    maskPattern?: number;
+    /**
+     * **This is an advanced option.**
+     *
+     * Specify the version to be used in QR code encoding.
+     *
+     * Accepts an integer in range [1, 40].
+     *
+     * For more information, please refer to [https://www.qrcode.com/en/about/version.html](https://www.qrcode.com/en/about/version.html).
+     */
+    version?: number;
+    /**
      * Color of the blocks on the QR code.
      *
      * Accepts a CSS &lt;color&gt;.

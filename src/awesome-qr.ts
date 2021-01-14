@@ -35,6 +35,30 @@ export type Options = {
   correctLevel?: number;
 
   /**
+   * **This is an advanced option.**
+   *
+   * Specify the mask pattern to be used in QR code encoding.
+   *
+   * Accepts a value provided by _QRMaskPattern_.
+   *
+   * To find out all eight mask patterns, please refer to [https://en.wikipedia.org/wiki/File:QR_Code_Mask_Patterns.svg](https://en.wikipedia.org/wiki/File:QR_Code_Mask_Patterns.svg)
+   *
+   * For more information, please refer to [https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#Masking](https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#Masking).
+   */
+  maskPattern?: number;
+
+  /**
+   * **This is an advanced option.**
+   *
+   * Specify the version to be used in QR code encoding.
+   *
+   * Accepts an integer in range [1, 40].
+   *
+   * For more information, please refer to [https://www.qrcode.com/en/about/version.html](https://www.qrcode.com/en/about/version.html).
+   */
+  version?: number;
+
+  /**
    * Color of the blocks on the QR code.
    *
    * Accepts a CSS &lt;color&gt;.
@@ -180,6 +204,12 @@ export class AwesomeQR {
     this.canvas = createCanvas(options.size!, options.size!);
     this.canvasContext = this.canvas.getContext("2d")!;
     this.qrCode = new QRCodeModel(-1, this.options.correctLevel!);
+    if (Number.isInteger(this.options.maskPattern)) {
+      this.qrCode.maskPattern = this.options.maskPattern!;
+    }
+    if (Number.isInteger(this.options.version)) {
+      this.qrCode.typeNumber = this.options.version!;
+    }
     this.qrCode.addData(this.options.text);
     this.qrCode.make();
   }
