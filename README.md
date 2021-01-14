@@ -19,7 +19,6 @@ An awesome but simple QR code generator written in JavaScript.
 ## Contents <!-- omit in toc -->
 
 - [Getting Started](#getting-started)
-  - [React](#react)
   - [Node.js](#nodejs)
   - [Browsers](#browsers)
 - [Options](#options)
@@ -49,10 +48,6 @@ An awesome but simple QR code generator written in JavaScript.
 - [Copyright &amp; License](#copyright--license)
 
 ## Getting Started
-
-### React
-
-Please use [react-awesome-qr](https://github.com/AwesomeQR/react-awesome-qr).
 
 ### Node.js
 
@@ -87,6 +82,8 @@ fs.writeFileSync("qrcode.png", buffer);
 ```
 
 ### Browsers
+
+> ⚛️ &nbsp; If you're using React, please use [react-awesome-qr](https://github.com/AwesomeQR/react-awesome-qr).
 
 ```html
 <!-- import to the global scope -->
@@ -192,7 +189,7 @@ Specify the version to be used in QR code encoding.
 
 Accepts an integer in range [1, 40].
 
-**⚠️ An error might occurs if the specified version does not have enough space for the input data.**
+**⚠️ &nbsp; An error might occurs if the specified version does not have enough space for the input data.**
 
 > For more information, please refer to [Information capacity and versions of QR Code | QRcode.com | DENSO WAVE](https://www.qrcode.com/en/about/version.html).
 
