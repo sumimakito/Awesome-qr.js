@@ -3,6 +3,72 @@ import { decompressFrames, parseGIF } from "./gifuct-js";
 import { QRCodeModel, QRErrorCorrectLevel, QRUtil } from "./qrcode";
 import GIFEncoder from "./gif.js/GIFEncoder";
 
+const defaultScale = 0.4;
+
+export type ComponentOptions = {
+  /**
+   * Component options for data/ECC.
+   */
+  data?: {
+    /**
+     * Scale factor for data/ECC dots.
+     * @default 0.4
+     */
+    scale?: number;
+  };
+
+  /**
+   * Component options for timing patterns.
+   */
+  timing?: {
+    /**
+     * Scale factor for timing patterns.
+     * @default 0.6
+     */
+    scale?: number;
+
+    /**
+     * Protector for timing patterns.
+     * @default false
+     */
+    protectors?: boolean;
+  };
+
+  /**
+   * Component options for alignment patterns.
+   */
+  alignment?: {
+    /**
+     * Scale factor for alignment patterns.
+     * @default 0.6
+     */
+    scale?: number;
+
+    /**
+     * Protector for alignment patterns.
+     * @default false
+     */
+    protectors?: boolean;
+  };
+
+  /**
+   * Component options for alignment pattern on the bottom-right corner.
+   */
+  cornerAlignment?: {
+    /**
+     * Scale factor for alignment pattern on the bottom-right corner.
+     * @default 1.0
+     */
+    scale?: number;
+
+    /**
+     * Protector for alignment pattern on the bottom-right corner.
+     * @default true
+     */
+    protectors?: boolean;
+  };
+};
+
 export type Options = {
   /**
    * Text to be encoded in the QR code.
@@ -57,6 +123,13 @@ export type Options = {
    * For more information, please refer to [https://www.qrcode.com/en/about/version.html](https://www.qrcode.com/en/about/version.html).
    */
   version?: number;
+
+  /**
+   * Options to control components in the QR code.
+   *
+   * @deafultValue undefined
+   */
+  components?: ComponentOptions;
 
   /**
    * Color of the blocks on the QR code.
@@ -122,6 +195,8 @@ export type Options = {
   whiteMargin?: boolean;
 
   /**
+   * @deprecated
+   *
    * Ratio of the real size to the full size of the blocks.
    *
    * This can be helpful when you want to make more parts of the background visible.
@@ -171,7 +246,25 @@ export class AwesomeQR {
 
   static CorrectLevel = QRErrorCorrectLevel;
 
-  static _defaultOptions: Options = {
+  private static defaultComponentOptions: ComponentOptions = {
+    data: {
+      scale: 0.4,
+    },
+    timing: {
+      scale: 0.6,
+      protectors: false,
+    },
+    alignment: {
+      scale: 0.6,
+      protectors: false,
+    },
+    cornerAlignment: {
+      scale: 1,
+      protectors: true,
+    },
+  };
+
+  private static defaultOptions: Options = {
     text: "",
     size: 400,
     margin: 20,
@@ -185,21 +278,45 @@ export class AwesomeQR {
     logoMargin: 6,
     logoCornerRadius: 8,
     whiteMargin: true,
-    dotScale: 0.4,
+    components: AwesomeQR.defaultComponentOptions,
     autoColor: true,
   };
 
   constructor(options: Partial<Options>) {
     const _options = Object.assign({}, options);
-    (Object.keys(AwesomeQR._defaultOptions) as (keyof Options)[]).map((k) => {
+
+    (Object.keys(AwesomeQR.defaultOptions) as (keyof Options)[]).forEach((k) => {
       if (!(k in _options)) {
-        Object.defineProperty(_options, k, {
-          value: AwesomeQR._defaultOptions[k],
-          enumerable: true,
-          writable: true,
-        });
+        Object.defineProperty(_options, k, { value: AwesomeQR.defaultOptions[k], enumerable: true, writable: true });
       }
     });
+
+    if (!_options.components) {
+      _options.components = AwesomeQR.defaultComponentOptions;
+    } else if (typeof _options.components === "object") {
+      (Object.keys(AwesomeQR.defaultComponentOptions) as (keyof ComponentOptions)[]).forEach((k) => {
+        if (!(k in _options.components!)) {
+          Object.defineProperty(_options.components!, k, {
+            value: AwesomeQR.defaultComponentOptions[k],
+            enumerable: true,
+            writable: true,
+          });
+        } else {
+          Object.defineProperty(_options.components!, k, {
+            value: { ...AwesomeQR.defaultComponentOptions[k], ..._options.components![k] },
+            enumerable: true,
+            writable: true,
+          });
+        }
+      });
+    }
+
+    if (_options.dotScale) {
+      _options.components.data!.scale = _options.dotScale;
+      _options.components.timing!.scale = _options.dotScale;
+      _options.components.alignment!.scale = _options.dotScale;
+    }
+
     this.options = _options as Options;
     this.canvas = createCanvas(options.size!, options.size!);
     this.canvasContext = this.canvas.getContext("2d")!;
@@ -309,11 +426,13 @@ export class AwesomeQR {
     canvasContext: CanvasRenderingContext2D,
     centerX: number,
     centerY: number,
-    nWidth: number,
-    nHeight: number
+    nSize: number
   ) {
-    canvasContext.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
-    canvasContext.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
+    canvasContext.clearRect((centerX - 2) * nSize, (centerY - 2) * nSize, 5 * nSize, 5 * nSize);
+    canvasContext.fillRect((centerX - 2) * nSize, (centerY - 2) * nSize, 5 * nSize, 5 * nSize);
+
+    // canvasContext.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
+    // canvasContext.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
   }
 
   private static _drawAlign(
@@ -336,10 +455,10 @@ export class AwesomeQR {
     AwesomeQR._drawDot(canvasContext, centerX, centerY, nSize, xyOffset, dotScale);
     canvasContext.fillStyle = "rgba(255, 255, 255, 0.6)";
     new Array(2).fill(0).map((_, i) => {
-      AwesomeQR._drawDot(canvasContext, centerX - 1 + i, centerY - 1, nSize, xyOffset, dotScale);
-      AwesomeQR._drawDot(canvasContext, centerX + 1, centerY - 1 + i, nSize, xyOffset, dotScale);
-      AwesomeQR._drawDot(canvasContext, centerX + 1 - i, centerY + 1, nSize, xyOffset, dotScale);
-      AwesomeQR._drawDot(canvasContext, centerX - 1, centerY + 1 - i, nSize, xyOffset, dotScale);
+      // AwesomeQR._drawDot(canvasContext, centerX - 1 + i, centerY - 1, nSize, 0, 1);
+      // AwesomeQR._drawDot(canvasContext, centerX + 1, centerY - 1 + i, nSize, 0, 1);
+      // AwesomeQR._drawDot(canvasContext, centerX + 1 - i, centerY + 1, nSize, 0, 1);
+      // AwesomeQR._drawDot(canvasContext, centerX - 1, centerY + 1 - i, nSize, 0, 1);
     });
     canvasContext.fillStyle = oldFillStyle;
   }
@@ -434,83 +553,97 @@ export class AwesomeQR {
       backgroundCanvasContext.fill();
     }
 
-    const agnPatternCenter = QRUtil.getPatternPosition(this.qrCode!.typeNumber);
+    const alignmentPatternCenters = QRUtil.getPatternPosition(this.qrCode!.typeNumber);
 
-    const xyOffset = (1 - dotScale) * 0.5;
+    const dataScale = this.options.components?.data?.scale || defaultScale;
+    const dataXyOffset = (1 - dataScale) * 0.5;
     for (let row = 0; row < nCount; row++) {
       for (let col = 0; col < nCount; col++) {
         const bIsDark = this.qrCode!.isDark(row, col);
         const isBlkPosCtr = (col < 8 && (row < 8 || row >= nCount - 8)) || (col >= nCount - 8 && row < 8);
-        let bProtected = isBlkPosCtr;
+        const isTiming = (row == 6 && col >= 8 && col <= nCount - 8) || (col == 6 && row >= 8 && row <= nCount - 8);
+        let isProtected = isBlkPosCtr || isTiming;
 
-        for (let i = 0; i < agnPatternCenter.length - 1; i++) {
-          bProtected =
-            bProtected ||
-            (row >= agnPatternCenter[i] - 2 &&
-              row <= agnPatternCenter[i] + 2 &&
-              col >= agnPatternCenter[i] - 2 &&
-              col <= agnPatternCenter[i] + 2);
+        for (let i = 1; i < alignmentPatternCenters.length - 1; i++) {
+          isProtected =
+            isProtected ||
+            (row >= alignmentPatternCenters[i] - 2 &&
+              row <= alignmentPatternCenters[i] + 2 &&
+              col >= alignmentPatternCenters[i] - 2 &&
+              col <= alignmentPatternCenters[i] + 2);
         }
 
-        const nLeft = col * nSize + (bProtected ? 0 : xyOffset * nSize);
-        const nTop = row * nSize + (bProtected ? 0 : xyOffset * nSize);
+        const nLeft = col * nSize + (isProtected ? 0 : dataXyOffset * nSize);
+        const nTop = row * nSize + (isProtected ? 0 : dataXyOffset * nSize);
         mainCanvasContext.strokeStyle = bIsDark ? this.options.colorDark! : this.options.colorLight!;
         mainCanvasContext.lineWidth = 0.5;
         mainCanvasContext.fillStyle = bIsDark ? this.options.colorDark! : "rgba(255, 255, 255, 0.6)";
-        if (agnPatternCenter.length === 0) {
-          if (!bProtected) {
+        if (alignmentPatternCenters.length === 0) {
+          if (!isProtected) {
             mainCanvasContext.fillRect(
               nLeft,
               nTop,
-              (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nSize,
-              (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nSize
+              (isProtected ? (isBlkPosCtr ? 1 : 1) : dataScale) * nSize,
+              (isProtected ? (isBlkPosCtr ? 1 : 1) : dataScale) * nSize
             );
           }
         } else {
           const inAgnRange = col < nCount - 4 && col >= nCount - 4 - 5 && row < nCount - 4 && row >= nCount - 4 - 5;
-          if (!bProtected && !inAgnRange) {
+          if (!isProtected && !inAgnRange) {
             // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
             mainCanvasContext.fillRect(
               nLeft,
               nTop,
-              (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nSize,
-              (bProtected ? (isBlkPosCtr ? 1 : 1) : dotScale) * nSize
+              (isProtected ? (isBlkPosCtr ? 1 : 1) : dataScale) * nSize,
+              (isProtected ? (isBlkPosCtr ? 1 : 1) : dataScale) * nSize
             );
           }
         }
       }
     }
 
-    // Draw POSITION protectors
+    const cornerAlignmentCenter = alignmentPatternCenters[alignmentPatternCenters.length - 1];
+
+    // - PROTECTORS
     const protectorStyle = "rgba(255, 255, 255, 0.6)";
+
+    // - FINDER PROTECTORS
     mainCanvasContext.fillStyle = protectorStyle;
     mainCanvasContext.fillRect(0, 0, 8 * nSize, 8 * nSize);
     mainCanvasContext.fillRect(0, (nCount - 8) * nSize, 8 * nSize, 8 * nSize);
     mainCanvasContext.fillRect((nCount - 8) * nSize, 0, 8 * nSize, 8 * nSize);
-    // Protectors for timing patterns
-    // mainCanvasContext.fillRect(8 * nSize, 6 * nSize, (nCount - 8 - 8) * nSize, nSize);
-    // mainCanvasContext.fillRect(6 * nSize, 8 * nSize, nSize, (nCount - 8 - 8) * nSize);
 
-    const edgeCenter = agnPatternCenter[agnPatternCenter.length - 1];
+    // - TIMING PROTECTORS
+    if (this.options.components?.timing?.protectors) {
+      mainCanvasContext.fillRect(8 * nSize, 6 * nSize, (nCount - 8 - 8) * nSize, nSize);
+      mainCanvasContext.fillRect(6 * nSize, 8 * nSize, nSize, (nCount - 8 - 8) * nSize);
+    }
 
-    // Draw ALIGN protectors
-    // for (let i = 0; i < agnPatternCenter.length; i++) {
-    //   for (let j = 0; j < agnPatternCenter.length; j++) {
-    //     const agnX = agnPatternCenter[j];
-    //     const agnY = agnPatternCenter[i];
-    //     if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
-    //       continue;
-    //     } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
-    //       continue;
-    //     } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-    //       AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
-    //     } else {
-    //       AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, dotScale * nSize, dotScale * nSize);
-    //     }
-    //   }
-    // }
+    // - CORNER ALIGNMENT PROTECTORS
+    if (this.options.components?.cornerAlignment?.protectors) {
+      AwesomeQR._drawAlignProtector(mainCanvasContext, cornerAlignmentCenter, cornerAlignmentCenter, nSize);
+    }
 
-    // Draw POSITION patterns
+    // - ALIGNMENT PROTECTORS
+    if (this.options.components?.alignment?.protectors) {
+      for (let i = 0; i < alignmentPatternCenters.length; i++) {
+        for (let j = 0; j < alignmentPatternCenters.length; j++) {
+          const agnX = alignmentPatternCenters[j];
+          const agnY = alignmentPatternCenters[i];
+          if (agnX === 6 && (agnY === 6 || agnY === cornerAlignmentCenter)) {
+            continue;
+          } else if (agnY === 6 && (agnX === 6 || agnX === cornerAlignmentCenter)) {
+            continue;
+          } else if (agnX === cornerAlignmentCenter && agnY === cornerAlignmentCenter) {
+            continue;
+          } else {
+            AwesomeQR._drawAlignProtector(mainCanvasContext, agnX, agnY, nSize);
+          }
+        }
+      }
+    }
+
+    // - FINDER
     mainCanvasContext.fillStyle = this.options.colorDark!;
     mainCanvasContext.fillRect(0, 0, 7 * nSize, nSize);
     mainCanvasContext.fillRect((nCount - 7) * nSize, 0, 7 * nSize, nSize);
@@ -529,35 +662,51 @@ export class AwesomeQR {
     mainCanvasContext.fillRect((nCount - 7 + 2) * nSize, 2 * nSize, 3 * nSize, 3 * nSize);
     mainCanvasContext.fillRect(2 * nSize, (nCount - 7 + 2) * nSize, 3 * nSize, 3 * nSize);
 
+    // - TIMING
+    const timingScale = this.options.components?.timing?.scale || defaultScale;
+    const timingXyOffset = (1 - timingScale) * 0.5;
     for (let i = 0; i < nCount - 8; i += 2) {
-      mainCanvasContext.fillRect(
-        (8 + i + xyOffset) * nSize,
-        (6 + xyOffset) * nSize,
-        dotScale * nSize,
-        dotScale * nSize
-      );
-      mainCanvasContext.fillRect(
-        (6 + xyOffset) * nSize,
-        (8 + i + xyOffset) * nSize,
-        dotScale * nSize,
-        dotScale * nSize
-      );
+      AwesomeQR._drawDot(mainCanvasContext, 8 + i, 6, nSize, timingXyOffset, timingScale);
+      AwesomeQR._drawDot(mainCanvasContext, 6, 8 + i, nSize, timingXyOffset, timingScale);
     }
 
-    for (let i = 0; i < agnPatternCenter.length; i++) {
-      for (let j = 0; j < agnPatternCenter.length; j++) {
-        const agnX = agnPatternCenter[j];
-        const agnY = agnPatternCenter[i];
-        if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
+    // - CORNER ALIGNMENT PROTECTORS
+    const cornerAlignmentScale = this.options.components?.cornerAlignment?.scale || defaultScale;
+    const cornerAlignmentXyOffset = (1 - cornerAlignmentScale) * 0.5;
+    AwesomeQR._drawAlign(
+      mainCanvasContext,
+      cornerAlignmentCenter,
+      cornerAlignmentCenter,
+      nSize,
+      cornerAlignmentXyOffset,
+      cornerAlignmentScale,
+      this.options.colorDark!
+    );
+
+    // - ALIGNEMNT
+    const alignmentScale = this.options.components?.alignment?.scale || defaultScale;
+    const alignmentXyOffset = (1 - alignmentScale) * 0.5;
+    for (let i = 0; i < alignmentPatternCenters.length; i++) {
+      for (let j = 0; j < alignmentPatternCenters.length; j++) {
+        const agnX = alignmentPatternCenters[j];
+        const agnY = alignmentPatternCenters[i];
+        if (agnX === 6 && (agnY === 6 || agnY === cornerAlignmentCenter)) {
           continue;
-        } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
+        } else if (agnY === 6 && (agnX === 6 || agnX === cornerAlignmentCenter)) {
           continue;
-        } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
-          // mainCanvasContext.fillStyle = "rgba(0, 0, 0, .2)";
-          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale, this.options.colorDark!);
+        } else if (agnX === cornerAlignmentCenter && agnY === cornerAlignmentCenter) {
+          continue;
         } else {
-          // mainCanvasContext.fillStyle = this.options.colorDark!;
-          AwesomeQR._drawAlign(mainCanvasContext, agnX, agnY, nSize, xyOffset, dotScale, this.options.colorDark!);
+          // mainCanvasContext.fillStyle = "rgba(0, 0, 0, .2)";
+          AwesomeQR._drawAlign(
+            mainCanvasContext,
+            agnX,
+            agnY,
+            nSize,
+            alignmentXyOffset,
+            alignmentScale,
+            this.options.colorDark!
+          );
         }
       }
     }

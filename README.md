@@ -28,6 +28,7 @@ An awesome but simple QR code generator written in JavaScript.
   - [correctLevel](#correctlevel)
   - [maskPattern](#maskpattern)
   - [version](#version)
+  - [components](#components)
   - [colorDark](#colordark)
   - [colorLight](#colorlight)
   - [autoColor](#autocolor)
@@ -35,11 +36,14 @@ An awesome but simple QR code generator written in JavaScript.
   - [backgroundDimming](#backgrounddimming)
   - [gifBackground](#gifbackground)
   - [whiteMargin](#whitemargin)
-  - [dotScale](#dotscale)
+  - [<del>dotScale</del> (DEPRECATED)](#deldotscaledel-deprecated)
   - [logoImage](#logoimage)
   - [logoScale](#logoscale)
   - [logoMargin](#logomargin)
   - [logoCornerRadius](#logocornerradius)
+- [ComponentOptions](#componentoptions)
+  - [scale](#scale)
+  - [protectors](#protectors)
 - [Sponsors](#sponsors)
 - [Changelog](#changelog)
 - [Special thanks](#special-thanks)
@@ -114,7 +118,7 @@ reader.readAsDataURL(file);
 > _Options_ is an object that you can pass to the generator to customize your QR code.
 
 ```ts
-Options {
+type Options = {
   text: string;
   size?: number;
   margin?: number;
@@ -129,6 +133,7 @@ Options {
   gifBackground?: ArrayBuffer;
   whiteMargin?: boolean;
   dotScale?: number;
+  components?: ComponentOptions;
   logoImage?: string | Buffer;
   logoScale?: number;
   logoMargin?: number;
@@ -138,32 +143,47 @@ Options {
 
 ### text
 
-`string`
+**Type** `string`
 
 Text to be encoded in the QR code.
 
+<hr/>
+
 ### size
 
-`number?, default: 400`
+**Type** `number?`
+
+**Default** `400`
 
 Size of the QR code in pixel.
 
+<hr/>
+
 ### margin
 
-`number?, default: 20`
+**Type** `number?`
+
+**Default** `20`
 
 Size of margins around the QR code body in pixel.
 
+<hr/>
+
 ### correctLevel
 
-`number?, default: QRErrorCorrectLevel.M = 0`
+**Type** `number?`
+
+**Default** `QRErrorCorrectLevel.M` ~> `0`
 
 > For more information, please refer to [Error correction feature | QRcode.com | DENSO WAVE](https://www.qrcode.com/en/about/error_correction.html).
 
 Error correction level of the QR code.
+
+<hr/>
+
 ### maskPattern
 
-`number?, continue reading to learn more`
+**Type** `number?`
 
 **This is an advanced option.**
 
@@ -177,9 +197,11 @@ Accepts a value provided by _QRMaskPattern_.
 
 > For more information, please refer to [Reed–Solomon codes for coders: Masking](https://en.wikiversity.org/wiki/Reed%E2%80%93Solomon_codes_for_coders#Masking).
 
+<hr/>
+
 ### version
 
-`number?, continue reading to learn more`
+**Type** `number?`
 
 **This is an advanced option.**
 
@@ -193,64 +215,109 @@ Accepts an integer in range [1, 40].
 
 > For more information, please refer to [Information capacity and versions of QR Code | QRcode.com | DENSO WAVE](https://www.qrcode.com/en/about/version.html).
 
+<hr/>
+
+### components
+
+**Type** [ComponentOptions](#componentoptions)
+
+Controls the appearances of parts in the QR code.
+
+Read section [ComponentOptions](#componentoptions) to learn more.
+
+<hr/>
 
 ### colorDark
 
-`string?, CSS <color>, default: "#000000"`
+**Type** `string?, CSS <color>`
+
+**Default** `"#000000"`
 
 > For more information about CSS &lt;color&gt;, please refer to [&lt;color&gt; - CSS: Cascading Style Sheets | MDN](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value)
 
 Color of the blocks on the QR code.
 
+<hr/>
+
 ### colorLight
 
-`string?, CSS <color>, default: "#ffffff"`
+**Type** `string?, CSS <color>`
+
+**Default** `"#ffffff"`
 
 Color of the empty areas on the QR code.
 
+<hr/>
+
 ### autoColor
 
-`boolean?, default: true`
+**Type** `boolean?`
+
+**Default** `true`
 
 Automatically calculate the _colorDark_ value from the QR code's background.
 
+<hr/>
+
 ### backgroundImage
 
-`(string|Buffer)?, default: undefined`
+**Type** `(string|Buffer)?`
+
+**Default** `undefined`
 
 Background image to be used in the QR code.
 
 Accepts a `data:` string in web browsers or a Buffer in Node.js.
 
+<hr/>
+
 ### backgroundDimming
 
-`string?, CSS <color>, default: "rgba(0, 0, 0, 0)"`
+**Type** `string?, CSS <color>`
+
+**Default** `"rgba(0, 0, 0, 0)"`
 
 Color of the dimming mask above the background image.
 
+<hr/>
+
 ### gifBackground
 
-`ArrayBuffer?, default: undefined`
+**Type** `ArrayBuffer?`
+
+**Default** `undefined`
 
 GIF background image to be used in the QR code.
 
+<hr/>
+
 ### whiteMargin
 
-`boolean?, default: true`
+**Type** `boolean?`
+
+**Default** `true`
 
 Use a white margin instead of a transparent one which reveals the background of the QR code on margins.
 
-### dotScale
+<hr/>
 
-`number?, default: 0.4`
+### <del>dotScale</del> (DEPRECATED)
+
+**Type** `number?`
+
+**Default** `0.4`
 
 Ratio of the real size to the full size of the blocks.
 
 This can be helpful when you want to make more parts of the background visible.
 
+<hr/>
+
 ### logoImage
 
-`(string|Buffer)?, default: undefined`
+**Type** `(string|Buffer)?`
+
+**Default** `undefined`
 
 Logo image to be displayed at the center of the QR code.
 
@@ -258,23 +325,95 @@ Accepts a `data:` string in web browsers or a Buffer in Node.js.
 
 When set to `undefined` or `null`, the logo is disabled.
 
+<hr/>
+
 ### logoScale
 
-`number?, default: 0.2`
+**Type** `number?`
+
+**Default** `0.2`
 
 Ratio of the logo size to the QR code size.
 
+<hr/>
+
 ### logoMargin
 
-`number?, default: 6`
+**Type** `number?`
+
+**Default** `6`
 
 Size of margins around the logo image in pixels.
 
+<hr/>
+
 ### logoCornerRadius
 
-`number?, default: 8`
+**Type** `number?`
+
+**Default** `8`
 
 Corner radius of the logo image in pixels.
+
+## ComponentOptions
+
+> _ComponentOptions_ controls the appearances of parts in the QR code.
+
+```ts
+type ComponentOptions = {
+  data?: {
+    scale?: number;
+  };
+  timing?: {
+    scale?: number;
+    protectors?: boolean;
+  };
+  alignment?: {
+    scale?: number;
+    protectors?: boolean;
+  };
+  cornerAlignment?: {
+    scale?: number;
+    protectors?: boolean;
+  };
+};
+```
+
+```ts
+// default ComponentOptions
+
+{
+  data: {
+    scale: 0.4,
+  },
+  timing: {
+    scale: 0.6,
+    protectors: false,
+  },
+  alignment: {
+    scale: 0.6,
+    protectors: false,
+  },
+  cornerAlignment: {
+    scale: 1,
+    protectors: true,
+  },
+}
+```
+
+### scale
+
+**Type** `number?`
+
+Scale factor for blocks in the specified area of the QR code.
+
+<hr/>
+
+### protectors
+
+**Type** `boolean?`
+
+Controls whether or not to draw the translucent protectors under the specified area in the QR code.
 
 ## Sponsors
 

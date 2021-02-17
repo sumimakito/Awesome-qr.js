@@ -1,4 +1,61 @@
 /// <reference types="node" />
+export declare type ComponentOptions = {
+    /**
+     * Component options for data/ECC.
+     */
+    data?: {
+        /**
+         * Scale factor for data/ECC dots.
+         * @default 0.4
+         */
+        scale?: number;
+    };
+    /**
+     * Component options for timing patterns.
+     */
+    timing?: {
+        /**
+         * Scale factor for timing patterns.
+         * @default 0.6
+         */
+        scale?: number;
+        /**
+         * Protector for timing patterns.
+         * @default false
+         */
+        protectors?: boolean;
+    };
+    /**
+     * Component options for alignment patterns.
+     */
+    alignment?: {
+        /**
+         * Scale factor for alignment patterns.
+         * @default 0.6
+         */
+        scale?: number;
+        /**
+         * Protector for alignment patterns.
+         * @default false
+         */
+        protectors?: boolean;
+    };
+    /**
+     * Component options for alignment pattern on the bottom-right corner.
+     */
+    cornerAlignment?: {
+        /**
+         * Scale factor for alignment pattern on the bottom-right corner.
+         * @default 1.0
+         */
+        scale?: number;
+        /**
+         * Protector for alignment pattern on the bottom-right corner.
+         * @default true
+         */
+        protectors?: boolean;
+    };
+};
 export declare type Options = {
     /**
      * Text to be encoded in the QR code.
@@ -48,6 +105,12 @@ export declare type Options = {
      * For more information, please refer to [https://www.qrcode.com/en/about/version.html](https://www.qrcode.com/en/about/version.html).
      */
     version?: number;
+    /**
+     * Options to control components in the QR code.
+     *
+     * @deafultValue undefined
+     */
+    components?: ComponentOptions;
     /**
      * Color of the blocks on the QR code.
      *
@@ -105,6 +168,8 @@ export declare type Options = {
      */
     whiteMargin?: boolean;
     /**
+     * @deprecated
+     *
      * Ratio of the real size to the full size of the blocks.
      *
      * This can be helpful when you want to make more parts of the background visible.
@@ -152,7 +217,8 @@ export declare class AwesomeQR {
         Q: number;
         H: number;
     };
-    static _defaultOptions: Options;
+    private static defaultComponentOptions;
+    private static defaultOptions;
     constructor(options: Partial<Options>);
     draw(): Promise<Buffer | ArrayBuffer | string | undefined>;
     private _clear;
