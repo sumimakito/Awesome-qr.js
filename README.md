@@ -28,6 +28,7 @@ An awesome but simple QR code generator written in JavaScript.
   - [correctLevel](#correctlevel)
   - [maskPattern](#maskpattern)
   - [version](#version)
+  - [<del>dotScale</del> (DEPRECATED)](#deldotscaledel-deprecated)
   - [components](#components)
   - [colorDark](#colordark)
   - [colorLight](#colorlight)
@@ -36,7 +37,6 @@ An awesome but simple QR code generator written in JavaScript.
   - [backgroundDimming](#backgrounddimming)
   - [gifBackground](#gifbackground)
   - [whiteMargin](#whitemargin)
-  - [<del>dotScale</del> (DEPRECATED)](#deldotscaledel-deprecated)
   - [logoImage](#logoimage)
   - [logoScale](#logoscale)
   - [logoMargin](#logomargin)
@@ -125,6 +125,8 @@ type Options = {
   correctLevel?: number;
   maskPattern?: number;
   version?: number;
+  dotScale?: number;
+  components?: ComponentOptions;
   colorDark?: string;
   colorLight?: string;
   autoColor?: boolean;
@@ -132,8 +134,6 @@ type Options = {
   backgroundDimming?: string;
   gifBackground?: ArrayBuffer;
   whiteMargin?: boolean;
-  dotScale?: number;
-  components?: ComponentOptions;
   logoImage?: string | Buffer;
   logoScale?: number;
   logoMargin?: number;
@@ -214,6 +214,22 @@ Accepts an integer in range [1, 40].
 **⚠️ &nbsp; An error might occurs if the specified version does not have enough space for the input data.**
 
 > For more information, please refer to [Information capacity and versions of QR Code | QRcode.com | DENSO WAVE](https://www.qrcode.com/en/about/version.html).
+
+<hr/>
+
+### <del>dotScale</del> (DEPRECATED)
+
+**Type** `number?`
+
+**Default** `0.4`
+
+Use [components](#components) to control the scaling in a more advanced way.
+
+> This option is yet to be removed. You can still use this option to control the scaling of the QR code parts in the lagacy way.
+
+Ratio of the real size to the full size of the blocks.
+
+This can be helpful when you want to make more parts of the background visible.
 
 <hr/>
 
@@ -298,18 +314,6 @@ GIF background image to be used in the QR code.
 **Default** `true`
 
 Use a white margin instead of a transparent one which reveals the background of the QR code on margins.
-
-<hr/>
-
-### <del>dotScale</del> (DEPRECATED)
-
-**Type** `number?`
-
-**Default** `0.4`
-
-Ratio of the real size to the full size of the blocks.
-
-This can be helpful when you want to make more parts of the background visible.
 
 <hr/>
 
