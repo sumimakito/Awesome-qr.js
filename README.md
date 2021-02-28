@@ -391,15 +391,15 @@ type ComponentOptions = {
     scale: 0.4,
   },
   timing: {
-    scale: 0.6,
+    scale: 0.5,
     protectors: false,
   },
   alignment: {
-    scale: 0.6,
+    scale: 0.5,
     protectors: false,
   },
   cornerAlignment: {
-    scale: 1,
+    scale: 0.5,
     protectors: true,
   },
 }

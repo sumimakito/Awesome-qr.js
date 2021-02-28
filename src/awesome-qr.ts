@@ -23,7 +23,7 @@ export type ComponentOptions = {
   timing?: {
     /**
      * Scale factor for timing patterns.
-     * @default 0.6
+     * @default 0.5
      */
     scale?: number;
 
@@ -40,7 +40,7 @@ export type ComponentOptions = {
   alignment?: {
     /**
      * Scale factor for alignment patterns.
-     * @default 0.6
+     * @default 0.5
      */
     scale?: number;
 
@@ -57,7 +57,7 @@ export type ComponentOptions = {
   cornerAlignment?: {
     /**
      * Scale factor for alignment pattern on the bottom-right corner.
-     * @default 1.0
+     * @default 0.5
      */
     scale?: number;
 
@@ -251,15 +251,15 @@ export class AwesomeQR {
       scale: 0.4,
     },
     timing: {
-      scale: 0.6,
+      scale: 0.5,
       protectors: false,
     },
     alignment: {
-      scale: 0.6,
+      scale: 0.5,
       protectors: false,
     },
     cornerAlignment: {
-      scale: 1,
+      scale: 0.5,
       protectors: true,
     },
   };
