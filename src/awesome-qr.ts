@@ -264,7 +264,7 @@ export class AwesomeQR {
     },
   };
 
-  private static defaultOptions: Options = {
+  static defaultOptions: Options = {
     text: "",
     size: 400,
     margin: 20,
