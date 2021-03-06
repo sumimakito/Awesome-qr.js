@@ -1,5 +1,13 @@
 # Changelog
 
+## Ver. 2.1.1
+
+- Fixed an issue in protectors drawing for alignment patterns.
+
+## Ver. 2.1.0
+
+- Separate controls for scaling components in the QR code.
+
 ## Ver. 2.0.1
 
 - Option now supports specifying QR mask pattern and QR version.

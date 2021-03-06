@@ -442,7 +442,8 @@ export class AwesomeQR {
     nSize: number,
     xyOffset: number = 0,
     dotScale: number = 1,
-    colorDark: string
+    colorDark: string,
+    hasProtector: boolean
   ) {
     const oldFillStyle = canvasContext.fillStyle;
     canvasContext.fillStyle = colorDark;
@@ -453,13 +454,15 @@ export class AwesomeQR {
       AwesomeQR._drawDot(canvasContext, centerX - 2, centerY + 2 - i, nSize, xyOffset, dotScale);
     });
     AwesomeQR._drawDot(canvasContext, centerX, centerY, nSize, xyOffset, dotScale);
-    canvasContext.fillStyle = "rgba(255, 255, 255, 0.6)";
-    new Array(2).fill(0).map((_, i) => {
-      // AwesomeQR._drawDot(canvasContext, centerX - 1 + i, centerY - 1, nSize, 0, 1);
-      // AwesomeQR._drawDot(canvasContext, centerX + 1, centerY - 1 + i, nSize, 0, 1);
-      // AwesomeQR._drawDot(canvasContext, centerX + 1 - i, centerY + 1, nSize, 0, 1);
-      // AwesomeQR._drawDot(canvasContext, centerX - 1, centerY + 1 - i, nSize, 0, 1);
-    });
+    if (!hasProtector) {
+      canvasContext.fillStyle = "rgba(255, 255, 255, 0.6)";
+      new Array(2).fill(0).map((_, i) => {
+        AwesomeQR._drawDot(canvasContext, centerX - 1 + i, centerY - 1, nSize, xyOffset, dotScale);
+        AwesomeQR._drawDot(canvasContext, centerX + 1, centerY - 1 + i, nSize, xyOffset, dotScale);
+        AwesomeQR._drawDot(canvasContext, centerX + 1 - i, centerY + 1, nSize, xyOffset, dotScale);
+        AwesomeQR._drawDot(canvasContext, centerX - 1, centerY + 1 - i, nSize, xyOffset, dotScale);
+      });
+    }
     canvasContext.fillStyle = oldFillStyle;
   }
 
@@ -680,7 +683,8 @@ export class AwesomeQR {
       nSize,
       cornerAlignmentXyOffset,
       cornerAlignmentScale,
-      this.options.colorDark!
+      this.options.colorDark!,
+      this.options.components?.cornerAlignment?.protectors || false
     );
 
     // - ALIGNEMNT
@@ -705,7 +709,8 @@ export class AwesomeQR {
             nSize,
             alignmentXyOffset,
             alignmentScale,
-            this.options.colorDark!
+            this.options.colorDark!,
+            this.options.components?.alignment?.protectors || false
           );
         }
       }
