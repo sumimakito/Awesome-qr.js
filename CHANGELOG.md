@@ -2,7 +2,7 @@
 
 ## Ver. 2.1.1
 
-- Fixed an issue in protectors drawing for alignment patterns.
+- Fixed an issue on protectors drawing for alignment patterns.
 
 ## Ver. 2.1.0
 
