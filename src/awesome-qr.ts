@@ -195,17 +195,6 @@ export type Options = {
   whiteMargin?: boolean;
 
   /**
-   * @deprecated
-   *
-   * Ratio of the real size to the full size of the blocks.
-   *
-   * This can be helpful when you want to make more parts of the background visible.
-   *
-   * @deafultValue 0.4
-   */
-  dotScale?: number;
-
-  /**
    * Logo image to be displayed at the center of the QR code.
    *
    * Accepts a `data:` string in web browsers or a Buffer in Node.js.
@@ -214,7 +203,7 @@ export type Options = {
    *
    * @defaultValue undefined
    */
-  logoImage?: string;
+  logoImage?: string | Buffer;
 
   /**
    * Ratio of the logo size to the QR code size.
@@ -236,6 +225,17 @@ export type Options = {
    * @defaultValue 8
    */
   logoCornerRadius?: number;
+
+  /**
+   * @deprecated
+   *
+   * Ratio of the real size to the full size of the blocks.
+   *
+   * This can be helpful when you want to make more parts of the background visible.
+   *
+   * @deafultValue 0.4
+   */
+  dotScale?: number;
 };
 
 export class AwesomeQR {
@@ -275,7 +275,7 @@ export class AwesomeQR {
     backgroundDimming: "rgba(0,0,0,0)",
     logoImage: undefined,
     logoScale: 0.2,
-    logoMargin: 6,
+    logoMargin: 4,
     logoCornerRadius: 8,
     whiteMargin: true,
     components: AwesomeQR.defaultComponentOptions,
@@ -311,7 +311,10 @@ export class AwesomeQR {
       });
     }
 
-    if (_options.dotScale) {
+    if (_options.dotScale !== null && _options.dotScale !== undefined) {
+      if (_options.dotScale! <= 0 || _options.dotScale! > 1) {
+        throw new Error("dotScale should be in range (0, 1].");
+      }
       _options.components.data!.scale = _options.dotScale;
       _options.components.timing!.scale = _options.dotScale;
       _options.components.alignment!.scale = _options.dotScale;
@@ -430,9 +433,6 @@ export class AwesomeQR {
   ) {
     canvasContext.clearRect((centerX - 2) * nSize, (centerY - 2) * nSize, 5 * nSize, 5 * nSize);
     canvasContext.fillRect((centerX - 2) * nSize, (centerY - 2) * nSize, 5 * nSize, 5 * nSize);
-
-    // canvasContext.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
-    // canvasContext.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
   }
 
   private static _drawAlign(
@@ -487,14 +487,9 @@ export class AwesomeQR {
     const mainCanvas = createCanvas(size, size);
     const mainCanvasContext = mainCanvas.getContext("2d");
 
-    const dotScale = this.options.dotScale!;
     this._clear();
 
-    if (dotScale <= 0 || dotScale > 1) {
-      throw new Error("Scale should be in range (0, 1].");
-    }
-
-    // Leave room for margin
+    // Translate to make the top and left margins off the viewport
     mainCanvasContext.save();
     mainCanvasContext.translate(margin, margin);
 
@@ -701,7 +696,6 @@ export class AwesomeQR {
         } else if (agnX === cornerAlignmentCenter && agnY === cornerAlignmentCenter) {
           continue;
         } else {
-          // mainCanvasContext.fillStyle = "rgba(0, 0, 0, .2)";
           AwesomeQR._drawAlign(
             mainCanvasContext,
             agnX,
@@ -741,12 +735,15 @@ export class AwesomeQR {
         logoCornerRadius = 0;
       }
 
-      mainCanvasContext.restore();
-
       const logoSize = viewportSize * logoScale;
       const x = 0.5 * (size - logoSize);
       const y = x;
 
+      // Restore the canvas
+      // After restoring, the top and left margins should be taken into account
+      mainCanvasContext.restore();
+
+      // Clean the area that the logo covers (including margins)
       mainCanvasContext.fillStyle = "#FFFFFF";
       mainCanvasContext.save();
       AwesomeQR._prepareRoundedCornerClip(
@@ -755,17 +752,25 @@ export class AwesomeQR {
         y - logoMargin,
         logoSize + 2 * logoMargin,
         logoSize + 2 * logoMargin,
-        logoCornerRadius
+        logoCornerRadius + logoMargin
       );
       mainCanvasContext.clip();
+      const oldGlobalCompositeOperation = mainCanvasContext.globalCompositeOperation;
+      mainCanvasContext.globalCompositeOperation = "destination-out";
       mainCanvasContext.fill();
+      mainCanvasContext.globalCompositeOperation = oldGlobalCompositeOperation;
       mainCanvasContext.restore();
 
+      // Draw logo image
       mainCanvasContext.save();
       AwesomeQR._prepareRoundedCornerClip(mainCanvasContext, x, y, logoSize, logoSize, logoCornerRadius);
       mainCanvasContext.clip();
       mainCanvasContext.drawImage(logoImage, x, y, logoSize, logoSize);
       mainCanvasContext.restore();
+
+      // Re-translate the canvas to translate the top and left margins into invisible area
+      mainCanvasContext.save();
+      mainCanvasContext.translate(margin, margin);
     }
 
     if (!!parsedGIFBackground) {

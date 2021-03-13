@@ -1,5 +1,11 @@
 # Changelog
 
+## Ver. 2.1.2
+
+- Fixed an issue where the QR codes were not drawing correctly if a logo image was set.
+- Fixed the incorrectly typed option `logoImage` in _Options_.
+- Optimized the style of logo in the QR code.
+
 ## Ver. 2.1.1
 
 - Fixed an issue on protectors drawing for alignment patterns.

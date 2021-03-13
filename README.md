@@ -11,9 +11,9 @@ An awesome but simple QR code generator written in JavaScript.
 <table>
 	<tr>
 		<td valign="top"><img src="art/gallery-1.png" width="350"></td>
-    	<td valign="top"><img src="art/gallery-2.png" width="350"></td>
-    	<td valign="top"><img src="art/gallery-3.gif" width="350"></td>
-  	</tr>
+    <td valign="top"><img src="art/gallery-2.png" width="350"></td>
+    <td valign="top"><img src="art/gallery-3.gif" width="350"></td>
+  </tr>
 </table>
 
 ## Contents <!-- omit in toc -->
@@ -125,7 +125,6 @@ type Options = {
   correctLevel?: number;
   maskPattern?: number;
   version?: number;
-  dotScale?: number;
   components?: ComponentOptions;
   colorDark?: string;
   colorLight?: string;
@@ -138,6 +137,7 @@ type Options = {
   logoScale?: number;
   logoMargin?: number;
   logoCornerRadius?: number;
+  dotScale?: number;
 };
 ```
 

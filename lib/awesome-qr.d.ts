@@ -168,16 +168,6 @@ export declare type Options = {
      */
     whiteMargin?: boolean;
     /**
-     * @deprecated
-     *
-     * Ratio of the real size to the full size of the blocks.
-     *
-     * This can be helpful when you want to make more parts of the background visible.
-     *
-     * @deafultValue 0.4
-     */
-    dotScale?: number;
-    /**
      * Logo image to be displayed at the center of the QR code.
      *
      * Accepts a `data:` string in web browsers or a Buffer in Node.js.
@@ -186,7 +176,7 @@ export declare type Options = {
      *
      * @defaultValue undefined
      */
-    logoImage?: string;
+    logoImage?: string | Buffer;
     /**
      * Ratio of the logo size to the QR code size.
      *
@@ -205,6 +195,16 @@ export declare type Options = {
      * @defaultValue 8
      */
     logoCornerRadius?: number;
+    /**
+     * @deprecated
+     *
+     * Ratio of the real size to the full size of the blocks.
+     *
+     * This can be helpful when you want to make more parts of the background visible.
+     *
+     * @deafultValue 0.4
+     */
+    dotScale?: number;
 };
 export declare class AwesomeQR {
     private canvas;
