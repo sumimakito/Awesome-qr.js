@@ -1,5 +1,10 @@
 # Changelog
 
+## Ver. 2.1.3
+
+- Fixed vulnerabilities in dependencies.
+- Updated node-canvas.
+
 ## Ver. 2.1.2
 
 - Fixed an issue where the QR codes were not drawing correctly if a logo image was set.

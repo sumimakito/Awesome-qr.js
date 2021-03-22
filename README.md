@@ -28,7 +28,6 @@ An awesome but simple QR code generator written in JavaScript.
   - [correctLevel](#correctlevel)
   - [maskPattern](#maskpattern)
   - [version](#version)
-  - [<del>dotScale</del> (DEPRECATED)](#deldotscaledel-deprecated)
   - [components](#components)
   - [colorDark](#colordark)
   - [colorLight](#colorlight)
@@ -41,6 +40,7 @@ An awesome but simple QR code generator written in JavaScript.
   - [logoScale](#logoscale)
   - [logoMargin](#logomargin)
   - [logoCornerRadius](#logocornerradius)
+  - [<del>dotScale</del> (DEPRECATED)](#deldotscaledel-deprecated)
 - [ComponentOptions](#componentoptions)
   - [scale](#scale)
   - [protectors](#protectors)
@@ -137,7 +137,7 @@ type Options = {
   logoScale?: number;
   logoMargin?: number;
   logoCornerRadius?: number;
-  dotScale?: number;
+  dotScale?: number; // DEPRECATED!!
 };
 ```
 
@@ -214,22 +214,6 @@ Accepts an integer in range [1, 40].
 **⚠️ &nbsp; An error might occurs if the specified version does not have enough space for the input data.**
 
 > For more information, please refer to [Information capacity and versions of QR Code | QRcode.com | DENSO WAVE](https://www.qrcode.com/en/about/version.html).
-
-<hr/>
-
-### <del>dotScale</del> (DEPRECATED)
-
-**Type** `number?`
-
-**Default** `0.4`
-
-Use [components](#components) to control the scaling in a more advanced way.
-
-> This option is yet to be removed. You can still use this option to control the scaling of the QR code parts in the lagacy way.
-
-Ratio of the real size to the full size of the blocks.
-
-This can be helpful when you want to make more parts of the background visible.
 
 <hr/>
 
@@ -358,6 +342,22 @@ Size of margins around the logo image in pixels.
 **Default** `8`
 
 Corner radius of the logo image in pixels.
+
+<hr/>
+
+### <del>dotScale</del> (DEPRECATED)
+
+**Type** `number?`
+
+**Default** `0.4`
+
+Use [components](#components) to control the scaling in a more advanced way.
+
+> This option is yet to be removed. You can still use this option to control the scaling of the QR code parts in the lagacy way.
+
+Ratio of the real size to the full size of the blocks.
+
+This can be helpful when you want to make more parts of the background visible.
 
 ## ComponentOptions
 
