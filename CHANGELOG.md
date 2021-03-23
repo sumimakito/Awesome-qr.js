@@ -1,5 +1,9 @@
 # Changelog
 
+## Ver. 2.1.4
+
+- Updated Webpack to v5.
+
 ## Ver. 2.1.3
 
 - Fixed vulnerabilities in dependencies.
