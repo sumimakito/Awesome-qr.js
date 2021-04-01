@@ -8,7 +8,7 @@ describe("Common tests", () => {
   it("Should draw and decode QR code without errors", (done) => {
     (async () => {
       try {
-        const expected = "Awesome-qr.js";
+        const expected = "Awesome-qr.js🧡";
         const qr = new AwesomeQR({ text: expected });
         const buf = await qr.draw();
         const image = await Jimp.read(buf);
