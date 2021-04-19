@@ -5,6 +5,7 @@ import * as constants from './Constants';
 import {
     CanvasType,
     DataPattern,
+    Design,
     EyeBallShape,
     EyeFrameShape,
     GradientType,
@@ -14,7 +15,6 @@ import {
 } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { isNode, loadImage } from './Util';
-
 if (isNode) {
     const path = require('path');
     const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
@@ -552,13 +552,12 @@ export class Drawing {
 
         const backgroundCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
         const backgroundContext = backgroundCanvas.getContext('2d');
-
-        return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage, this.config.backgroundColor)
+        return this.addBackground(backgroundContext, this.config.size,this.config.moduleSize, this.config.backgroundImage, this.config.backgroundColor)
             .then(() => {
                 return this.drawAlignPatterns(mainContext, gradient);
             })
             .then(() => {
-                return this.drawPositionProtectors(mainContext);
+               return this.drawPositionProtectors(mainContext);
             })
             .then(() => {
                 return this.drawAlignProtectors(mainContext);
@@ -581,6 +580,9 @@ export class Drawing {
                 return this.scaleFinalImage(mainCanvas);
             })
             .then((canvas: Canvas) => {
+                return this.addDesign(canvas,gradient);
+            })
+            .then((canvas: Canvas) => {
                 return this.drawFrame(canvas, this.config.frameStyle, this.config.frameColor, this.config.frameText);
             })
             .then((canvas: Canvas) => {
@@ -588,12 +590,63 @@ export class Drawing {
                 return canvas;
             });
     }
+    private async addDesign(canvas: Canvas, gradient: CanvasGradient | string) {
+        const size = this.config.rawSize;
+        const finalCanvas: Canvas = createCanvas(Math.sqrt(2)*size,Math.sqrt(2)*size,this.canvasType);
+        const finalContext = finalCanvas.getContext('2d');
+        const design = this.config.designStyle?this.config.designStyle:'none';
+        switch(design){
+            case Design.Circular:
+                finalContext.beginPath();
+                finalContext.arc(Math.sqrt(2)*size/2, Math.sqrt(2)*size/2, size/Math.sqrt(2), 0, 2*Math.PI);
+                finalContext.fillStyle = this.config.backgroundColor?this.config.backgroundColor:'white' ;
+                finalContext.lineWidth = 10;
+                finalContext.fill();
+                finalContext.clip();    
+                break;
+            default:
+                return canvas;
+        }
+        
+        finalContext.fillStyle = gradient;
+        if(this.config.designBorder){ 
+            finalContext.strokeStyle = "black";
+            finalContext.stroke();
+        }
+        
+        const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
+        const moduleSize = this.config.dotScale*this.config.moduleSize;
 
+        for(let i =0 ;i<2*size;i+=moduleSize) {
+            for(let j = 0;j<2*size;j+=moduleSize) {
+                if(Math.floor(Math.random() * 2) === 1) {
+                    switch (dataPattern) {
+                        case DataPattern.CIRCLE:
+                            this.drawCircle(i+moduleSize/2,j+moduleSize/2,finalContext,moduleSize/2);
+                            break;
+                        case DataPattern.KITE:
+                            this.drawKite(i,j,finalContext,moduleSize,moduleSize);
+                            break;
+                        case DataPattern.LEFT_DIAMOND:
+                            this.drawDiamond(i,j,finalContext,moduleSize,moduleSize,false);
+                            break;
+                        case DataPattern.RIGHT_DIAMOND:
+                            this.drawDiamond(i,j,finalContext,moduleSize,moduleSize,true);
+                            break;
+                        default:
+                           this.drawSquare(i,j,finalContext,moduleSize,moduleSize,false);
+                           break;
+                    }
+                }
+            }
+        }
+        finalContext.drawImage(canvas,size/4.6,size/4.6,size,size);
+        return finalCanvas;
+    }
     private async drawFrame(canvas: Canvas, frameStyle: QRCodeFrame | undefined, frameColor: string | undefined, frameText: string | undefined): Promise<Canvas> {
         if (!frameStyle || frameStyle === QRCodeFrame.NONE) {
             return canvas;
         }
-
         const color = frameColor ? frameColor : '#000000';
         const moduleSize = this.config.moduleSize;
         const rawSize = this.config.rawSize;
@@ -1178,7 +1231,6 @@ export class Drawing {
         }
         context.fillRect(startX, startY, width, height);
     }
-
     private drawKite(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound?: boolean) {
         context.beginPath();
         context.moveTo(startX + width / 2, startY);
@@ -1199,7 +1251,6 @@ export class Drawing {
         const eyeFrameColor = this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient;
         const eyeFrameShape = this.config.eyeFrameShape ? this.config.eyeFrameShape : EyeFrameShape.SQUARE;
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
-
         this.drawEyeFrames(context, eyeFrameShape, eyeFrameColor);
         this.drawEyeBalls(context, eyeBallShape, eyeBallColor);
 
@@ -1420,9 +1471,13 @@ export class Drawing {
         }
     }
 
-    private async addBackground(context: CanvasRenderingContext2D, size: number, backgroundImage?: string, backgroundColor?: string) {
+    private async addBackground(context: CanvasRenderingContext2D, size: number,moduleSize: number, backgroundImage?: string, backgroundColor?: string) {
         if (!backgroundImage) {
-            context.rect(0, 0, size, size);
+            if(this.config.designStyle === Design.Circular){
+                context.rect(2*moduleSize, 2*moduleSize, size-4*moduleSize, size-4*moduleSize);
+            }else {
+                context.rect(0, 0, size, size);
+            }
             context.fillStyle = backgroundColor ? backgroundColor : '#ffffff';
             context.fill();
             return;
