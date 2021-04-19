@@ -27,7 +27,7 @@ const config = {
     colorDark: 'yellow',
     colorLight: '#4494fc',
     dotScale: 1,
-    gradientType: GradientType.VERTICAL,
+    // gradientType: GradientType.VERTICAL,
     // frameStyle: QRCodeFrame.BALLOON_BOTTOM,
     frameColor: '#0b1257',
     // frameText: 'HEY QR',
