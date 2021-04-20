@@ -197,14 +197,15 @@ export class SVGDrawing {
         const svgWindow = createSVGWindow();
         const svgDocument = svgWindow.document;
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
-        const finalCanvas = SVG(svgDocument.documentElement).size(2*size,2*size);
+        const finalCanvas = SVG(svgDocument.documentElement).size(2*size+100,2*size+100);
         const color = this.config.backgroundColor?this.config.backgroundColor:'white' ;
-        finalCanvas.circle(size).attr({cx: size+100,cy: size+100}).radius(size).fill(color);
+        const width = (this.config.designBorder?10:0);
+        finalCanvas.circle(size).attr({cx: size+100,cy: size+100,stroke:'#000','stroke-width':width}).radius(size).fill(color);
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
         for(let i =0 ;i<2*size;i+=moduleSize) {
             for(let j = 0;j<2*size;j+=moduleSize) {
-                if(Math.floor(Math.random() * 2) === 1 && (i-size)*(i-size)+(j-size)*(j-size)<size*size-50) {
+                if(Math.floor(Math.random() * 2) === 1 && ((i<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-50*size) || (i>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size))) {
                     switch (dataPattern) {
                      case DataPattern.CIRCLE:
                         this.drawCircle(i+moduleSize/2,j+moduleSize/2, finalCanvas, gradient, moduleSize / 2, moduleSize / 2, true);
@@ -226,7 +227,7 @@ export class SVGDrawing {
             }
         }
         // @ts-ignore
-        finalCanvas.add(canvas.move(size/2,size/2));
+        finalCanvas.add(canvas.move(size/1.514,size/1.514));
         return finalCanvas;
     }
     private setupCanvasForGradient(ctx: CanvasRenderingContext2D, size: number) {
@@ -419,12 +420,15 @@ export class SVGDrawing {
 
     private async addBackground(context: object, size: number, backgroundImage?: string, backgroundColor?: string) {
         if (!backgroundImage) {
-            if (backgroundColor) {
-                const color = backgroundColor ? backgroundColor : '#ffffff';
-                // @ts-ignore
-               context.rect(size, size).fill(color).move(this.shiftX,this.shiftY).radius(this.config.moduleSize);
+            const color = backgroundColor ? backgroundColor : '#ffffff';
+            if (this.config.designStyle === Design.Circular){
+                 // @ts-ignore
+                context.rect(size-120, size-120).fill(color).move(this.shiftX+60,this.shiftY+60).radius(this.config.moduleSize);
             }
-           
+            else{
+                // @ts-ignore
+                context.rect(size,size).fill(color).move(this.shiftX,this.shiftY).radius(this.config.moduleSize);
+            }
             return;
         }
         this.config.backgroundColor = '';

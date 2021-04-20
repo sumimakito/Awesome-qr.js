@@ -1,3 +1,4 @@
+import { Gradient } from '@svgdotjs/svg.js';
 import 'mocha';
 import { CanvasType, DataPattern,Design, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame, QRErrorCorrectLevel } from '../Enums';
 import { QRCodeBuilder } from '../index';
@@ -18,28 +19,39 @@ REV:2008-04-24T19:52:43Z
 END:VCARD`;
 
 const config = {
-    text: 'https://www.beaconstac.com',
-   // backgroundImage: 'https://s3.amazonaws.com/beaconstac-content-qa/1593/9653e5dae58849b9bf523e27142f875e',
-    backgroundColor: '#000000',
-    canvasType: CanvasType.SVG,
-    eyeFrameShape: EyeFrameShape.ROUNDED,
-    eyeBallShape: EyeBallShape.ROUNDED,
-    colorDark: 'yellow',
-    colorLight: '#4494fc',
-    dotScale: 1,
-    // gradientType: GradientType.VERTICAL,
-    // frameStyle: QRCodeFrame.BALLOON_BOTTOM,
-    frameColor: '#0b1257',
-    // frameText: 'HEY QR',
-    // logoMargin: 10,
-    // logoScale: 0.25,
-    // margin: 80,
-    size: 2048,
-    designStyle:Design.Circular,
-    designBorder:true,
+    
+   // backgroundImage: "",
+    canvasType: CanvasType.PNG,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: 2,
+    dataPattern: DataPattern.SQUARE,
+    designBorder: true,
+    designStyle: Design.Circular,
+    dotScale: 0.96,
+    eyeBallShape: EyeBallShape.CIRCLE,
+    // eyeFrameColor: "",
+    eyeFrameShape: EyeFrameShape.SQUARE,
+    frameColor: "#000000",
+    frameText: "",
+    gradientType: GradientType.NONE,
+   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
     isVCard: false,
-    useCanvas: false,
-    useOpacity: true,
+    logoCornerRadius: 8,
+    // logoImage: "",
+    logoMargin: 10,
+    logoScale: 0.2,
+    margin: 80,
+    // maskedDots: false,
+   // moduleSize: 27,
+   // nSize: 27,
+   // rawSize: 1051,
+   // size: 1051,
+    text: "https://qr.getwifireapp.com/zy9t9e",
+   // typeNumber: 4,
+   // useCanvas: false,
+   // useOpacity: true,
+   // viewportSize: 891,
 };
 
 describe('QR code tests', () => {
