@@ -191,7 +191,27 @@ export class SVGDrawing {
                 return canvas.svg();
             });
     }
+    private inShape(x: number, y: number,pt: number,side: number): boolean {
+        pt  -= 100;
+        side -= 50;
+        const bottomX = pt + 50;
+        const bottomY = pt +50;
+        const topX = pt+side;
+        const topY = pt+side;
+        let inX = false,inY = false;
+        if (x>bottomX && x<topX) {
+            inX = true;
+        }
+        if(y> bottomY && y<topY) {
+            inY = true;
+        }
+       
+        return !(inX && inY);
+    }
     private async addDesign(canvas: object,gradient: string): Promise<object> {
+        if(!this.config.designStyle){
+            return canvas;
+        }
         const size = this.config.rawSize;
         const { createSVGWindow } = require('svgdom');
         const svgWindow = createSVGWindow();
@@ -200,12 +220,15 @@ export class SVGDrawing {
         const finalCanvas = SVG(svgDocument.documentElement).size(2*size+100,2*size+100);
         const color = this.config.backgroundColor?this.config.backgroundColor:'white' ;
         const width = (this.config.designBorder?10:0);
-        finalCanvas.circle(size).attr({cx: size+100,cy: size+100,stroke:'#000','stroke-width':width}).radius(size).fill(color);
+        if(this.config.backgroundColor){
+            finalCanvas.circle(size).attr({cx: size+100,cy: size+100,stroke:'#000','stroke-width':width}).radius(size).fill(color);
+        }
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
+        const shift = size/1.514;
         for(let i =0 ;i<2*size;i+=moduleSize) {
             for(let j = 0;j<2*size;j+=moduleSize) {
-                if(Math.floor(Math.random() * 2) === 1 && ((i<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-50*size) || (i>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size))) {
+                if(Math.floor(Math.random() * 2) === 1 && ((i<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-50*size) || (i>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size)) && this.inShape(i,j,shift,size)) {
                     switch (dataPattern) {
                      case DataPattern.CIRCLE:
                         this.drawCircle(i+moduleSize/2,j+moduleSize/2, finalCanvas, gradient, moduleSize / 2, moduleSize / 2, true);
@@ -227,7 +250,7 @@ export class SVGDrawing {
             }
         }
         // @ts-ignore
-        finalCanvas.add(canvas.move(size/1.514,size/1.514));
+        finalCanvas.add(canvas.move(shift,shift));
         return finalCanvas;
     }
     private setupCanvasForGradient(ctx: CanvasRenderingContext2D, size: number) {
@@ -420,14 +443,16 @@ export class SVGDrawing {
 
     private async addBackground(context: object, size: number, backgroundImage?: string, backgroundColor?: string) {
         if (!backgroundImage) {
-            const color = backgroundColor ? backgroundColor : '#ffffff';
-            if (this.config.designStyle === Design.Circular){
-                 // @ts-ignore
-                context.rect(size-120, size-120).fill(color).move(this.shiftX+60,this.shiftY+60).radius(this.config.moduleSize);
-            }
-            else{
-                // @ts-ignore
-                context.rect(size,size).fill(color).move(this.shiftX,this.shiftY).radius(this.config.moduleSize);
+            if(backgroundColor) {
+                const color = backgroundColor ? backgroundColor : '#ffffff';
+                if (this.config.designStyle === Design.Circular){
+                    // @ts-ignore
+                    context.rect(size-120, size-120).fill(color).move(this.shiftX+60,this.shiftY+60).radius(this.config.moduleSize);
+                }
+                else{
+                    // @ts-ignore
+                    context.rect(size,size).fill(color).move(this.shiftX,this.shiftY).radius(this.config.moduleSize);
+                }
             }
             return;
         }
