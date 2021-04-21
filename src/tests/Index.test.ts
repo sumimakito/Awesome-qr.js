@@ -1,6 +1,6 @@
 import { Gradient } from '@svgdotjs/svg.js';
 import 'mocha';
-import { CanvasType, DataPattern,Design, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame, QRErrorCorrectLevel } from '../Enums';
+import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame, QRErrorCorrectLevel } from '../Enums';
 import { QRCodeBuilder } from '../index';
 
 const vCardSampleData = `BEGIN:VCARD
@@ -21,18 +21,18 @@ END:VCARD`;
 const config = {
     
    // backgroundImage: "",
+    backgroundColor:'white',
     canvasType: CanvasType.PNG,
     colorDark: "#000000",
     colorLight: "#ffffff",
     correctLevel: 2,
     dataPattern: DataPattern.SQUARE,
-    designBorder: true,
-    designStyle: Design.Circular,
     dotScale: 0.96,
     eyeBallShape: EyeBallShape.CIRCLE,
     // eyeFrameColor: "",
     eyeFrameShape: EyeFrameShape.SQUARE,
-    frameColor: "#000000",
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameColor: "blue",
     frameText: "",
     gradientType: GradientType.NONE,
    // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
@@ -58,17 +58,17 @@ describe('QR code tests', () => {
     it('Main test SVG', done => {
         const qrCodeGenerator = new QRCodeBuilder(config);
 
-        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
+        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
             
 
             // const fs = require('fs');
              
-            // const out = fs.createWriteStream(__dirname + '/test.png');
-            // const stream = canvas.createPDFStream();
-            // stream.pipe(out);
-            // return out.on('finish', () => {
-            //     return;
-            // });
+            // // const out = fs.createWriteStream(__dirname + '/test.png');
+            // // const stream = canvas.createPDFStream();
+            // // stream.pipe(out);
+            // // return out.on('finish', () => {
+            // //     return;
+            // // });
             // const dataUrl = qrCode.canvas.toDataURL('image/png');
             // const matches: any = dataUrl.match(
             //         /^data:([A-Za-z-+\/]+);base64,(.+)$/

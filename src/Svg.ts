@@ -2,7 +2,7 @@
 import { Circle, Gradient } from '@svgdotjs/svg.js';
 import { Canvas, CanvasGradient, CanvasPattern, CanvasRenderingContext2D, createCanvas } from 'canvas';
 import { CanvasUtil } from './Common';
-import { CanvasType,DataPattern,Design, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame } from './Enums';
+import { CanvasType,DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { cellPhoneSVGPath, isNode, isSvgFile, loadImage } from './Util';
 const fetch = require("node-fetch");
@@ -209,7 +209,7 @@ export class SVGDrawing {
         return !(inX && inY);
     }
     private async addDesign(canvas: object,gradient: string): Promise<object> {
-        if(!this.config.designStyle){
+        if(!this.config.frameStyle){
             return canvas;
         }
         const size = this.config.rawSize;
@@ -445,7 +445,7 @@ export class SVGDrawing {
         if (!backgroundImage) {
             if(backgroundColor) {
                 const color = backgroundColor ? backgroundColor : '#ffffff';
-                if (this.config.designStyle === Design.Circular){
+                if (this.config.frameStyle === QRCodeFrame.CIRCULAR){
                     // @ts-ignore
                     context.rect(size-120, size-120).fill(color).move(this.shiftX+60,this.shiftY+60).radius(this.config.moduleSize);
                 }

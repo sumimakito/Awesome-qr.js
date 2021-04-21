@@ -5,7 +5,6 @@ import * as constants from './Constants';
 import {
     CanvasType,
     DataPattern,
-    Design,
     EyeBallShape,
     EyeFrameShape,
     GradientType,
@@ -604,9 +603,9 @@ export class Drawing {
         const size = this.config.rawSize;
         const finalCanvas: Canvas = createCanvas(Math.sqrt(2)*size,Math.sqrt(2)*size,this.canvasType);
         const finalContext = finalCanvas.getContext('2d');
-        const design = this.config.designStyle?this.config.designStyle:'none';
+        const design = this.config.frameStyle? this.config.frameStyle : 'none';
         switch(design){
-            case Design.Circular:
+            case QRCodeFrame.CIRCULAR:
                 finalContext.beginPath();
                 finalContext.arc(Math.sqrt(2)*size/2, Math.sqrt(2)*size/2, size/Math.sqrt(2), 0, 2*Math.PI);
                 finalContext.fillStyle = this.config.backgroundColor?this.config.backgroundColor:'white' ;
@@ -618,11 +617,8 @@ export class Drawing {
                 return canvas;
         }
         finalContext.fillStyle = gradient;
-        if(this.config.designBorder){ 
-            finalContext.strokeStyle = "black";
-            finalContext.stroke();
-        }
-        
+        finalContext.strokeStyle = this.config.frameColor?this.config.frameColor:"black";
+        finalContext.stroke();
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
 
@@ -1496,7 +1492,7 @@ export class Drawing {
 
     private async addBackground(context: CanvasRenderingContext2D, size: number,moduleSize: number, backgroundImage?: string, backgroundColor?: string) {
         if (!backgroundImage) {
-            if(this.config.designStyle === Design.Circular){
+            if(this.config.frameStyle === QRCodeFrame.CIRCULAR){
                 context.rect(2*moduleSize, 2*moduleSize, size-4*moduleSize, size-4*moduleSize);
             }else {
                 context.rect(0, 0, size, size);

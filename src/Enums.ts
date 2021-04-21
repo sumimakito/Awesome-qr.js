@@ -72,10 +72,8 @@ export enum QRCodeFrame {
     BANNER_BOTTOM = 'banner-bottom',
     BALLOON_BOTTOM = 'balloon-bottom',
     BALLOON_TOP = 'balloon-top',
+    CIRCULAR = 'circular',
     // BOX_LIGHT = 'box-light',
 }
 
-export enum Design {
-    NONE ='none',
-    Circular = 'circular',
-}
+
