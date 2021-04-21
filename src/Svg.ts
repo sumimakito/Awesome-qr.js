@@ -209,7 +209,7 @@ export class SVGDrawing {
         return !(inX && inY);
     }
     private async addDesign(canvas: object,gradient: string): Promise<object> {
-        if(!this.config.frameStyle){
+        if(this.config.frameStyle !== QRCodeFrame.CIRCULAR){
             return canvas;
         }
         const size = this.config.rawSize;
@@ -219,13 +219,13 @@ export class SVGDrawing {
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
         const finalCanvas = SVG(svgDocument.documentElement).size(2*size+100,2*size+100);
         const color = this.config.backgroundColor?this.config.backgroundColor:'white' ;
-        const width = (this.config.designBorder?10:0);
+        const width = (this.config.frameColor?10:0);
         if(this.config.backgroundColor){
             finalCanvas.circle(size).attr({cx: size+100,cy: size+100,stroke:'#000','stroke-width':width}).radius(size).fill(color);
         }
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
-        const shift = size/1.514;
+        const shift = size/1.614;
         for(let i =0 ;i<2*size;i+=moduleSize) {
             for(let j = 0;j<2*size;j+=moduleSize) {
                 if(Math.floor(Math.random() * 2) === 1 && ((i<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-50*size) || (i>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size)) && this.inShape(i,j,shift,size)) {
@@ -1280,7 +1280,7 @@ export class SVGDrawing {
     }
 
     private async drawFrame(canvas: object, frameStyle: QRCodeFrame | undefined, frameColor: string | undefined, frameText: string | undefined) {
-        if (!frameStyle || frameStyle === QRCodeFrame.NONE) {
+        if (!frameStyle || frameStyle === QRCodeFrame.NONE || frameStyle === QRCodeFrame.CIRCULAR) {
             return;
         }
 

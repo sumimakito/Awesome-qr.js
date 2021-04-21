@@ -58,7 +58,7 @@ describe('QR code tests', () => {
     it('Main test SVG', done => {
         const qrCodeGenerator = new QRCodeBuilder(config);
 
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
+        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
             
 
             // const fs = require('fs');
