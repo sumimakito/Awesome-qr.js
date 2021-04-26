@@ -60,8 +60,6 @@ export interface QRDrawingConfig {
     logoMargin: number;
     logoCornerRadius: number;
     maskedDots: boolean;
-    designStyle?:string;
-    designBorder?: boolean;
     canvasType?: CanvasType;
     eyeBallShape?: EyeBallShape;
     eyeFrameShape?: EyeFrameShape;
