@@ -34,7 +34,7 @@ const config = {
     frameStyle: QRCodeFrame.CIRCULAR,
     frameColor: "blue",
     frameText: "",
-    gradientType: GradientType.NONE,
+    gradientType: GradientType.VERTICAL,
    // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
     isVCard: false,
     logoCornerRadius: 8,

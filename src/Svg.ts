@@ -1,5 +1,5 @@
 /* tslint:disable:no-var-requires */
-import { Circle, Gradient } from '@svgdotjs/svg.js';
+import { Circle, find, Gradient } from '@svgdotjs/svg.js';
 import { Canvas, CanvasGradient, CanvasPattern, CanvasRenderingContext2D, createCanvas } from 'canvas';
 import { CanvasUtil } from './Common';
 import { CanvasType,DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame } from './Enums';
@@ -228,22 +228,23 @@ export class SVGDrawing {
         const shift = size/1.614;
         for(let i =0 ;i<2*size;i+=moduleSize) {
             for(let j = 0;j<2*size;j+=moduleSize) {
-                if(Math.floor(Math.random() * 2) === 1 && ((i<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-50*size) || (i>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size)) && this.inShape(i,j,shift,size)) {
+                if(Math.floor(Math.random() * 2) === 1 && ((i<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-50*size) || (i>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-30*size)) && this.inShape(i,j,shift,size)) {
+                    const grad =  await (this.getColorFromCanvas(this.canvasQR, i/2.5,j/2.5));
                     switch (dataPattern) {
                      case DataPattern.CIRCLE:
-                        this.drawCircle(i+moduleSize/2,j+moduleSize/2, finalCanvas, gradient, moduleSize / 2, moduleSize / 2, true);
+                        this.drawCircle(i+moduleSize/2,j+moduleSize/2, finalCanvas, grad, moduleSize / 2, moduleSize / 2, true);
                         break;
                     case DataPattern.KITE:
-                        this.drawKite(i,j,finalCanvas,gradient,moduleSize,moduleSize);
+                        this.drawKite(i,j,finalCanvas,grad,moduleSize,moduleSize);
                         break;   
                     case DataPattern.LEFT_DIAMOND:
-                        this.drawDiamond(i,j,finalCanvas,gradient,moduleSize,moduleSize,false);
+                        this.drawDiamond(i,j,finalCanvas,grad,moduleSize,moduleSize,false);
                         break;   
                     case DataPattern.RIGHT_DIAMOND:
-                        this.drawDiamond(i,j,finalCanvas,gradient,moduleSize,moduleSize,true);
+                        this.drawDiamond(i,j,finalCanvas,grad,moduleSize,moduleSize,true);
                         break;
                     default:
-                        this.drawSquare(i,j,finalCanvas,moduleSize,moduleSize,false,gradient);
+                        this.drawSquare(i,j,finalCanvas,moduleSize,moduleSize,false,grad);
                         break;   
                   }
                 }
