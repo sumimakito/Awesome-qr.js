@@ -194,8 +194,8 @@ export class SVGDrawing {
     private inShape(x: number, y: number,pt: number,side: number): boolean {
         pt  -= 100;
         side -= 50;
-        const bottomX = pt + 50;
-        const bottomY = pt +50;
+        const bottomX = pt + 70;
+        const bottomY = pt + 70;
         const topX = pt+side;
         const topY = pt+side;
         let inX = false,inY = false;
