@@ -229,7 +229,10 @@ export class SVGDrawing {
         for(let i = 0; i < 2*size; i += moduleSize) {
             for(let j = 0; j < 2*size; j += moduleSize) {
                 if(Math.floor(Math.random() * 2) === 1 && ((i<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-50*size) || (i>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-30*size)) && this.inShape(i,j,shift,size)) {
-                    const grad =  await (this.getColorFromCanvas(this.canvasQR, i/2.5,j/2.5));
+                    let grad =  await (this.getColorFromCanvas(this.canvasQR, i/2.5,j/2.5));
+                    if(this.config.gradientType === GradientType.RADIAL) {
+                        grad = gradient;
+                    }
                     switch (dataPattern) {
                      case DataPattern.CIRCLE:
                         this.drawCircle(i+moduleSize/2, j+moduleSize/2, finalCanvas, grad, moduleSize / 2, moduleSize / 2, true);
