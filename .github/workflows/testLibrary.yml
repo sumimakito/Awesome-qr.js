@@ -7,8 +7,10 @@ jobs:
     name: Testing QR Library
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '10'
       - name: Install dependencies
         run: npm install
       - name: Run unit tests
@@ -23,9 +25,10 @@ jobs:
           RUN_ID: ${{ github.run_id }}
           ACTOR: ${{ github.actor }}
           COLOR: '#FF0000'
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           curl --request POST \
-            --url https://hooks.slack.com/services/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 \
+            --url $SLACK_WEBHOOK_URL \
             --header 'Content-Type: application/json' \
             --header 'cache-control: no-cache' \
             --data "{\"channel\":\"${CHANNEL}\", \"attachments\": [ { \"title\":\"${TITLE} [ ${GITHUB_REF##*/} ] : [ ${ACTOR} ]\", \"text\": \"https://github.com/mobstac/${REPOSITORY_NAME}/actions/runs/${RUN_ID}\", \"color\": \"${COLOR}\" } ]}"
