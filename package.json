@@ -22,9 +22,6 @@
             "src/**/*.ts",
             "src/**/*.tsx"
         ],
-        "exclude": [
-            "src/Models.ts"
-        ],
         "extension": [
             ".ts",
             ".tsx"
