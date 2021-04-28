@@ -18,9 +18,11 @@ import { isNode, loadImage } from './Util';
 import { SVGDrawing } from './Svg';
 
 if (isNode) {
-    const path = require('path');
-    const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
-    registerFont(fontPath, { family: 'Roboto' });
+    // uncomment these for node
+
+    // const path = require('path');
+    // const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
+    // registerFont(fontPath, { family: 'Roboto' });
 }
 
 
@@ -559,14 +561,16 @@ export class Drawing {
         // Leave room for margin
         mainContext.translate(this.config.margin, this.config.margin);
         mainContext.save();
+
         const backgroundCanvas = createCanvas(this.config.size, this.config.size, this.canvasType);
         const backgroundContext = backgroundCanvas.getContext('2d');
-        return this.addBackground(backgroundContext, this.config.size,this.config.moduleSize, this.config.backgroundImage, this.config.backgroundColor)
+
+        return this.addBackground(backgroundContext, this.config.size, this.config.backgroundImage, this.config.backgroundColor)
             .then(() => {
                 return this.drawAlignPatterns(mainContext, gradient);
             })
             .then(() => {
-               return this.drawPositionProtectors(mainContext);
+                return this.drawPositionProtectors(mainContext);
             })
             .then(() => {
                 return this.drawAlignProtectors(mainContext);
@@ -603,7 +607,7 @@ export class Drawing {
         const size = this.config.rawSize;
         const finalCanvas: Canvas = createCanvas(Math.sqrt(2)*size,Math.sqrt(2)*size,this.canvasType);
         const finalContext = finalCanvas.getContext('2d');
-        const design = this.config.frameStyle? this.config.frameStyle : 'none';
+        const design = this.config.frameStyle?this.config.frameStyle:'none';
         switch(design){
             case QRCodeFrame.CIRCULAR:
                 finalContext.beginPath();
@@ -616,15 +620,33 @@ export class Drawing {
             default:
                 return canvas;
         }
+       
+        if(this.config.gradientType === GradientType.RADIAL) {
+            gradient = finalContext.createRadialGradient(
+                Math.sqrt(2)*size/2,
+                Math.sqrt(2)*size/2,
+                (this.config.moduleSize * this.moduleCount) / 6,
+                Math.sqrt(2)*size/2,
+                Math.sqrt(2)*size/2,
+                (this.config.moduleSize * this.moduleCount) / 2,
+            );
+            gradient.addColorStop(0, this.config.colorLight);
+            gradient.addColorStop(1, this.config.colorDark);
+        }
         finalContext.fillStyle = gradient;
-        finalContext.strokeStyle = this.config.frameColor?this.config.frameColor:"black";
+        if(this.config.backgroundColor) {
+            finalContext.strokeStyle = this.config.frameColor?this.config.frameColor:"black";
+        }
+        finalContext.lineWidth =10;
         finalContext.stroke();
+        
+        
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
-
+        const radius = Math.sqrt(2)*size/2;
         for(let i =0 ;i<2*size;i+=moduleSize) {
             for(let j = 0;j<2*size;j+=moduleSize) {
-                if(Math.floor(Math.random() * 2) === 1) {
+                if(Math.floor(Math.random() * 2) === 1 && ((i<radius && ((i-radius)*(i-radius)+(j-radius)*(j-radius))<radius*radius) || (i>radius && ((i-radius)*(i-radius)+(j-radius)*(j-radius))<radius*radius))) {
                     switch (dataPattern) {
                         case DataPattern.CIRCLE:
                             this.drawCircle(i+moduleSize/2,j+moduleSize/2,finalContext,moduleSize/2);
@@ -645,13 +667,14 @@ export class Drawing {
                 }
             }
         }
-        finalContext.drawImage(canvas,size/4.6,size/4.6,size,size);
+       finalContext.drawImage(canvas,size/4.6,size/4.6,size,size);
         return finalCanvas;
     }
     private async drawFrame(canvas: Canvas, frameStyle: QRCodeFrame | undefined, frameColor: string | undefined, frameText: string | undefined): Promise<Canvas> {
         if (!frameStyle || frameStyle === QRCodeFrame.NONE) {
             return canvas;
         }
+
         const color = frameColor ? frameColor : '#000000';
         const moduleSize = this.config.moduleSize;
         const rawSize = this.config.rawSize;
@@ -1039,14 +1062,10 @@ export class Drawing {
             }
             default: {
                 context.fillStyle = color;
-                context.strokeStyle = color;
-                const cornerRadius = moduleSize;
-                context.lineWidth = cornerRadius;
-                this.drawSquareEyeFrame(0 + cornerRadius / 4 + moduleSize/4, 0 + cornerRadius / 4 + moduleSize/4, context, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, false);
-                this.drawSquareEyeFrame((moduleCount - 7) * moduleSize + cornerRadius / 4 + moduleSize/4, 0 + cornerRadius / 4 + moduleSize/4, context, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, false);
-                this.drawSquareEyeFrame(0 + cornerRadius / 4 + moduleSize/4, (moduleCount - 7) * moduleSize + cornerRadius / 4 + moduleSize/4, context, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, false);
+                this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false);
+                this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false);
+                this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false);
                 context.fillStyle = this.config.colorDark;
-                context.strokeStyle = this.config.colorDark;
                 break;
             }
         }
@@ -1086,8 +1105,8 @@ export class Drawing {
 
     private drawSquareEyeFrame(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound: boolean) {
         const moduleSize = this.config.moduleSize;
-        context.strokeRect(startX, startY, width, height);
-        // context.clearRect(startX + 1 * moduleSize, startY + 1 * moduleSize, width - 2 * moduleSize, height - 2 * moduleSize);
+        context.fillRect(startX, startY, width, height);
+        context.clearRect(startX + 1 * moduleSize, startY + 1 * moduleSize, width - 2 * moduleSize, height - 2 * moduleSize);
 
     }
 
@@ -1247,6 +1266,7 @@ export class Drawing {
         }
         context.fillRect(startX, startY, width, height);
     }
+
     private drawKite(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound?: boolean) {
         context.beginPath();
         context.moveTo(startX + width / 2, startY);
@@ -1268,6 +1288,7 @@ export class Drawing {
         const eyeFrameColor = this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient;
         const eyeFrameShape = this.config.eyeFrameShape ? this.config.eyeFrameShape : EyeFrameShape.SQUARE;
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
+
         this.drawEyeFrames(context, eyeFrameShape, eyeFrameColor);
         this.drawEyeBalls(context, eyeBallShape, eyeBallColor);
 
@@ -1490,9 +1511,10 @@ export class Drawing {
         }
     }
 
-    private async addBackground(context: CanvasRenderingContext2D, size: number,moduleSize: number, backgroundImage?: string, backgroundColor?: string) {
+    private async addBackground(context: CanvasRenderingContext2D, size: number, backgroundImage?: string, backgroundColor?: string) {
         if (!backgroundImage) {
             if(this.config.frameStyle === QRCodeFrame.CIRCULAR){
+                const moduleSize = this.config.moduleSize;
                 context.rect(2*moduleSize, 2*moduleSize, size-4*moduleSize, size-4*moduleSize);
             }else {
                 context.rect(0, 0, size, size);
