@@ -221,7 +221,6 @@ export class SVGDrawing {
         const color = this.config.backgroundColor?this.config.backgroundColor:'white' ;
         const width = (this.config.frameColor?10:0);
         if(this.config.backgroundColor || this.config.backgroundImage){
-            console.log('sdhcb');
             const frameColor = this.config.frameColor?this.config.frameColor:'black';
             finalCanvas.circle(size).attr({cx: size+90,cy: size+90,stroke:frameColor,'stroke-width':width}).radius(size).fill(color);
         }
