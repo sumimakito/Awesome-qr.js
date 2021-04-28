@@ -143,6 +143,31 @@ export const CanvasUtil = {
         context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
     },
 
+    drawSVGAlignProtector(
+        context: object,
+        centerX: number,
+        centerY: number,
+        nWidth: number,
+        nHeight: number,
+        margin: number,
+        color: string,
+        shiftX: number,
+        shiftY: number,
+        useOpacity = true
+    ) {
+        if (useOpacity) {
+            // @ts-ignore
+            context.rect(5 * nWidth, 5 * nHeight).fill(color)
+                .move((centerX - 2) * nWidth + margin + shiftX, (centerY - 2) * nHeight + margin + shiftY)
+                .attr({opacity: 0.6});
+        } else {
+            // @ts-ignore
+            context.rect(5 * nWidth, 5 * nHeight).fill(color)
+                .move((centerX - 2) * nWidth + margin + shiftX, (centerY - 2) * nHeight + margin + shiftY);
+        }
+
+    },
+
     drawAlign(context: CanvasRenderingContext2D, centerX: number, centerY: number, nWidth: number, nHeight: number) {
         context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, nWidth, 4 * nHeight);
         context.fillRect((centerX + 2) * nWidth, (centerY - 2 + 1) * nHeight, nWidth, 4 * nHeight);

@@ -15,6 +15,8 @@ import {
 import { QRCodeConfig, QRDrawingConfig } from './Types';
 import { isNode, loadImage } from './Util';
 
+import { SVGDrawing } from './Svg';
+
 if (isNode) {
     const path = require('path');
     const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
@@ -168,8 +170,11 @@ export class QRCode {
     public dataCache?: any[];
     public dataList: QR8bitByte[] = [];
     public drawing: Drawing;
+    // for dashboard comment this out
+    public svgDrawing: SVGDrawing;
     // @ts-ignore
     public canvas: Canvas;
+    public svg: any = '';
 
     private config: QRCodeConfig;
 
@@ -180,6 +185,8 @@ export class QRCode {
         this.addData(config.text);
         this.make();
         this.drawing = new Drawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
+        // for dashboard comment this out
+        this.svgDrawing = new SVGDrawing(this.moduleCount, this.patternPosition, config, this.isDark, this.modules);
     }
 
     get patternPosition() {
@@ -197,6 +204,9 @@ export class QRCode {
     }
 
     public toBuffer(): Buffer {
+        if (this.config.canvasType === CanvasType.SVG && !this.config.useCanvas) {
+            return this.svg;
+        }
         let drawing = this.canvas.toBuffer();
         switch (this.config.canvasType) {
             case CanvasType.PDF:
@@ -598,7 +608,7 @@ export class Drawing {
         const moduleSize = this.config.moduleSize;
         const rawSize = this.config.rawSize;
         const size = rawSize + moduleSize * 2;
-        const text = frameText ? frameText : 'SCAN ME';
+        const text = frameText ? frameText.toUpperCase() : 'SCAN ME';
         let canvasWidth: number = size + moduleSize,
             canvasHeight: number = 1.265 * size,
             borderX: number = 0,
@@ -792,6 +802,7 @@ export class Drawing {
         const fontSize = this.config.size / 10;
         finalContext.font = `${fontSize}px "Roboto"`;
 
+        textX = finalCanvas.width/2 + 1.1 * moduleSize;
         if (this.config.isVCard) {
             textX = textX + moduleSize * 3;
             textY = textY + moduleSize;
@@ -799,10 +810,16 @@ export class Drawing {
             logoY = logoY + moduleSize * 2;
         }
 
-        finalContext.fillText(text, textX + 1.1 * moduleSize, textY);
+        finalContext.fillText(text, textX, textY);
         finalContext.drawImage(canvas, qrX, qrY, rawSize, rawSize);
         return loadImage('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg').then(image => {
 
+            if (this.config.isVCard) {
+                logoX = (finalCanvas.width/2 - finalContext.measureText(text).width/2) - (this.config.size/13);
+                logoY = logoY + (this.config.size * 0.01)
+            } else {
+                logoX = (finalCanvas.width/2 - finalContext.measureText(text).width/2) - (this.config.size/12);
+            }
             finalContext.drawImage(image, logoX, logoY, size / 10, size / 10);
             finalContext.fillStyle = frameColor ? frameColor : '#000000';
             if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
@@ -849,7 +866,6 @@ export class Drawing {
         finalContext.drawImage(canvas, 0, 0, rawSize, rawSize);
         return finalCanvas;
     }
-
     private get canvasType(): 'svg' | 'pdf' | undefined {
         switch (this.config.canvasType) {
             case CanvasType.SVG:
@@ -860,6 +876,7 @@ export class Drawing {
                 return;
         }
     }
+
 
     private async drawLogoImage(context: CanvasRenderingContext2D) {
         if (!this.config.logoImage) {
@@ -974,10 +991,14 @@ export class Drawing {
             }
             default: {
                 context.fillStyle = color;
-                this.drawSquareEyeFrame(0, 0, context, 7 * moduleSize, 7 * moduleSize, false);
-                this.drawSquareEyeFrame((moduleCount - 7) * moduleSize, 0, context, 7 * moduleSize, 7 * moduleSize, false);
-                this.drawSquareEyeFrame(0, (moduleCount - 7) * moduleSize, context, 7 * moduleSize, 7 * moduleSize, false);
+                context.strokeStyle = color;
+                const cornerRadius = moduleSize;
+                context.lineWidth = cornerRadius;
+                this.drawSquareEyeFrame(0 + cornerRadius / 4 + moduleSize/4, 0 + cornerRadius / 4 + moduleSize/4, context, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, false);
+                this.drawSquareEyeFrame((moduleCount - 7) * moduleSize + cornerRadius / 4 + moduleSize/4, 0 + cornerRadius / 4 + moduleSize/4, context, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, false);
+                this.drawSquareEyeFrame(0 + cornerRadius / 4 + moduleSize/4, (moduleCount - 7) * moduleSize + cornerRadius / 4 + moduleSize/4, context, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, 7 * moduleSize - cornerRadius / 2 - moduleSize/2, false);
                 context.fillStyle = this.config.colorDark;
+                context.strokeStyle = this.config.colorDark;
                 break;
             }
         }
@@ -1017,8 +1038,8 @@ export class Drawing {
 
     private drawSquareEyeFrame(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound: boolean) {
         const moduleSize = this.config.moduleSize;
-        context.fillRect(startX, startY, width, height);
-        context.clearRect(startX + 1 * moduleSize, startY + 1 * moduleSize, width - 2 * moduleSize, height - 2 * moduleSize);
+        context.strokeRect(startX, startY, width, height);
+        // context.clearRect(startX + 1 * moduleSize, startY + 1 * moduleSize, width - 2 * moduleSize, height - 2 * moduleSize);
 
     }
 
@@ -1190,6 +1211,7 @@ export class Drawing {
 
     private drawPositionPatterns(context: CanvasRenderingContext2D, gradient: CanvasGradient | string) {
         context.fillStyle = gradient;
+        context.fillStyle = '#242'
 
         const moduleSize = this.config.moduleSize;
         const moduleCount = this.moduleCount;
@@ -1308,6 +1330,7 @@ export class Drawing {
     }
 
     private drawAlignProtectors(context: CanvasRenderingContext2D) {
+        // context.fillStyle = '#242'
         const patternPosition = this.patternPosition;
         const moduleSize = this.config.moduleSize;
         const edgeCenter = patternPosition[patternPosition.length - 1];
@@ -1327,6 +1350,7 @@ export class Drawing {
     }
 
     private drawPositionProtectors(context: CanvasRenderingContext2D) {
+        // context.fillStyle = '#242';
         context.fillStyle = this.config.backgroundImage ? 'rgba(255, 255, 255, 0.6)' : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
         const size = this.config.moduleSize;
         const moduleCount = this.moduleCount;
