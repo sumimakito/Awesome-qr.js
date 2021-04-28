@@ -220,8 +220,10 @@ export class SVGDrawing {
         const finalCanvas = SVG(svgDocument.documentElement).size(2*size+100,2*size+100);
         const color = this.config.backgroundColor?this.config.backgroundColor:'white' ;
         const width = (this.config.frameColor?10:0);
-        if(this.config.backgroundColor){
-            finalCanvas.circle(size).attr({cx: size+90,cy: size+90,stroke:'#000','stroke-width':width}).radius(size).fill(color);
+        if(this.config.backgroundColor || this.config.backgroundImage){
+            console.log('sdhcb');
+            const frameColor = this.config.frameColor?this.config.frameColor:'black';
+            finalCanvas.circle(size).attr({cx: size+90,cy: size+90,stroke:frameColor,'stroke-width':width}).radius(size).fill(color);
         }
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
