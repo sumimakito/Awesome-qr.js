@@ -8,6 +8,7 @@
     "types": "lib/index.d.ts",
     "scripts": {
         "test": "nyc mocha",
+        "coverage": "nyc --reporter=text npm run test",
         "build": "tsc && webpack",
         "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
         "lint": "tslint -p tsconfig.json",
@@ -20,6 +21,9 @@
         "include": [
             "src/**/*.ts",
             "src/**/*.tsx"
+        ],
+        "exclude": [
+            "src/Models.ts"
         ],
         "extension": [
             ".ts",
