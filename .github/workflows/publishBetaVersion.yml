@@ -1,0 +1,41 @@
+name: Publish beta version to npm
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Publish beta version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '10'
+      - name: Install dependencies
+        run: npm install
+      - name: Run unit tests
+        run: npm run test
+      - name: Login to npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
+      - name: Publish to npm
+        run: npm publish --tag beta
+      - name: Publish Beta Failure
+        if: ${{ failure() }}
+        shell: bash
+        env:
+          CHANNEL: 'engineering'
+          TITLE: 'workflow-failed'
+          REPOSITORY_NAME: 'mobstac-awesome-qr'
+          RUN_ID: ${{ github.run_id }}
+          ACTOR: ${{ github.actor }}
+          COLOR: '#FF0000'
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl --request POST \
+            --url $SLACK_WEBHOOK_URL \
+            --header 'Content-Type: application/json' \
+            --header 'cache-control: no-cache' \
+            --data "{\"channel\":\"${CHANNEL}\", \"attachments\": [ { \"title\":\"${TITLE} [ ${GITHUB_REF##*/} ] : [ ${ACTOR} ]\", \"text\": \"https://github.com/mobstac/${REPOSITORY_NAME}/actions/runs/${RUN_ID}\", \"color\": \"${COLOR}\" } ]}"
