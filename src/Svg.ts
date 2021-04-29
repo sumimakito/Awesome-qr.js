@@ -222,7 +222,37 @@ export class SVGDrawing {
         const width = (this.config.frameColor?10:0);
         if(this.config.backgroundColor || this.config.backgroundImage){
             const frameColor = this.config.frameColor?this.config.frameColor:'black';
-            finalCanvas.circle(size).attr({cx: size+90,cy: size+90,stroke:frameColor,'stroke-width':width}).radius(size).fill(color);
+            // @ts-ignore
+            let grad; 
+            const col1 = this.config.colorDark;
+            const col2 = this.config.colorLight;
+            switch (this.config.gradientType) {
+                case GradientType.HORIZONTAL:
+                    // @ts-ignore
+                    grad = finalCanvas.gradient('linear', function(add) {
+                        add.stop(0, col1 )
+                        add.stop(1, col2 )
+                      });
+                      break;
+                case GradientType.VERTICAL:
+                    // @ts-ignore
+                    grad = finalCanvas.gradient('linear', function(add) {
+                        add.stop(0, col1 )
+                        add.stop(1, col2 )
+                      }).from(0, 0).to(0, 1);
+                    break;
+                case GradientType.LINEAR:
+                    // @ts-ignore
+                    grad = finalCanvas.gradient('linear', function(add) {
+                        add.stop(0, col1 )
+                        add.stop(1, col2 )
+                      });
+                      break;
+                default:
+                    grad =gradient;
+            }
+            
+            finalCanvas.circle(size).attr({cx: size+90,cy: size+90,stroke:grad,'stroke-width':width}).radius(size).fill(color);
         }
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;

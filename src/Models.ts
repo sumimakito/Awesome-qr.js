@@ -635,9 +635,10 @@ export class Drawing {
         }
         finalContext.fillStyle = gradient;
         if(this.config.backgroundColor) {
-            finalContext.strokeStyle = this.config.frameColor?this.config.frameColor:"black";
+            finalContext.strokeStyle = gradient;
         }
-        finalContext.lineWidth =10;
+        finalContext.lineWidth =40;
+        
         finalContext.stroke();
         
         
