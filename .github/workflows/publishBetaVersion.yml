@@ -18,15 +18,8 @@ jobs:
         run: npm run test
       - name: Login to npm
         env:
-          USER_NAME: 'test'
-          PASSWORD: 'pwd123'
-          EMAIL: 'test@mobstac.com'
-        run: |
-          npm login << EOF
-          $USER_NAME
-          $PASSWORD
-          $EMAIL
-          EOF
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
       - name: Publish to npm
         run: npm publish --tag beta
       - name: Publish Beta Failure
