@@ -483,7 +483,7 @@ export class SVGDrawing {
                 const color = backgroundColor ? backgroundColor : '#ffffff';
                 if (this.config.frameStyle === QRCodeFrame.CIRCULAR){
                     // @ts-ignore
-                    context.rect(size-120, size-120).fill(color).move(this.shiftX+60,this.shiftY+60).radius(this.config.moduleSize);
+                    context.rect(size-140, size-140).fill(color).move(this.shiftX+70,this.shiftY+70).radius(this.config.moduleSize);
                 }
                 else{
                     // @ts-ignore
