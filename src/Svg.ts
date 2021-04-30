@@ -192,8 +192,8 @@ export class SVGDrawing {
             });
     }
     private inShape(x: number, y: number,pt: number,side: number): boolean {
-        pt  -= 100;
-        side -= 50;
+        pt  -= 140;
+        side -= 70;
         const bottomX = pt + 70;
         const bottomY = pt + 70;
         const topX = pt+side;
@@ -209,7 +209,7 @@ export class SVGDrawing {
         return !(inX && inY);
     }
     private async addDesign(canvas: object,gradient: string): Promise<object> {
-        if(this.config.frameStyle !== QRCodeFrame.CIRCULAR){
+        if (this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
             return canvas;
         }
         const size = this.config.rawSize;
@@ -217,9 +217,9 @@ export class SVGDrawing {
         const svgWindow = createSVGWindow();
         const svgDocument = svgWindow.document;
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
-        const finalCanvas = SVG(svgDocument.documentElement).size(2*size+100,2*size+100);
+        const finalCanvas = SVG(svgDocument.documentElement).size(2*size+100, 2*size+100);
         const color = this.config.backgroundColor?this.config.backgroundColor:'white' ;
-        const width = (this.config.frameColor?10:0);
+        const width = 20;
         if(this.config.backgroundColor || this.config.backgroundImage){
             const frameColor = this.config.frameColor?this.config.frameColor:'black';
             // @ts-ignore
@@ -256,10 +256,11 @@ export class SVGDrawing {
         }
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
-        const shift = size/1.614;
-        for(let i = 0; i < 2*size; i += moduleSize) {
-            for(let j = 0; j < 2*size; j += moduleSize) {
-                if(Math.floor(Math.random() * 2) === 1 && ((i<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-50*size) || (i>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-30*size)) && this.inShape(i,j,shift,size)) {
+        const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
+        const shift = size/1.814;
+        for(let i = 0; i < 2*size; i += increment) {
+            for(let j = 0; j < 2*size; j += increment) {
+                if(Math.floor(Math.random() * 2) === 1 && ((i<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-70*size) || (i>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-50*size)) && this.inShape(i,j,shift,size)) {
                     let grad =  await (this.getColorFromCanvas(this.canvasQR, i/2.5,j/2.5));
                     if(this.config.gradientType === GradientType.RADIAL) {
                         grad = gradient;

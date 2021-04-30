@@ -640,13 +640,13 @@ export class Drawing {
         finalContext.lineWidth =40;
         
         finalContext.stroke();
-        
-        
+
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
+        const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
         const radius = Math.sqrt(2)*size/2;
-        for(let i =0 ;i<2*size;i+=moduleSize) {
-            for(let j = 0;j<2*size;j+=moduleSize) {
+        for(let i =0 ;i<2*size;i+=increment) {
+            for(let j = 0;j<2*size;j+=increment) {
                 if(Math.floor(Math.random() * 2) === 1 && ((i<radius && ((i-radius)*(i-radius)+(j-radius)*(j-radius))<radius*radius) || (i>radius && ((i-radius)*(i-radius)+(j-radius)*(j-radius))<radius*radius))) {
                     switch (dataPattern) {
                         case DataPattern.CIRCLE:
@@ -1431,8 +1431,7 @@ export class Drawing {
 
     private drawAlignPatterns(context: CanvasRenderingContext2D, gradient: CanvasGradient | string) {
         const moduleCount = this.moduleCount;
-        const xyOffset = (1 - this.config.dotScale) * 0.5;
-
+        const xyOffset = (1 - this.config.dotScale) * 0.5; 
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
 
         for (let row = 0; row < moduleCount; row++) {
@@ -1515,8 +1514,8 @@ export class Drawing {
     private async addBackground(context: CanvasRenderingContext2D, size: number, backgroundImage?: string, backgroundColor?: string) {
         if (!backgroundImage) {
             if(this.config.frameStyle === QRCodeFrame.CIRCULAR){
-                const moduleSize = this.config.moduleSize;
-                context.rect(2*moduleSize, 2*moduleSize, size-4*moduleSize, size-4*moduleSize);
+                const moduleSize = this.config.dotScale*this.config.moduleSize;
+                context.rect(2*moduleSize-30, 2*moduleSize-30, size-4*moduleSize+60, size-4*moduleSize+60);
             }else {
                 context.rect(0, 0, size, size);
             }
