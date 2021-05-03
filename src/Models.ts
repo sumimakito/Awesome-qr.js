@@ -668,7 +668,7 @@ export class Drawing {
                 }
             }
         }
-       finalContext.drawImage(canvas,size/4.6,size/4.6,size,size);
+       finalContext.drawImage(canvas,size/2.8,size/2.8,5*size/7,5*size/7);
         return finalCanvas;
     }
     private async drawFrame(canvas: Canvas, frameStyle: QRCodeFrame | undefined, frameColor: string | undefined, frameText: string | undefined): Promise<Canvas> {
