@@ -217,7 +217,7 @@ export class SVGDrawing {
         const svgWindow = createSVGWindow();
         const svgDocument = svgWindow.document;
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
-        const finalCanvas = SVG(svgDocument.documentElement).size(2*size+100, 2*size+100);
+        const finalCanvas = SVG(svgDocument.documentElement).size(2*size, 2*size);
         const color = this.config.backgroundColor?this.config.backgroundColor:'white' ;
         const width = 20;
         if(this.config.backgroundColor || this.config.backgroundImage){
@@ -252,7 +252,7 @@ export class SVGDrawing {
                     grad =gradient;
             }
             
-            finalCanvas.circle(size).attr({cx: size+90,cy: size+90,stroke:grad,'stroke-width':width}).radius(size).fill(color);
+            finalCanvas.circle(size).attr({cx: size,cy: size,stroke:grad,'stroke-width':width}).radius(size).fill(color);
         }
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
@@ -260,7 +260,7 @@ export class SVGDrawing {
         const shift = size/1.814;
         for(let i = 0; i < 2*size; i += increment) {
             for(let j = 0; j < 2*size; j += increment) {
-                if(Math.floor(Math.random() * 2) === 1 && ((i<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-70*size) || (i>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-50*size)) && this.inShape(i,j,shift,size)) {
+                if(Math.floor(Math.random() * 2) === 1 && ((j<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-100*size) || (j>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-120*size)) && this.inShape(i,j,shift,size)) {
                     let grad =  await (this.getColorFromCanvas(this.canvasQR, i/2.5,j/2.5));
                     if(this.config.gradientType === GradientType.RADIAL) {
                         grad = gradient;
@@ -481,14 +481,9 @@ export class SVGDrawing {
         if (!backgroundImage) {
             if(backgroundColor) {
                 const color = backgroundColor ? backgroundColor : '#ffffff';
-                if (this.config.frameStyle === QRCodeFrame.CIRCULAR){
-                    // @ts-ignore
-                    context.rect(size-140, size-140).fill(color).move(this.shiftX+70,this.shiftY+70).radius(this.config.moduleSize);
-                }
-                else{
                     // @ts-ignore
                     context.rect(size,size).fill(color).move(this.shiftX,this.shiftY).radius(this.config.moduleSize);
-                }
+                
             }
             return;
         }

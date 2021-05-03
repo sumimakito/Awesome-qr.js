@@ -1513,12 +1513,7 @@ export class Drawing {
 
     private async addBackground(context: CanvasRenderingContext2D, size: number, backgroundImage?: string, backgroundColor?: string) {
         if (!backgroundImage) {
-            if(this.config.frameStyle === QRCodeFrame.CIRCULAR){
-                const moduleSize = this.config.dotScale*this.config.moduleSize;
-                context.rect(2*moduleSize-30, 2*moduleSize-30, size-4*moduleSize+60, size-4*moduleSize+60);
-            }else {
-                context.rect(0, 0, size, size);
-            }
+            context.rect(0, 0, size, size);
             context.fillStyle = backgroundColor ? backgroundColor : '#ffffff';
             context.fill();
             return;

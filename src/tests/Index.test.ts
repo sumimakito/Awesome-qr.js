@@ -35,7 +35,7 @@ const config = {
     // frameText: 'HEY QR',
     // logoMargin: 10,
     // logoScale: 0.25,
-    margin: 80,
+    margin: 0,
     size: 2048,
     isVCard: false,
     useCanvas: false,
