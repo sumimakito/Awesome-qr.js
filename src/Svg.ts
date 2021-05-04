@@ -222,42 +222,42 @@ export class SVGDrawing {
         const svgDocument = svgWindow.document;
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
         const finalCanvas = SVG(svgDocument.documentElement).size(Math.sqrt(2)*size + 4*this.config.moduleSize, Math.sqrt(2)*size + 4*this.config.moduleSize);
-        const color = this.config.backgroundColor?this.config.backgroundColor:'white' ;
+        const color = this.config.backgroundColor?this.config.backgroundColor:'none' ;
         const width = this.config.moduleSize;
-        if(this.config.backgroundColor || this.config.backgroundImage){
-            // @ts-ignore
-            let grad; 
-            const col1 = this.config.colorDark;
-            const col2 = this.config.colorLight;
-            switch (this.config.gradientType) {
-                case GradientType.HORIZONTAL:
-                    // @ts-ignore
-                    grad = finalCanvas.gradient('linear', function(add) {
-                        add.stop(0, col1 )
-                        add.stop(1, col2 )
-                      });
-                      break;
-                case GradientType.VERTICAL:
-                    // @ts-ignore
-                    grad = finalCanvas.gradient('linear', function(add) {
-                        add.stop(0, col1 )
-                        add.stop(1, col2 )
-                      }).from(0, 0).to(0, 1);
+        
+        // @ts-ignore
+        let grad; 
+        const col1 = this.config.colorDark;
+        const col2 = this.config.colorLight;
+        switch (this.config.gradientType) {
+            case GradientType.HORIZONTAL:
+                // @ts-ignore
+                grad = finalCanvas.gradient('linear', function(add) {
+                    add.stop(0, col1 )
+                    add.stop(1, col2 )
+                    });
                     break;
-                case GradientType.LINEAR:
-                    // @ts-ignore
-                    grad = finalCanvas.gradient('linear', function(add) {
-                        add.stop(0, col1 )
-                        add.stop(1, col2 )
-                      });
-                      break;
-                default:
-                    grad =gradient;
-            }
-            const pos = Math.sqrt(2)*size/2 + 2*this.config.moduleSize;
-            const radius = size/Math.sqrt(2) + this.config.moduleSize;
-            finalCanvas.circle(size).attr({cx: pos,cy: pos, stroke:grad, 'stroke-width':width}).radius(radius).fill(color);
+            case GradientType.VERTICAL:
+                // @ts-ignore
+                grad = finalCanvas.gradient('linear', function(add) {
+                    add.stop(0, col1 )
+                    add.stop(1, col2 )
+                    }).from(0, 0).to(0, 1);
+                break;
+            case GradientType.LINEAR:
+                // @ts-ignore
+                grad = finalCanvas.gradient('linear', function(add) {
+                    add.stop(0, col1 )
+                    add.stop(1, col2 )
+                    });
+                    break;
+            default:
+                grad =gradient;
         }
+        const pos = Math.sqrt(2)*size/2 + 2*this.config.moduleSize;
+        const radius = size/Math.sqrt(2) + this.config.moduleSize;
+        finalCanvas.circle(size).attr({cx: pos,cy: pos, stroke:grad, 'stroke-width':width}).radius(radius).fill(color);
+        
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;

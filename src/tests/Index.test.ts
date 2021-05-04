@@ -39,7 +39,7 @@ const config = {
     size: 2048,
     isVCard: false,
     useCanvas: false,
-    useOpacity: true,
+    useOpacity: false,
 };
 
 describe('QR code tests', () => {
