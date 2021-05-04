@@ -267,7 +267,7 @@ export class SVGDrawing {
         
         for(let i = 0; i < limit; i += increment) {
             for(let j = 0; j < limit; j += increment) {
-                if( Math.floor(Math.random() * 2) === 1 && (i-pos)*(i-pos)+(j-pos)*(j-pos)<size*size) {
+                if( Math.floor(Math.random() * 2) === 1 && (i-pos)*(i-pos)+(j-pos)*(j-pos)<size*size && this.inShape(i,j,shift,this.config.rawSize + 3*moduleSize)) { 
                     grad =  await (this.getColorFromCanvas(this.canvasQR, i/2.5,j/2.5));
                     if(this.config.gradientType === GradientType.RADIAL) {
                         grad = gradient;
