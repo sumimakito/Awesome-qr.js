@@ -215,7 +215,6 @@ export class SVGDrawing {
         if (this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
             return canvas;
         }
-        console.log(gradient);
         let size = this.config.rawSize;
         const { createSVGWindow } = require('svgdom');
         const svgWindow = createSVGWindow();
@@ -266,7 +265,7 @@ export class SVGDrawing {
         size = size/Math.sqrt(2) + this.config.moduleSize;
         for(let i = 0; i < limit; i += increment) {
             for(let j = 0; j < limit; j += increment) {
-                if(Math.floor(Math.random() * 2) === 1 && ((i<size && j>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-60*size) || i>=size || j<=size) &&((j<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-120*size) || (j>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size)) && this.inShape(i,j,shift,this.config.rawSize + 2*moduleSize)) {
+                if(Math.floor(Math.random() * 2) === 1 && ((i<size && j<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-140*size) || i>=size || j>=size) && ((i<size && j>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-130*size) || i>=size || j<=size) &&((j<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-120*size) || (j>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-20*size)) && this.inShape(i,j,shift,this.config.rawSize + 3*moduleSize)) {
                     let grad =  await (this.getColorFromCanvas(this.canvasQR, i/2.5,j/2.5));
                     if(this.config.gradientType === GradientType.RADIAL) {
                         grad = gradient;
