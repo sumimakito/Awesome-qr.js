@@ -261,12 +261,14 @@ export class SVGDrawing {
         const moduleSize = this.config.dotScale*this.config.moduleSize;
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
         const shift = size/3.8;
-        const limit  = 2*size + 4*this.config.moduleSize;
-        size = size/Math.sqrt(2) + this.config.moduleSize;
+        const dist = 2048;
+        const limit  = 2*dist + 4*this.config.moduleSize;
+        size = size/Math.sqrt(2) + this.config.moduleSize/2;
+        
         for(let i = 0; i < limit; i += increment) {
             for(let j = 0; j < limit; j += increment) {
-                if(Math.floor(Math.random() * 2) === 1 && ((i<size && j<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-140*size) || i>=size || j>=size) && ((i<size && j>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-130*size) || i>=size || j<=size) &&((j<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-120*size) || (j>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-20*size)) && this.inShape(i,j,shift,this.config.rawSize + 3*moduleSize)) {
-                    let grad =  await (this.getColorFromCanvas(this.canvasQR, i/2.5,j/2.5));
+                if( Math.floor(Math.random() * 2) === 1 && (i-pos)*(i-pos)+(j-pos)*(j-pos)<size*size) {
+                    grad =  await (this.getColorFromCanvas(this.canvasQR, i/2.5,j/2.5));
                     if(this.config.gradientType === GradientType.RADIAL) {
                         grad = gradient;
                     }
