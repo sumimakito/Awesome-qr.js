@@ -476,17 +476,19 @@ export class Drawing {
         const nSize = Math.ceil(rawViewportSize / qrModuleCount);
         const viewportSize = nSize * qrModuleCount;
         const size = viewportSize + 2 * margin;
-
+        let qrmargin = config.margin;
+        if (config.frameStyle === QRCodeFrame.CIRCULAR) {
+            qrmargin = nSize / 5;
+        }
         const drawingConfig: Partial<QRDrawingConfig> = {
             size,
             nSize,
             rawSize: config.size,
             viewportSize,
-            margin,
+            margin: qrmargin,
             dotScale,
             moduleSize: nSize,
         };
-
         // @ts-ignore
         return Object.assign(config, drawingConfig);
     }
@@ -596,6 +598,9 @@ export class Drawing {
                 return this.addDesign(canvas,gradient);
             })
             .then((canvas: Canvas) => {
+                return this.scaleFinalImage(canvas);
+            }) 
+            .then((canvas: Canvas) => {
                 return this.drawFrame(canvas, this.config.frameStyle, this.config.frameColor, this.config.frameText);
             })
             .then((canvas: Canvas) => {
@@ -605,13 +610,13 @@ export class Drawing {
     }
     private async addDesign(canvas: Canvas, gradient: CanvasGradient | string) {
         const size = this.config.rawSize;
-        const finalCanvas: Canvas = createCanvas(Math.sqrt(2)*size,Math.sqrt(2)*size,this.canvasType);
+        const finalCanvas: Canvas = createCanvas(Math.sqrt(2)*size + 4*this.config.moduleSize, Math.sqrt(2)*size + 4*this.config.moduleSize,this.canvasType);
         const finalContext = finalCanvas.getContext('2d');
         const design = this.config.frameStyle?this.config.frameStyle:'none';
         switch(design){
             case QRCodeFrame.CIRCULAR:
                 finalContext.beginPath();
-                finalContext.arc(Math.sqrt(2)*size/2, Math.sqrt(2)*size/2, size/Math.sqrt(2), 0, 2*Math.PI);
+                finalContext.arc(Math.sqrt(2)*size/2 + 2*this.config.moduleSize, Math.sqrt(2)*size/2 + 2*this.config.moduleSize, size/Math.sqrt(2) + 2*this.config.moduleSize, 0, 2*Math.PI);
                 finalContext.fillStyle = this.config.backgroundColor?this.config.backgroundColor:'white' ;
                 finalContext.lineWidth = 10;
                 finalContext.fill();
@@ -637,7 +642,7 @@ export class Drawing {
         if(this.config.backgroundColor) {
             finalContext.strokeStyle = gradient;
         }
-        finalContext.lineWidth =40;
+        finalContext.lineWidth = 2*this.config.moduleSize;
         
         finalContext.stroke();
 
@@ -645,9 +650,10 @@ export class Drawing {
         const moduleSize = this.config.dotScale*this.config.moduleSize;
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
         const radius = Math.sqrt(2)*size/2;
-        for(let i =0 ;i<2*size;i+=increment) {
-            for(let j = 0;j<2*size;j+=increment) {
-                if(Math.floor(Math.random() * 2) === 1 && ((i<radius && ((i-radius)*(i-radius)+(j-radius)*(j-radius))<radius*radius) || (i>radius && ((i-radius)*(i-radius)+(j-radius)*(j-radius))<radius*radius))) {
+        const limit  = 2*size + 4*this.config.moduleSize;
+        for(let i =0 ;i<limit;i+=increment) {
+            for(let j = 0;j<limit;j+=increment) {
+                if(Math.floor(Math.random() * 2) === 1) {
                     switch (dataPattern) {
                         case DataPattern.CIRCLE:
                             this.drawCircle(i+moduleSize/2,j+moduleSize/2,finalContext,moduleSize/2);
@@ -668,7 +674,7 @@ export class Drawing {
                 }
             }
         }
-       finalContext.drawImage(canvas,size/2.8,size/2.8,5*size/7,5*size/7);
+        finalContext.drawImage(canvas,size/3.65,size/3.65,size,size);
         return finalCanvas;
     }
     private async drawFrame(canvas: Canvas, frameStyle: QRCodeFrame | undefined, frameColor: string | undefined, frameText: string | undefined): Promise<Canvas> {

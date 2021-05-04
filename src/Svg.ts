@@ -28,13 +28,16 @@ export class SVGDrawing {
         const nSize = Math.ceil(rawViewportSize / qrModuleCount);
         const viewportSize = nSize * qrModuleCount;
         const size = viewportSize + 2 * margin;
-
+        let qrmargin  = config.margin;
+        if (config.frameStyle === QRCodeFrame.CIRCULAR) {
+            qrmargin = 0;
+        }
         const drawingConfig: Partial<QRDrawingConfig> = {
             size,
             nSize,
             rawSize: config.size,
             viewportSize,
-            margin,
+            margin: qrmargin,
             dotScale,
             moduleSize: nSize,
         };
@@ -212,16 +215,16 @@ export class SVGDrawing {
         if (this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
             return canvas;
         }
-        const size = this.config.rawSize;
+        console.log(gradient);
+        let size = this.config.rawSize;
         const { createSVGWindow } = require('svgdom');
         const svgWindow = createSVGWindow();
         const svgDocument = svgWindow.document;
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
-        const finalCanvas = SVG(svgDocument.documentElement).size(2*size, 2*size);
+        const finalCanvas = SVG(svgDocument.documentElement).size(Math.sqrt(2)*size + 4*this.config.moduleSize, Math.sqrt(2)*size + 4*this.config.moduleSize);
         const color = this.config.backgroundColor?this.config.backgroundColor:'white' ;
-        const width = 20;
+        const width = this.config.moduleSize;
         if(this.config.backgroundColor || this.config.backgroundImage){
-            const frameColor = this.config.frameColor?this.config.frameColor:'black';
             // @ts-ignore
             let grad; 
             const col1 = this.config.colorDark;
@@ -251,23 +254,26 @@ export class SVGDrawing {
                 default:
                     grad =gradient;
             }
-            
-            finalCanvas.circle(size).attr({cx: size,cy: size,stroke:grad,'stroke-width':width}).radius(size).fill(color);
+            const pos = Math.sqrt(2)*size/2 + 2*this.config.moduleSize;
+            const radius = size/Math.sqrt(2) + this.config.moduleSize;
+            finalCanvas.circle(size).attr({cx: pos,cy: pos, stroke:grad, 'stroke-width':width}).radius(radius).fill(color);
         }
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
-        const shift = size/1.814;
-        for(let i = 0; i < 2*size; i += increment) {
-            for(let j = 0; j < 2*size; j += increment) {
-                if(Math.floor(Math.random() * 2) === 1 && ((j<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-100*size) || (j>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-120*size)) && this.inShape(i,j,shift,size)) {
+        const shift = size/3.8;
+        const limit  = 2*size + 4*this.config.moduleSize;
+        size = size/Math.sqrt(2) + this.config.moduleSize;
+        for(let i = 0; i < limit; i += increment) {
+            for(let j = 0; j < limit; j += increment) {
+                if(Math.floor(Math.random() * 2) === 1 && ((i<size && j>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-60*size) || i>=size || j<=size) &&((j<size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size-120*size) || (j>size && ((i-size)*(i-size)+(j-size)*(j-size))<size*size)) && this.inShape(i,j,shift,this.config.rawSize + 2*moduleSize)) {
                     let grad =  await (this.getColorFromCanvas(this.canvasQR, i/2.5,j/2.5));
                     if(this.config.gradientType === GradientType.RADIAL) {
                         grad = gradient;
                     }
                     switch (dataPattern) {
                      case DataPattern.CIRCLE:
-                        this.drawCircle(i+moduleSize/2, j+moduleSize/2, finalCanvas, grad, moduleSize / 2, moduleSize / 2, true);
+                        this.drawCircle(i+moduleSize/2, j+moduleSize/2, finalCanvas, grad, moduleSize / 2, moduleSize / 2, false);
                         break;
                     case DataPattern.KITE:
                         this.drawKite(i, j, finalCanvas, grad, moduleSize, moduleSize);
@@ -287,6 +293,7 @@ export class SVGDrawing {
         }
         // @ts-ignore
         finalCanvas.add(canvas.move(shift,shift));
+        finalCanvas.translate(this.canvas.rawSize,this.canvas.rawSize);
         return finalCanvas;
     }
     private setupCanvasForGradient(ctx: CanvasRenderingContext2D, size: number) {
