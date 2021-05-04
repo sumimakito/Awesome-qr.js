@@ -639,12 +639,10 @@ export class Drawing {
             gradient.addColorStop(1, this.config.colorDark);
         }
         finalContext.fillStyle = gradient;
-        if(this.config.backgroundColor) {
-            finalContext.strokeStyle = gradient;
-        }
+        finalContext.strokeStyle = gradient;
         finalContext.lineWidth = 2*this.config.moduleSize;
-        
         finalContext.stroke();
+        
 
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
