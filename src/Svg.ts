@@ -196,7 +196,7 @@ export class SVGDrawing {
     }
     private inShape(x: number, y: number,pt: number,side: number): boolean {
         
-        const bottomX = pt ;//- this.config.moduleSize ;
+        const bottomX = pt ;
         const bottomY = pt  ;
         const topX = pt+side;
         const topY = pt+side;
@@ -262,12 +262,11 @@ export class SVGDrawing {
         const shift = size/3.8;
         const dist = 2048;
         const limit  = 2*dist + 4*this.config.moduleSize;
-        size = size/Math.sqrt(2) + this.config.moduleSize/2;
-        
+        size = size/Math.sqrt(2) - this.config.moduleSize/4;
         for(let i = 0; i < limit; i += increment) {
             for(let j = 0; j < limit; j += increment) {
                 if( Math.floor(Math.random() * 2) === 1 && (i-pos)*(i-pos)+(j-pos)*(j-pos)<size*size && this.inShape(i,j,shift - this.config.moduleSize,this.config.rawSize + moduleSize)) { 
-                    grad =  await (this.getColorFromCanvas(this.canvasQR, i/2.5,j/2.5));
+                    grad =  await (this.getColorFromCanvas(this.canvasQR, i*size/limit,j*size/limit));
                     if(this.config.gradientType === GradientType.RADIAL) {
                         grad = gradient;
                     }
@@ -289,6 +288,7 @@ export class SVGDrawing {
                         break;   
                   }
                 }
+
             }
         }
         // @ts-ignore
