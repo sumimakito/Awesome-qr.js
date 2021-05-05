@@ -9,6 +9,7 @@
     "scripts": {
         "test": "nyc mocha",
         "build": "tsc && webpack",
+        "coverage": "nyc --reporter=text npm run test",
         "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
         "lint": "tslint -p tsconfig.json",
         "prepare": "npm run build",

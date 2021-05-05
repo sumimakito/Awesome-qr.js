@@ -1,10 +1,12 @@
-name: Test Mobstac Awesome QR
+name: Publish stable version to npm
 
-on: [push]
+on:
+  push:
+    branches: [ master ]
 
 jobs:
   test:
-    name: Testing QR Library
+    name: Publish beta version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -14,14 +16,14 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run unit tests
-        run: |
-          cp -r ./src/tests/qrTests/. ./src/tests/qrTestsOld
-          npm run test
-      - name: Compare files
-        run: |
-          chmod +x ./.github/workflows/compare_files.sh
-          exec ./.github/workflows/compare_files.sh
-      - name: Test Failure
+        run: npm run test
+      - name: Login to npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm set //registry.npmjs.org/:_authToken=$NPM_TOKEN
+      - name: Publish to npm
+        run: npm publish
+      - name: Publish Beta Failure
         if: ${{ failure() }}
         shell: bash
         env:
