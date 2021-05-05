@@ -333,7 +333,7 @@ const config10 = {
     backgroundColor:'white',
     colorDark: "blue",
     colorLight: "green",
-    dataPattern: DataPattern.KITE,
+    dataPattern: DataPattern.CIRCLE,
     dotScale: 1,
     eyeBallShape: EyeBallShape.CIRCLE,
     // eyeFrameColor: "",
