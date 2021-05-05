@@ -210,6 +210,12 @@ export class SVGDrawing {
        
         return !(inX && inY);
     }
+    private checkCircle(x: number, y: number, r: number , cx: number) {
+        if((x-cx)*(x-cx) + (y-cx) * (y-cx) <= r*r) {
+            return true;
+        }
+        return false;
+    }
     private async addDesign(canvas: object,gradient: string): Promise<object> {
         if (this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
             return canvas;
@@ -219,7 +225,7 @@ export class SVGDrawing {
         const svgWindow = createSVGWindow();
         const svgDocument = svgWindow.document;
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
-        const finalCanvas = SVG(svgDocument.documentElement).size(Math.sqrt(2)*size + 4*this.config.moduleSize, Math.sqrt(2)*size + 4*this.config.moduleSize);
+        const finalCanvas = SVG(svgDocument.documentElement).size(Math.sqrt(2)*size + 2*this.config.moduleSize, Math.sqrt(2)*size + 2*this.config.moduleSize);
         const color = this.config.backgroundColor?this.config.backgroundColor:'none' ;
         const width = this.config.moduleSize;
         
@@ -252,20 +258,20 @@ export class SVGDrawing {
             default:
                 grad =gradient;
         }
-        const pos = Math.sqrt(2)*size/2 + 2*this.config.moduleSize;
-        const radius = size/Math.sqrt(2) + this.config.moduleSize;
+        const pos = Math.sqrt(2)*size/2 + this.config.moduleSize;
+        const radius = size/Math.sqrt(2) + this.config.moduleSize / 2;
         finalCanvas.circle(size).attr({cx: pos,cy: pos, stroke:grad, 'stroke-width':width}).radius(radius).fill(color);
         
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
-        const shift = size/3.8;
+        const shift = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ; 
         const dist = 2048;
-        const limit  = 2*dist + 4*this.config.moduleSize;
-        size = size/Math.sqrt(2) - this.config.moduleSize/4;
+        const limit  = Math.sqrt(2)*size + 2*this.config.moduleSize+1;
+
         for(let i = 0; i < limit; i += increment) {
             for(let j = 0; j < limit; j += increment) {
-                if( Math.floor(Math.random() * 2) === 1 && (i-pos)*(i-pos)+(j-pos)*(j-pos)<size*size && this.inShape(i,j,shift - this.config.moduleSize,this.config.rawSize + moduleSize)) { 
+                if( Math.floor(Math.random() * 2) === 1 && this.checkCircle(i,j,radius - this.config.moduleSize / 2,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius -this.config.moduleSize / 2, pos) && this.inShape(i,j,shift,size) && this.inShape(i+moduleSize,j+moduleSize,shift,size)) { 
                     grad =  await (this.getColorFromCanvas(this.canvasQR, i*size/limit,j*size/limit));
                     if(this.config.gradientType === GradientType.RADIAL) {
                         grad = gradient;
