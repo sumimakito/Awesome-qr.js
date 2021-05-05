@@ -220,7 +220,7 @@ export class SVGDrawing {
         if (this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
             return canvas;
         }    
-        const size = this.config.rawSize;
+        const size = this.config.size;;
         const { createSVGWindow } = require('svgdom');
         const svgWindow = createSVGWindow();
         const svgDocument = svgWindow.document;
@@ -259,7 +259,7 @@ export class SVGDrawing {
                 grad =gradient;
         }
         const pos = Math.sqrt(2)*size/2 + this.config.moduleSize;
-        const radius = size/Math.sqrt(2) + this.config.moduleSize / 2;
+        const radius = (size)/Math.sqrt(2) + this.config.moduleSize/2;
         finalCanvas.circle(size).attr({cx: pos,cy: pos, stroke:grad, 'stroke-width':width}).radius(radius).fill(color);
         
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
@@ -267,7 +267,6 @@ export class SVGDrawing {
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
         const shift = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ; 
         const limit  = Math.sqrt(2)*size + 2*this.config.moduleSize+1;
-
         for(let i = 0; i < limit; i += increment) {
             for(let j = 0; j < limit; j += increment) {
                 if( Math.floor(Math.random() * 2) === 1 && this.checkCircle(i,j,radius - this.config.moduleSize / 2,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius -this.config.moduleSize / 2, pos) && this.inShape(i,j,shift,size) && this.inShape(i+moduleSize,j+moduleSize,shift,size)) { 

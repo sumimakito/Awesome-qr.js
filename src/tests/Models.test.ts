@@ -299,6 +299,104 @@ const config8 = {
     useOpacity: false,
 };
 
+const config9 = {
+    backgroundColor:'white',
+    canvasType: CanvasType.SVG,
+    colorDark: "red",
+    colorLight: "green",
+    correctLevel: 2,
+    dataPattern: DataPattern.KITE,
+    dotScale: 0.96,
+    eyeBallShape: EyeBallShape.SQUARE,
+    // eyeFrameColor: "",
+    eyeFrameShape: EyeFrameShape.RIGHT_LEAF,
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameColor: "blue",
+    frameText: "Scan QR",
+    gradientType: GradientType.RADIAL,
+   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
+    isVCard: false,
+    logoCornerRadius: 8,
+    logoMargin: 11,
+    logoScale: 0.26,
+    margin: 80,
+    maskedDots: false,
+   size: 1051,
+    text: "https://www.google.com/search?q=google+image&sxsrf=ALeKk01HdEjd-1kgx0opDH4z57mKAKdSfg:1619608675472&source=lnms&tbm=isch&sa=X&ved=2ahUKEwja3Zq-6KDwAhVDjOYKHeseBpQQ_AUoAXoECAEQAw&biw=1853&bih=949#imgrc=NaNXoifrEY1VZM",
+   typeNumber: 4,
+   useCanvas: false,
+   useOpacity: false,
+   viewportSize: 891,
+};
+const config10 = {
+    canvasType: CanvasType.SVG,
+    backgroundColor:'white',
+    colorDark: "blue",
+    colorLight: "green",
+    dataPattern: DataPattern.KITE,
+    dotScale: 1,
+    eyeBallShape: EyeBallShape.CIRCLE,
+    // eyeFrameColor: "",
+    eyeFrameShape: EyeFrameShape.CIRCLE,
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameColor: "blue",
+    frameText: "Scan QR",
+    gradientType: GradientType.VERTICAL,
+   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
+
+    text: "https://www.google.com/search?q=google+image&sxsrf=ALeKk01HdEjd-1kgx0opDH4z57mKAKdSfg:1619608675472&source=lnms&tbm=isch&sa=X&ved=2ahUKEwja3Zq-6KDwAhVDjOYKHeseBpQQ_AUoAXoECAEQAw&biw=1853&bih=949#imgrc=NaNXoifrEY1VZM",
+};
+const config11 = {
+    canvasType: CanvasType.SVG,
+    colorDark: "blue",
+    colorLight: "green",
+    dataPattern: DataPattern.LEFT_DIAMOND,
+    dotScale: 1,
+    eyeBallShape: EyeBallShape.CIRCLE,
+    // eyeFrameColor: "",
+    eyeFrameShape: EyeFrameShape.CIRCLE,
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameColor: "blue",
+    frameText: "Scan QR",
+    gradientType: GradientType.VERTICAL,
+   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
+
+    text: "https://google.com",
+};
+const config12 = {
+    canvasType: CanvasType.SVG,
+    colorDark: "blue",
+    colorLight: "green",
+    dataPattern: DataPattern.RIGHT_DIAMOND,
+    dotScale: 1,
+    eyeBallShape: EyeBallShape.CIRCLE,
+    // eyeFrameColor: "",
+    eyeFrameShape: EyeFrameShape.CIRCLE,
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameColor: "blue",
+    frameText: "Scan QR",
+    gradientType: GradientType.VERTICAL,
+   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
+
+    text: "https://google.com",
+};
+const config13 = {
+    canvasType: CanvasType.SVG,
+    colorDark: "red",
+    colorLight: "green",
+    dataPattern: DataPattern.SQUARE,
+    dotScale: 1,
+    eyeBallShape: EyeBallShape.CIRCLE,
+    // eyeFrameColor: "",
+    eyeFrameShape: EyeFrameShape.CIRCLE,
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameColor: "blue",
+    frameText: "Scan QR",
+    gradientType: GradientType.VERTICAL,
+   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
+
+    text: "https://google.com",
+};
 describe('PNG QR code tests', () => {
     // it('Main test SVG', done => {
     //     const qrCodeGenerator = new QRCodeBuilder(config);
@@ -547,6 +645,161 @@ describe('PNG QR code tests', () => {
             const imageBuffer = decodedImg.data;
             const extension ='png';
             const fileName = '/test8' + "." + extension;
+            fs.writeFileSync(__dirname+fileName, imageBuffer);
+            // console.log(dataUrl.substr(0,200));
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+            
+            
+            // const fs = require('fs');
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            // done();
+        }).catch(err => {
+            done();
+        });
+    });
+    it('Main test QR 9 circular', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config9);
+
+        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
+            
+            const fs = require('fs');
+             
+            const dataUrl = qrCode.canvas.toDataURL('image/png');
+            const matches: any = dataUrl.match(
+                    /^data:([A-Za-z-+\/]+);base64,(.+)$/
+                  ),
+                response: any  ={};
+            response.type = matches[1];
+            response.data = Buffer.from(matches[2], "base64");
+            const decodedImg = response;
+            const imageBuffer = decodedImg.data;
+            const extension ='png';
+            const fileName = '/circular-kite' + "." + extension;
+            fs.writeFileSync(__dirname+fileName, imageBuffer);
+            // console.log(dataUrl.substr(0,200));
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+            
+            
+            // const fs = require('fs');
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            // done();
+        }).catch(err => {
+            done();
+        });
+    });
+    it('Main test QR 10 circular', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config10);
+
+        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
+            
+            const fs = require('fs');
+             
+            const dataUrl = qrCode.canvas.toDataURL('image/png');
+            const matches: any = dataUrl.match(
+                    /^data:([A-Za-z-+\/]+);base64,(.+)$/
+                  ),
+                response: any  ={};
+            response.type = matches[1];
+            response.data = Buffer.from(matches[2], "base64");
+            const decodedImg = response;
+            const imageBuffer = decodedImg.data;
+            const extension ='png';
+            const fileName = '/circular-circle' + "." + extension;
+            fs.writeFileSync(__dirname+fileName, imageBuffer);
+            // console.log(dataUrl.substr(0,200));
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+            
+            
+            // const fs = require('fs');
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            // done();
+        }).catch(err => {
+            done();
+        });
+    });
+    it('Main test QR 11 circular', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config11);
+
+        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
+            
+            const fs = require('fs');
+             
+            const dataUrl = qrCode.canvas.toDataURL('image/png');
+            const matches: any = dataUrl.match(
+                    /^data:([A-Za-z-+\/]+);base64,(.+)$/
+                  ),
+                response: any  ={};
+            response.type = matches[1];
+            response.data = Buffer.from(matches[2], "base64");
+            const decodedImg = response;
+            const imageBuffer = decodedImg.data;
+            const extension ='png';
+            const fileName = '/circular-leftdiamond' + "." + extension;
+            fs.writeFileSync(__dirname+fileName, imageBuffer);
+            // console.log(dataUrl.substr(0,200));
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+            
+            
+            // const fs = require('fs');
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            // done();
+        }).catch(err => {
+            done();
+        });
+    });
+    it('Main test QR 12 circular', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config12);
+
+        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
+            
+            const fs = require('fs');
+             
+            const dataUrl = qrCode.canvas.toDataURL('image/png');
+            const matches: any = dataUrl.match(
+                    /^data:([A-Za-z-+\/]+);base64,(.+)$/
+                  ),
+                response: any  ={};
+            response.type = matches[1];
+            response.data = Buffer.from(matches[2], "base64");
+            const decodedImg = response;
+            const imageBuffer = decodedImg.data;
+            const extension ='png';
+            const fileName = '/circular-rightdiamond' + "." + extension;
+            fs.writeFileSync(__dirname+fileName, imageBuffer);
+            // console.log(dataUrl.substr(0,200));
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+            
+            
+            // const fs = require('fs');
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            // done();
+        }).catch(err => {
+            done();
+        });
+    });
+    it('Main test QR 13 circular', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config13);
+
+        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
+            
+            const fs = require('fs');
+             
+            const dataUrl = qrCode.canvas.toDataURL('image/png');
+            const matches: any = dataUrl.match(
+                    /^data:([A-Za-z-+\/]+);base64,(.+)$/
+                  ),
+                response: any  ={};
+            response.type = matches[1];
+            response.data = Buffer.from(matches[2], "base64");
+            const decodedImg = response;
+            const imageBuffer = decodedImg.data;
+            const extension ='png';
+            const fileName = '/circular-square' + "." + extension;
             fs.writeFileSync(__dirname+fileName, imageBuffer);
             // console.log(dataUrl.substr(0,200));
             // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());

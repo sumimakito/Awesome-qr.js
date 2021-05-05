@@ -182,6 +182,104 @@ const config5 = {
    useOpacity: false,
    viewportSize: 891,
 };
+const config6 = {
+    backgroundColor:'white',
+    canvasType: CanvasType.SVG,
+    colorDark: "red",
+    colorLight: "green",
+    correctLevel: 2,
+    dataPattern: DataPattern.KITE,
+    dotScale: 0.96,
+    eyeBallShape: EyeBallShape.SQUARE,
+    // eyeFrameColor: "",
+    eyeFrameShape: EyeFrameShape.RIGHT_LEAF,
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameColor: "blue",
+    frameText: "Scan QR",
+    gradientType: GradientType.RADIAL,
+   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
+    isVCard: false,
+    logoCornerRadius: 8,
+    logoMargin: 11,
+    logoScale: 0.26,
+    margin: 80,
+    maskedDots: false,
+   size: 1051,
+    text: "https://www.google.com/search?q=google+image&sxsrf=ALeKk01HdEjd-1kgx0opDH4z57mKAKdSfg:1619608675472&source=lnms&tbm=isch&sa=X&ved=2ahUKEwja3Zq-6KDwAhVDjOYKHeseBpQQ_AUoAXoECAEQAw&biw=1853&bih=949#imgrc=NaNXoifrEY1VZM",
+   typeNumber: 4,
+   useCanvas: false,
+   useOpacity: false,
+   viewportSize: 891,
+};
+const config7 = {
+    canvasType: CanvasType.SVG,
+    backgroundColor:'white',
+    colorDark: "blue",
+    colorLight: "green",
+    dataPattern: DataPattern.KITE,
+    dotScale: 1,
+    eyeBallShape: EyeBallShape.CIRCLE,
+    // eyeFrameColor: "",
+    eyeFrameShape: EyeFrameShape.CIRCLE,
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameColor: "blue",
+    frameText: "Scan QR",
+    gradientType: GradientType.VERTICAL,
+   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
+
+    text: "https://www.google.com/search?q=google+image&sxsrf=ALeKk01HdEjd-1kgx0opDH4z57mKAKdSfg:1619608675472&source=lnms&tbm=isch&sa=X&ved=2ahUKEwja3Zq-6KDwAhVDjOYKHeseBpQQ_AUoAXoECAEQAw&biw=1853&bih=949#imgrc=NaNXoifrEY1VZM",
+};
+const config8 = {
+    canvasType: CanvasType.SVG,
+    colorDark: "blue",
+    colorLight: "green",
+    dataPattern: DataPattern.LEFT_DIAMOND,
+    dotScale: 1,
+    eyeBallShape: EyeBallShape.CIRCLE,
+    // eyeFrameColor: "",
+    eyeFrameShape: EyeFrameShape.CIRCLE,
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameColor: "blue",
+    frameText: "Scan QR",
+    gradientType: GradientType.VERTICAL,
+   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
+
+    text: "https://google.com",
+};
+const config9 = {
+    canvasType: CanvasType.SVG,
+    colorDark: "blue",
+    colorLight: "green",
+    dataPattern: DataPattern.RIGHT_DIAMOND,
+    dotScale: 1,
+    eyeBallShape: EyeBallShape.CIRCLE,
+    // eyeFrameColor: "",
+    eyeFrameShape: EyeFrameShape.CIRCLE,
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameColor: "blue",
+    frameText: "Scan QR",
+    gradientType: GradientType.VERTICAL,
+   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
+
+    text: "https://google.com",
+};
+const config10 = {
+    canvasType: CanvasType.SVG,
+    colorDark: "red",
+    colorLight: "green",
+    dataPattern: DataPattern.SQUARE,
+    dotScale: 1,
+    eyeBallShape: EyeBallShape.CIRCLE,
+    // eyeFrameColor: "",
+    eyeFrameShape: EyeFrameShape.CIRCLE,
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameColor: "blue",
+    frameText: "Scan QR",
+    gradientType: GradientType.VERTICAL,
+   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
+
+    text: "https://google.com",
+};
 describe('QR code tests', () => {
     it('Main test SVG 1', done => {
         const qrCodeGenerator = new QRCodeBuilder(config);
@@ -237,6 +335,66 @@ describe('QR code tests', () => {
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
             const fs = require('fs');
             fs.writeFileSync(__dirname + '/test5.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+        }).catch(err => {
+           console.error(err);
+            done();
+        });
+    });
+    it('Main test SVG 6 circular', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config6);
+
+        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
+            const fs = require('fs');
+            fs.writeFileSync(__dirname + '/circular-kite.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+        }).catch(err => {
+           console.error(err);
+            done();
+        });
+    });
+    it('Main test SVG 7 circular with large text', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config7);
+
+        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
+            const fs = require('fs');
+            fs.writeFileSync(__dirname + '/circular-circle.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+        }).catch(err => {
+           console.error(err);
+            done();
+        });
+    });
+    it('Main test SVG 8 circular', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config8);
+
+        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
+            const fs = require('fs');
+            fs.writeFileSync(__dirname + '/circular-leftdiamond.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+        }).catch(err => {
+           console.error(err);
+            done();
+        });
+    });
+    it('Main test SVG 9 circular', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config9);
+
+        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
+            const fs = require('fs');
+            fs.writeFileSync(__dirname + '/circular-rightdiamond.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+        }).catch(err => {
+           console.error(err);
+            done();
+        });
+    });
+    it('Main test SVG 10 circular', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config10);
+
+        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
+            const fs = require('fs');
+            fs.writeFileSync(__dirname + '/circular-sqaure.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
            console.error(err);
