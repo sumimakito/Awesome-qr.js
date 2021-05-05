@@ -219,8 +219,8 @@ export class SVGDrawing {
     private async addDesign(canvas: object,gradient: string): Promise<object> {
         if (this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
             return canvas;
-        }
-        let size = this.config.rawSize;
+        }    
+        const size = this.config.rawSize;
         const { createSVGWindow } = require('svgdom');
         const svgWindow = createSVGWindow();
         const svgDocument = svgWindow.document;
@@ -266,7 +266,6 @@ export class SVGDrawing {
         const moduleSize = this.config.dotScale*this.config.moduleSize;
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
         const shift = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ; 
-        const dist = 2048;
         const limit  = Math.sqrt(2)*size + 2*this.config.moduleSize+1;
 
         for(let i = 0; i < limit; i += increment) {
@@ -299,7 +298,6 @@ export class SVGDrawing {
         }
         // @ts-ignore
         finalCanvas.add(canvas.move(shift,shift));
-        finalCanvas.translate(this.canvas.rawSize,this.canvas.rawSize);
         return finalCanvas;
     }
     private setupCanvasForGradient(ctx: CanvasRenderingContext2D, size: number) {
@@ -398,7 +396,6 @@ export class SVGDrawing {
                 return fetch(this.config.logoImage)
                     .then((r: { text: () => void; }) => r.text())
                     .then((text: any) => {
-
                         const color = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
                         // @ts-ignore
                         context.rect(logoSize + logoMargin, logoSize + logoMargin).fill(color).move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
@@ -450,7 +447,7 @@ export class SVGDrawing {
 
                     })
                     .catch(console.error.bind(console));
-            } else {
+                } else {
                 return this.loadNonSvgLogo(logoSize, centreCoordinate, logoMargin, logoCornerRadius, context)
             }
         });

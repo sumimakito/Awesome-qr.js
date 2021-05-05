@@ -42,7 +42,8 @@ const config = {
     size: 2048,
     isVCard: false,
     logoScale: 0.2,
-margin: 0,
+   logoImage: 'https://static.beaconstac.com/assets/img/qr-code-logos/covid-logo-1.svg',
+    margin: 80,
     useCanvas: false,
     useOpacity: false,
 };

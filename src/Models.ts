@@ -598,9 +598,6 @@ export class Drawing {
                 return this.addDesign(canvas,gradient);
             })
             .then((canvas: Canvas) => {
-                return this.scaleFinalImage(canvas);
-            }) 
-            .then((canvas: Canvas) => {
                 return this.drawFrame(canvas, this.config.frameStyle, this.config.frameColor, this.config.frameText);
             })
             .then((canvas: Canvas) => {
