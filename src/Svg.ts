@@ -216,6 +216,16 @@ export class SVGDrawing {
         }
         return false;
     }
+    private middleSquare(seed: number) {
+        const result = (seed * seed).toString().padStart(4,"0").slice(1, 3);
+        let ret = parseInt(result, 10);
+        const str = this.config.text;
+        const len = str.length;
+        if(ret ===  0){
+            ret = str.charCodeAt(0) + str.charCodeAt(len-1);
+        }
+        return ret;
+    }
     private async addDesign(canvas: object,gradient: string): Promise<object> {
         if (this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
             return canvas;
@@ -267,9 +277,13 @@ export class SVGDrawing {
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
         const shift = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ; 
         const limit  = Math.sqrt(2)*size + 2*this.config.moduleSize+1;
+        const str = this.config.text;
+        const len = str.length;
+        let num = str.charCodeAt(0) + str.charCodeAt(len-1);
         for(let i = 0; i < limit; i += increment) {
             for(let j = 0; j < limit; j += increment) {
-                if( Math.floor(Math.random() * 2) === 1 && this.checkCircle(i,j,radius - this.config.moduleSize / 2,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius -this.config.moduleSize / 2, pos) && this.inShape(i,j,shift,size) && this.inShape(i+moduleSize,j+moduleSize,shift,size)) { 
+                num = this.middleSquare(num*i+j);
+                if( (num%2) === 0 && this.checkCircle(i,j,radius - this.config.moduleSize / 2,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius -this.config.moduleSize / 2, pos) && this.inShape(i,j,shift,size) && this.inShape(i+moduleSize,j+moduleSize,shift,size) && this.inShape(i,j+moduleSize,shift,size) && this.inShape(i+moduleSize,j,shift,size)) { 
                     grad =  await (this.getColorFromCanvas(this.canvasQR, i*size/limit,j*size/limit));
                     if(this.config.gradientType === GradientType.RADIAL) {
                         grad = gradient;

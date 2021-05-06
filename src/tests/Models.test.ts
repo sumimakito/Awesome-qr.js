@@ -375,7 +375,7 @@ const config12 = {
     frameStyle: QRCodeFrame.CIRCULAR,
     frameColor: "blue",
     frameText: "Scan QR",
-    gradientType: GradientType.VERTICAL,
+  //  gradientType: GradientType.VERTICAL,
    // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
 
     text: "https://google.com",

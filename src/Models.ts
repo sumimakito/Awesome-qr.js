@@ -621,6 +621,16 @@ export class Drawing {
        
         return !(inX && inY);
     }
+    private middleSquare(seed: number) {
+        const result = (seed * seed).toString().padStart(4,"0").slice(1, 3);
+        let ret = parseInt(result, 10);
+        const str = this.config.text;
+        const len = str.length;
+        if(ret ===  0){
+            ret = str.charCodeAt(0) + str.charCodeAt(len-1);
+        }
+        return ret;
+    }
     private async addDesign(canvas: Canvas, gradient: CanvasGradient | string) {
         const size = this.config.rawSize;
         const finalCanvas: Canvas = createCanvas(Math.sqrt(2)*size + 2*this.config.moduleSize, Math.sqrt(2)*size + 2*this.config.moduleSize,this.canvasType);
@@ -663,9 +673,13 @@ export class Drawing {
         const radius = Math.sqrt(2)*size/2;
         const limit  = 2*size + 4*this.config.moduleSize;
         const coor = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ; // posx = (sizeA - sizeB) /2 ;
+        const str = this.config.text;
+        const len = str.length;
+        let num = str.charCodeAt(0) + str.charCodeAt(len-1);
         for(let i =0 ;i<limit;i+=increment) {
             for(let j = 0;j<limit;j+=increment) {
-                if(Math.floor(Math.random() * 2) === 1 && this.inShape(i, j, coor, size) && this.inShape(i+moduleSize,j+moduleSize,coor,size)) {
+                num = this.middleSquare(num*i+j);
+                if((num%2) === 0 && this.inShape(i, j, coor, size) && this.inShape(i+moduleSize,j+moduleSize,coor,size) && this.inShape(i,j+moduleSize,coor,size) &&this.inShape(i+moduleSize,j,coor,size)) {
                     switch (dataPattern) {
                         case DataPattern.CIRCLE:
                             this.drawCircle(i+moduleSize/2,j+moduleSize/2,finalContext,moduleSize/2);
@@ -684,6 +698,7 @@ export class Drawing {
                            break;
                     }
                 }
+
             }
         }
         
