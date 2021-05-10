@@ -217,14 +217,18 @@ export class SVGDrawing {
         return false;
     }
     private middleSquare(seed: number) {
-        const result = (seed * seed).toString().padStart(4,"0").slice(1, 3);
-        let ret = parseInt(result, 10);
+        let result = (seed * seed).toString();
+        while(result.length<4){
+            result  = '0' + result;
+        }
+        result = result.slice(1, 3);
+        let randomNumber = parseInt(result, 10);
         const str = this.config.text;
         const len = str.length;
-        if(ret ===  0){
-            ret = str.charCodeAt(0) + str.charCodeAt(len-1);
+        if(randomNumber ===  0){
+            randomNumber = str.charCodeAt(0) + str.charCodeAt(len-1);
         }
-        return ret;
+        return randomNumber;
     }
     private async addDesign(canvas: object,gradient: string): Promise<object> {
         if (this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
