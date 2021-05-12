@@ -519,8 +519,6 @@ const configCasePNG2 = {
 };
 const configCasePNG3 = {
     text: 'https://www.beaconstac.com',
-   backgroundImage: 'https://s3.amazonaws.com/beaconstac-content-qa/1593/9653e5dae58849b9bf523e27142f875e',
-   imageServerURL: 'https://s3.amazonaws.com/beaconstac-content-qa/1593/9653e5dae58849b9bf523e27142f875e',
     backgroundColor: 'white',
     canvasType: CanvasType.SVG,
     eyeFrameShape: EyeFrameShape.ROUNDED,

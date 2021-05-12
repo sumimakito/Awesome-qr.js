@@ -675,38 +675,74 @@ export class Drawing {
         const moduleSize = this.config.dotScale*this.config.moduleSize;
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
         const radius = Math.sqrt(2)*size/2;
-        const limit  = 2*size + 4*this.config.moduleSize;
+        const limit  = Math.sqrt(2)*size + 2*this.config.moduleSize;
         const coor = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ; // posx = (sizeA - sizeB) /2 ;
         const str = this.config.text;
         const len = str.length;
         let num = str.charCodeAt(0) + str.charCodeAt(len-1);
-        for(let i =0 ;i<limit;i+=increment) {
-            for(let j = 0;j<limit;j+=increment) {
+        const randomArray = [];
+        for(let i =0 ; i < limit / 2; i += increment) {
+            for(let j = 0 ; j < limit /2 ; j += increment) {
                 num = this.middleSquare(num*i+j);
-                if((num%2) === 0 && this.inShape(i, j, coor, size) && this.inShape(i+moduleSize,j+moduleSize,coor,size) && this.inShape(i,j+moduleSize,coor,size) &&this.inShape(i+moduleSize,j,coor,size)) {
-                    switch (dataPattern) {
-                        case DataPattern.CIRCLE:
-                            this.drawCircle(i+moduleSize/2,j+moduleSize/2,finalContext,moduleSize/2);
-                            break;
-                        case DataPattern.KITE:
-                            this.drawKite(i,j,finalContext,moduleSize,moduleSize);
-                            break;
-                        case DataPattern.LEFT_DIAMOND:
-                            this.drawDiamond(i,j,finalContext,moduleSize,moduleSize,false);
-                            break;
-                        case DataPattern.RIGHT_DIAMOND:
-                            this.drawDiamond(i,j,finalContext,moduleSize,moduleSize,true);
-                            break;
-                        default:
-                           this.drawSquare(i,j,finalContext,moduleSize,moduleSize,false);
-                           break;
-                    }
+                if((num%2) === 0 && this.inShape(i, j, coor, size) && this.inShape(i+moduleSize,j+moduleSize,coor,size) && this.inShape(i,j+moduleSize,coor,size) && this.inShape(i+moduleSize,j,coor,size)) {
+                  randomArray.push({"i": i,"j": j});
                 }
-
             }
         }
-        
-        finalContext.drawImage(canvas,coor,coor,size,size);
+        for(let i =0 ; i < limit / 2; i += increment) {
+            for(let c = limit ; c >= limit/2 ; c -= increment) {
+                const j = c-moduleSize;
+                num = this.middleSquare(num*i+j);
+                if((num%2) === 0 && this.inShape(i, j, coor, size) && this.inShape(i+moduleSize,j+moduleSize,coor,size) && this.inShape(i,j+moduleSize,coor,size) && this.inShape(i+moduleSize,j,coor,size)) {
+                  randomArray.push({"i": i,"j": j});
+                }
+            }
+        }
+        for(let r =limit-1 ; r >= limit / 2; r -= increment) {
+            for(let c = 0 ; c < limit / 2; c += increment) {
+                const i = r - moduleSize;
+                const j = c ;
+                num = this.middleSquare(num*i+j);
+                if((num%2) === 0 && this.inShape(i, j, coor, size) && this.inShape(i+moduleSize,j+moduleSize,coor,size) && this.inShape(i,j+moduleSize,coor,size) && this.inShape(i+moduleSize,j,coor,size)) {
+                  randomArray.push({"i": i,"j": j});
+                }
+            }
+        }
+        for(let r =limit-1 ; r >= limit / 2; r -= increment) {
+            for(let c = limit - 1 ; c >= limit / 2; c -= increment) {
+                const i = r - moduleSize;
+                const j = c - moduleSize;
+                num = this.middleSquare(num*i+j);
+                if((num%2) === 0 && this.inShape(i, j, coor, size) && this.inShape(i+moduleSize,j+moduleSize,coor,size) && this.inShape(i,j+moduleSize,coor,size) && this.inShape(i+moduleSize,j,coor,size)) {
+                  randomArray.push({"i": i,"j": j});
+                }
+            }
+        }
+        // @ts-ignore
+        for(const values of Object.values(randomArray)) {
+            // @ts-ignore
+            const i  = values["i"];
+            const j  = values["j"];
+           // console.log(i,' ',j);
+            switch (dataPattern) {
+                case DataPattern.CIRCLE:
+                    this.drawCircle(i+moduleSize/2,j+moduleSize/2,finalContext,moduleSize/2);
+                    break;
+                case DataPattern.KITE:
+                    this.drawKite(i,j,finalContext,moduleSize,moduleSize);
+                    break;
+                case DataPattern.LEFT_DIAMOND:
+                    this.drawDiamond(i,j,finalContext,moduleSize,moduleSize,false);
+                    break;
+                case DataPattern.RIGHT_DIAMOND:
+                    this.drawDiamond(i,j,finalContext,moduleSize,moduleSize,true);
+                    break;
+                default:
+                    this.drawSquare(i,j,finalContext,moduleSize,moduleSize,false);
+                    break;
+            }
+        }
+       finalContext.drawImage(canvas,coor,coor,size,size);
         return finalCanvas;
     }
     private async drawFrame(canvas: Canvas, frameStyle: QRCodeFrame | undefined, frameColor: string | undefined, frameText: string | undefined): Promise<Canvas> {
