@@ -21,7 +21,8 @@ END:VCARD`;
 const config = {
     
     backgroundImage: "https://i.pinimg.com/474x/d4/48/2b/d4482ba4e7ebdbff7b8ba73e7d39aceb.jpg",
-    logoImage: "https://i.pinimg.com/474x/d4/48/2b/d4482ba4e7ebdbff7b8ba73e7d39aceb.jpg",
+    logoImage: "https://static.beaconstac.com/assets/img/qr-code-logos/facebook.svg",
+    logoBackground: false,
     backgroundColor:'white',
     canvasType: CanvasType.SVG,
     colorDark: "red",

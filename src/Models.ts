@@ -902,14 +902,14 @@ export class Drawing {
         const mainMargin = this.config.margin;
         const coordinate = 0.5 * (this.config.size - logoSize);
         const centreCoordinate = coordinate - logoMargin - mainMargin;
-
-        context.fillStyle = '#ffffff';
-        context.save();
-        CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate, centreCoordinate, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
-        context.clip();
-        context.fill();
-        context.restore();
-
+        if (this.config.logoBackground !== false) {
+            context.fillStyle = '#ffffff';
+            context.save();
+            CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate, centreCoordinate, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
+            context.clip();
+            context.fill();
+            context.restore();
+        }
         context.save();
 
         return loadImage(this.config.logoImage!, this.config.imageServerURL, this.config.imageServerRequestHeaders).then((image: any) => {
