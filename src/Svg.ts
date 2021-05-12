@@ -218,13 +218,16 @@ export class SVGDrawing {
     }
     private middleSquare(seed: number) {
         let result = (seed * seed).toString();
+        const str = this.config.text;
+        const len = str.length;
+        if(result === 'NaN') {
+            result  = (str.charCodeAt(0) + str.charCodeAt(len-1)).toString();;
+        }
         while(result.length<4){
             result  = '0' + result;
         }
         result = result.slice(1, 3);
         let randomNumber = parseInt(result, 10);
-        const str = this.config.text;
-        const len = str.length;
         if(randomNumber ===  0){
             randomNumber = str.charCodeAt(0) + str.charCodeAt(len-1);
         }
@@ -285,43 +288,50 @@ export class SVGDrawing {
         const len = str.length;
         let num = str.charCodeAt(0) + str.charCodeAt(len-1);
         const randomArray: any = [];
-        for(let i =0 ; i < limit / 2; i += increment) {
-            for(let j = 0 ; j < limit /2 ; j += increment) {
+        for(let r = shift - 2*moduleSize; r >=0 ; r -= increment) {
+            for(let c = 0 ; c < limit  ; c += increment) {
+                const i  = r;
+                const j  = c ;
                 num = this.middleSquare(num*i+j);
-                if((num%2) === 0 && this.checkCircle(i,j,radius - this.config.moduleSize / 2,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius -this.config.moduleSize / 2, pos) && this.inShape(i,j,shift,size) && this.inShape(i+moduleSize,j+moduleSize,shift,size) && this.inShape(i,j+moduleSize,shift,size) && this.inShape(i+moduleSize,j,shift,size)) {
+                if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
                   randomArray.push({"i": i,"j": j});
                 }
             }
         }
-        for(let i =0 ; i < limit / 2; i += increment) {
-            for(let c = limit ; c >= limit/2 ; c -= increment) {
-                const j = c-moduleSize;
+        num = str.charCodeAt(0) + str.charCodeAt(len-1);
+        for(let r = shift+ size + moduleSize; r < limit ; r += increment) {
+            for(let c = 0 ; c < limit  ; c += increment) {
+                const i  = r;
+                const j  = c ;
                 num = this.middleSquare(num*i+j);
-                if((num%2) === 0 && this.checkCircle(i,j,radius - this.config.moduleSize / 2,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius -this.config.moduleSize / 2, pos) && this.inShape(i,j,shift,size) && this.inShape(i+moduleSize,j+moduleSize,shift,size) && this.inShape(i,j+moduleSize,shift,size) && this.inShape(i+moduleSize,j,shift,size)) {
-                    randomArray.push({"i": i,"j": j});
+                if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
+                  randomArray.push({"i": i,"j": j});
                 }
             }
         }
-        for(let r =limit-1 ; r >= limit / 2; r -= increment) {
-            for(let c = 0 ; c < limit / 2; c += increment) {
-                const i = r - moduleSize;
-                const j = c ;
+        num = str.charCodeAt(0) + str.charCodeAt(len-1);
+        for(let r = 0; r < limit ; r += increment) {
+            for(let c = shift + size + moduleSize ; c < limit  ; c += increment) {
+                const i  = r;
+                const j  = c ;
                 num = this.middleSquare(num*i+j);
-                if((num%2) === 0 && this.checkCircle(i,j,radius - this.config.moduleSize / 2,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius -this.config.moduleSize / 2, pos) && this.inShape(i,j,shift,size) && this.inShape(i+moduleSize,j+moduleSize,shift,size) && this.inShape(i,j+moduleSize,shift,size) && this.inShape(i+moduleSize,j,shift,size)) {
-                    randomArray.push({"i": i,"j": j});
+                if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
+                  randomArray.push({"i": i,"j": j});
                 }
             }
         }
-        for(let r =limit-1 ; r >= limit / 2; r -= increment) {
-            for(let c = limit - 1 ; c >= limit / 2; c -= increment) {
-                const i = r - moduleSize;
-                const j = c - moduleSize;
+        num = str.charCodeAt(0) + str.charCodeAt(len-1);
+        for(let r = 0; r < limit ; r += increment) {
+            for(let c = shift - 2*moduleSize; c >= 0  ; c -= increment) {
+                const i  = r;
+                const j  = c ;
                 num = this.middleSquare(num*i+j);
-                if((num%2) === 0 && this.checkCircle(i,j,radius - this.config.moduleSize / 2,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius -this.config.moduleSize / 2, pos) && this.inShape(i,j,shift,size) && this.inShape(i+moduleSize,j+moduleSize,shift,size) && this.inShape(i,j+moduleSize,shift,size) && this.inShape(i+moduleSize,j,shift,size)) {
-                    randomArray.push({"i": i,"j": j});
+                if((num%2 === 1) && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
+                  randomArray.push({"i": i,"j": j});
                 }
             }
         }
+        
         for(const values of Object.values(randomArray)) {
             // @ts-ignore
             const i  = values["i"];
