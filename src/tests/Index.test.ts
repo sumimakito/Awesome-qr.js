@@ -35,6 +35,7 @@ backgroundColor:'white',
     frameColor: "blue",
     frameText: "",
     gradientType: GradientType.NONE,
+  //  useOpacity: true,
    // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
     size:2048,
 };

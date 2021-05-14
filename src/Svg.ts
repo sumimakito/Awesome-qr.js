@@ -224,6 +224,18 @@ export class SVGDrawing {
         const width = this.config.moduleSize; 
         const pos = Math.sqrt(2)*size/2 + this.config.moduleSize;
         const radius = (size)/Math.sqrt(2) + this.config.moduleSize/2;
+        // @ts-ignore
+        if(this.config.backgroundImage) {
+            const { createSVGWindow } = require('svgdom');
+            const svgWindow = createSVGWindow();
+            const svgDocument = svgWindow.document;
+            const { SVG, registerWindow } = require('@svgdotjs/svg.js');
+            const maskCanvas = SVG(svgDocument.documentElement).size(Math.sqrt(2)*size + 2*this.config.moduleSize, Math.sqrt(2)*size + 2*this.config.moduleSize);
+            maskCanvas.circle(size).attr({cx: pos,cy: pos}).radius(radius - this.config.moduleSize/2).fill('white').attr({opacity:0.6});
+            // @ts-ignore
+            finalCanvas.add(maskCanvas);
+        }
+        
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
@@ -765,18 +777,21 @@ export class SVGDrawing {
         if (!this.config.backgroundImage) {
             return ;
         }
-
+        let opacityD = 0.6;
+        if (this.config.backgroundImage && this.config.frameStyle === QRCodeFrame.CIRCULAR) {
+            opacityD = 0.0;
+        }
         if (this.config.useOpacity) {
             // @ts-ignore
-            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY).attr({opacity: 0.6});
+            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY).attr({opacity: opacityD});
             // @ts-ignore
-            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY).attr({opacity: 0.6});
+            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY).attr({opacity: opacityD});
             // @ts-ignore
-            context.rect(8 * size, 8 * size).fill(color).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY).attr({opacity: 0.6});
+            context.rect(8 * size, 8 * size).fill(color).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY).attr({opacity: opacityD});
             // @ts-ignore
-            context.rect((moduleCount - 8 - 8) * size, size).fill(color).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY).attr({opacity: 0.6});
+            context.rect((moduleCount - 8 - 8) * size, size).fill(color).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY).attr({opacity: opacityD});
             // @ts-ignore
-            context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY).attr({opacity: 0.6});
+            context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY).attr({opacity: opacityD});
         } else {
             // @ts-ignore
             context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
@@ -1143,7 +1158,10 @@ export class SVGDrawing {
     }
 
     private drawSquare(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string, isMask?: boolean) {
-        const op = isMask ? 0.6 : 1;
+        let op = isMask ? 0.6 : 1;
+        if(this.config.frameStyle === QRCodeFrame.CIRCULAR && this.config.backgroundImage && isMask) {
+            op = 0.0;
+        }
         if (isRound) {
             if (this.config.useOpacity) {
                 // @ts-ignore

@@ -607,6 +607,12 @@ export class Drawing {
                 return canvas;
             });
     }
+    private checkCircle(x: number, y: number, r: number , cx: number) {
+        if((x-cx)*(x-cx) + (y-cx) * (y-cx) <= r*r) {
+            return true;
+        }
+        return false;
+    }
     private inShape(x: number, y: number,pt: number,side: number): boolean {
         
         const bottomX = pt ;
@@ -641,9 +647,13 @@ export class Drawing {
         return randomNumber;
     }
     private async addDesignHelper(finalCanvas: Canvas,canvas: Canvas,gradient: CanvasGradient | string) {
+       
         const size = this.config.rawSize;
         const finalContext = finalCanvas.getContext('2d');
-
+        if(this.config.backgroundImage) {
+            finalContext.fillStyle = 'rgba(255,255,255,0.6)';
+            finalContext.fill();
+        }
         if(this.config.gradientType === GradientType.RADIAL) {
             gradient = finalContext.createRadialGradient(
                 Math.sqrt(2)*size/2,
@@ -673,13 +683,15 @@ export class Drawing {
         const randomArray = [];
         const shift = coor;
         const margin = 0.3*moduleSize;
+        const radius = (size)/Math.sqrt(2) ;
+        const pos = Math.sqrt(2)*size/2 + this.config.moduleSize;
         for(let r = shift - moduleSize - margin; r >=0 ; r -= increment) {
             for(let c = 0 ; c < limit  ; c += increment) {
                 const i  = r;
                 const j  = c ;
                 num = this.middleSquare(num*i+j);
                 if((num%2) === 0 && this.inShape(i, j, coor, size) && this.inShape(i+moduleSize,j+moduleSize,coor,size) && this.inShape(i,j+moduleSize,coor,size) && this.inShape(i+moduleSize,j,coor,size)) {
-                  randomArray.push({"i": i,"j": j});
+                    randomArray.push({"i": i,"j": j});
                 }
             }
         }
@@ -690,7 +702,7 @@ export class Drawing {
                 const j  = c ;
                 num = this.middleSquare(num*i+j);
                 if((num%2) === 0 && this.inShape(i, j, coor, size) && this.inShape(i+moduleSize,j+moduleSize,coor,size) && this.inShape(i,j+moduleSize,coor,size) && this.inShape(i+moduleSize,j,coor,size)) {
-                  randomArray.push({"i": i,"j": j});
+                    randomArray.push({"i": i,"j": j});
                 }
             }
         }
@@ -701,7 +713,7 @@ export class Drawing {
                 const j  = c ;
                 num = this.middleSquare(num*i+j);
                 if((num%2) === 0 && this.inShape(i, j, coor, size) && this.inShape(i+moduleSize,j+moduleSize,coor,size) && this.inShape(i,j+moduleSize,coor,size) && this.inShape(i+moduleSize,j,coor,size)) {
-                  randomArray.push({"i": i,"j": j});
+                    randomArray.push({"i": i,"j": j});
                 }
             }
         }
@@ -712,7 +724,7 @@ export class Drawing {
                 const j  = c ;
                 num = this.middleSquare(num*i+j);
                 if((num%2) === 0 && this.inShape(i, j, coor, size) && this.inShape(i+moduleSize,j+moduleSize,coor,size) && this.inShape(i,j+moduleSize,coor,size) && this.inShape(i+moduleSize,j,coor,size)) {
-                  randomArray.push({"i": i,"j": j});
+                    randomArray.push({"i": i,"j": j});
                 }
             }
         }
@@ -721,7 +733,7 @@ export class Drawing {
             // @ts-ignore
             const i  = values["i"];
             const j  = values["j"];
-           // console.log(i,' ',j);
+            
             switch (dataPattern) {
                 case DataPattern.CIRCLE:
                     this.drawCircle(i+moduleSize/2,j+moduleSize/2,finalContext,moduleSize/2);
@@ -1518,7 +1530,11 @@ export class Drawing {
 
     private drawPositionProtectors(context: CanvasRenderingContext2D) {
         // context.fillStyle = '#242';
-        context.fillStyle = this.config.backgroundImage ? 'rgba(255, 255, 255, 0.6)' : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
+        let colorRest = 'rgba(255, 255, 255, 0.6)';
+        if(this.config.frameStyle === QRCodeFrame.CIRCULAR) {
+            colorRest = 'rgba(255, 255, 255, 0.0)';
+        }
+        context.fillStyle = this.config.backgroundImage ? colorRest : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
         const size = this.config.moduleSize;
         const moduleCount = this.moduleCount;
         context.fillRect(0, 0, 8 * size, 8 * size);
@@ -1547,7 +1563,11 @@ export class Drawing {
 
                 context.strokeStyle = bIsDark ? gradient : this.config.colorLight;
                 context.lineWidth = 0.5;
-                context.fillStyle = bIsDark ? gradient : this.config.backgroundImage ? 'rgba(255, 255, 255, 0.6)' : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
+                let colorRest = 'rgba(255, 255, 255, 0.6)';
+                if (this.config.frameStyle === QRCodeFrame.CIRCULAR) {
+                    colorRest = 'rgba(255, 255, 255, 0.0)';
+                }
+                context.fillStyle = bIsDark ? gradient : this.config.backgroundImage ? colorRest : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
 
                 const nLeft = col * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
                 const nTop = row * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
