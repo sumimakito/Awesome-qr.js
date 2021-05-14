@@ -1518,11 +1518,7 @@ export class Drawing {
 
     private drawPositionProtectors(context: CanvasRenderingContext2D) {
         // context.fillStyle = '#242';
-        let colorRest = 'rgba(255, 255, 255, 0.6)';
-        if (this.config.frameStyle === QRCodeFrame.CIRCULAR && this.config.backgroundImage) {
-            colorRest = 'rgba(255, 255, 255, 0.0)';
-        }
-        context.fillStyle = this.config.backgroundImage ? colorRest : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
+        context.fillStyle = this.config.backgroundImage ? 'rgba(255, 255, 255, 0.6)' : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
         const size = this.config.moduleSize;
         const moduleCount = this.moduleCount;
         context.fillRect(0, 0, 8 * size, 8 * size);
@@ -1551,11 +1547,7 @@ export class Drawing {
 
                 context.strokeStyle = bIsDark ? gradient : this.config.colorLight;
                 context.lineWidth = 0.5;
-                let colorRest = 'rgba(255, 255, 255, 0.6)';
-                if (this.config.frameStyle === QRCodeFrame.CIRCULAR && this.config.backgroundImage) {
-                    colorRest = 'rgba(255, 255, 255, 0.0)';
-                }
-                context.fillStyle = bIsDark ? gradient : this.config.backgroundImage ? colorRest : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
+                context.fillStyle = bIsDark ? gradient : this.config.backgroundImage ? 'rgba(255, 255, 255, 0.6)' : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
 
                 const nLeft = col * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
                 const nTop = row * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
