@@ -20,10 +20,13 @@ END:VCARD`;
 
 const config = {
     text: 'https://beaconstac.com',
+  //  backgroundImage: 'https://i.pinimg.com/474x/d4/48/2b/d4482ba4e7ebdbff7b8ba73e7d39aceb.jpg',
+ // backgroundImage:'https://www.fnordware.com/superpng/pnggrad16rgb.png',
+  backgroundImage:'https://png.pngtree.com/png-clipart/20200721/original/pngtree-design-scene-prototype-renderings-logo-sample-material-png-image_4913697.jpg',
+// backgroundImage:'https://www.tutorialspoint.com/videotutorials/images/coding_ground_home.jpg',   
+backgroundColor:'white',
     canvasType: CanvasType.SVG,
-    colorDark: "#cfcfcf",
-    correctLevel: 2,
-    dataPattern: DataPattern.KITE,
+    dataPattern: DataPattern.SQUARE,
     dotScale: 1,
     eyeBallShape: EyeBallShape.CIRCLE,
     // eyeFrameColor: "",
@@ -33,7 +36,7 @@ const config = {
     frameText: "",
     gradientType: GradientType.NONE,
    // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
-    size:16,
+    size:2048,
 };
 
 describe('QR code tests', () => {

@@ -590,8 +590,10 @@ export class Drawing {
                 // Swap and merge the foreground and the background
                 const size = this.config.size;
                 const margin = this.config.margin;
-                backgroundContext.drawImage(mainCanvas, 0, 0, size, size);
-                mainContext.drawImage(backgroundCanvas, -margin, -margin, size, size);
+                if(this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
+                    backgroundContext.drawImage(mainCanvas, 0, 0, size, size);
+                    mainContext.drawImage(backgroundCanvas, -margin, -margin, size, size);
+                }
                 return this.scaleFinalImage(mainCanvas);
             })
             .then((canvas: Canvas) => {
@@ -638,24 +640,10 @@ export class Drawing {
         }
         return randomNumber;
     }
-    private async addDesign(canvas: Canvas, gradient: CanvasGradient | string) {
+    private async addDesignHelper(finalCanvas: Canvas,canvas: Canvas,gradient: CanvasGradient | string) {
         const size = this.config.rawSize;
-        const finalCanvas: Canvas = createCanvas(Math.sqrt(2)*size + 2*this.config.moduleSize, Math.sqrt(2)*size + 2*this.config.moduleSize,this.canvasType);
         const finalContext = finalCanvas.getContext('2d');
-        const design = this.config.frameStyle?this.config.frameStyle:'none';
-        switch(design){
-            case QRCodeFrame.CIRCULAR:
-                finalContext.beginPath();
-                finalContext.arc(Math.sqrt(2)*size/2 + this.config.moduleSize, Math.sqrt(2)*size/2 + this.config.moduleSize, size/Math.sqrt(2) + this.config.moduleSize, 0, 2*Math.PI);
-                finalContext.fillStyle = this.config.backgroundColor?this.config.backgroundColor:'white' ;
-                finalContext.lineWidth = 10;
-                finalContext.fill();
-                finalContext.clip();    
-                break;
-            default:
-                return canvas;
-        }
-       
+
         if(this.config.gradientType === GradientType.RADIAL) {
             gradient = finalContext.createRadialGradient(
                 Math.sqrt(2)*size/2,
@@ -677,7 +665,6 @@ export class Drawing {
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
-        const radius = Math.sqrt(2)*size/2;
         const limit  = Math.sqrt(2)*size + 2*this.config.moduleSize;
         const coor = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ; // posx = (sizeA - sizeB) /2 ;
         const str = this.config.text;
@@ -685,7 +672,8 @@ export class Drawing {
         let num = str.charCodeAt(0) + str.charCodeAt(len-1);
         const randomArray = [];
         const shift = coor;
-        for(let r = shift - 2*moduleSize; r >=0 ; r -= increment) {
+        const margin = 0.3*moduleSize;
+        for(let r = shift - moduleSize - margin; r >=0 ; r -= increment) {
             for(let c = 0 ; c < limit  ; c += increment) {
                 const i  = r;
                 const j  = c ;
@@ -696,7 +684,7 @@ export class Drawing {
             }
         }
         num = str.charCodeAt(0) + str.charCodeAt(len-1);
-        for(let r = shift+ size + moduleSize; r < limit ; r += increment) {
+        for(let r = shift+ size + margin; r < limit ; r += increment) {
             for(let c = 0 ; c < limit  ; c += increment) {
                 const i  = r;
                 const j  = c ;
@@ -708,7 +696,7 @@ export class Drawing {
         }
         num = str.charCodeAt(0) + str.charCodeAt(len-1);
         for(let r = 0; r < limit ; r += increment) {
-            for(let c = shift + size + moduleSize ; c < limit  ; c += increment) {
+            for(let c = shift + size + margin ; c < limit  ; c += increment) {
                 const i  = r;
                 const j  = c ;
                 num = this.middleSquare(num*i+j);
@@ -719,7 +707,7 @@ export class Drawing {
         }
         num = str.charCodeAt(0) + str.charCodeAt(len-1);
         for(let r = 0; r < limit ; r += increment) {
-            for(let c = shift - 2*moduleSize; c >= 0  ; c -= increment) {
+            for(let c = shift - moduleSize - margin; c >= 0  ; c -= increment) {
                 const i  = r;
                 const j  = c ;
                 num = this.middleSquare(num*i+j);
@@ -752,8 +740,35 @@ export class Drawing {
                     break;
             }
         }
-       finalContext.drawImage(canvas,coor,coor,size,size);
+        const context = canvas.getContext('2d');
+        finalContext.drawImage(canvas,coor,coor,size,size);   
         return finalCanvas;
+    }
+    private async addDesign(canvas: Canvas, gradient: CanvasGradient | string) {
+        const size = this.config.rawSize;
+        const finalCanvas: Canvas = createCanvas(Math.sqrt(2)*size + 2*this.config.moduleSize, Math.sqrt(2)*size + 2*this.config.moduleSize,this.canvasType);
+        const finalContext = finalCanvas.getContext('2d');
+       
+        const design = this.config.frameStyle?this.config.frameStyle:'none';
+        switch(design){
+            case QRCodeFrame.CIRCULAR:
+                finalContext.beginPath();
+                finalContext.arc(Math.sqrt(2)*size/2 + this.config.moduleSize, Math.sqrt(2)*size/2 + this.config.moduleSize, size/Math.sqrt(2) + this.config.moduleSize, 0, 2*Math.PI);
+                finalContext.fillStyle = this.config.backgroundColor?this.config.backgroundColor:'white' ;
+                finalContext.lineWidth = 10;
+                finalContext.fill();
+                finalContext.clip();    
+                break;
+            default:
+              
+            return canvas;
+        }
+       if(this.config.backgroundImage) {
+            return this.addCircularBackgroundImage(finalContext,Math.sqrt(2)*size + 2*this.config.moduleSize, Math.sqrt(2)*size/2 + this.config.moduleSize, size/Math.sqrt(2) + this.config.moduleSize,this.config.backgroundImage).then(()=>{
+                return this.addDesignHelper(finalCanvas,canvas,gradient);
+            });
+        }
+        return this.addDesignHelper(finalCanvas,canvas,gradient);
     }
     private async drawFrame(canvas: Canvas, frameStyle: QRCodeFrame | undefined, frameColor: string | undefined, frameText: string | undefined): Promise<Canvas> {
         if (!frameStyle || frameStyle === QRCodeFrame.NONE) {
@@ -1503,7 +1518,11 @@ export class Drawing {
 
     private drawPositionProtectors(context: CanvasRenderingContext2D) {
         // context.fillStyle = '#242';
-        context.fillStyle = this.config.backgroundImage ? 'rgba(255, 255, 255, 0.6)' : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
+        let colorRest = 'rgba(255, 255, 255, 0.6)';
+        if (this.config.frameStyle === QRCodeFrame.CIRCULAR && this.config.backgroundImage) {
+            colorRest = 'rgba(255, 255, 255, 0.0)';
+        }
+        context.fillStyle = this.config.backgroundImage ? colorRest : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
         const size = this.config.moduleSize;
         const moduleCount = this.moduleCount;
         context.fillRect(0, 0, 8 * size, 8 * size);
@@ -1532,7 +1551,11 @@ export class Drawing {
 
                 context.strokeStyle = bIsDark ? gradient : this.config.colorLight;
                 context.lineWidth = 0.5;
-                context.fillStyle = bIsDark ? gradient : this.config.backgroundImage ? 'rgba(255, 255, 255, 0.6)' : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
+                let colorRest = 'rgba(255, 255, 255, 0.6)';
+                if (this.config.frameStyle === QRCodeFrame.CIRCULAR && this.config.backgroundImage) {
+                    colorRest = 'rgba(255, 255, 255, 0.0)';
+                }
+                context.fillStyle = bIsDark ? gradient : this.config.backgroundImage ? colorRest : this.config.backgroundColor ? this.config.backgroundColor : 'rgba(255, 255, 255, 0.6)';
 
                 const nLeft = col * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
                 const nTop = row * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
@@ -1602,11 +1625,41 @@ export class Drawing {
             context.fill();
             return;
         }
-
         return this.addBackgroundImage(context, size, backgroundImage!);
     }
 
     private async addBackgroundImage(context: CanvasRenderingContext2D, size: number, backgroundImage: string) {
+        return loadImage(backgroundImage, this.config.imageServerURL, this.config.imageServerRequestHeaders).then(image => {
+            if (this.config.autoColor) {
+                // @ts-ignore
+                const avgRGB = CanvasUtil.getAverageRGB(image, size);
+                this.config.colorDark = 'rgb(' + avgRGB.r + ', ' + avgRGB.g + ', ' + avgRGB.b + ')';
+            }
+            if(this.config.frameStyle === QRCodeFrame.CIRCULAR) {
+                return;
+            }
+            if (this.config.maskedDots) {
+                // tslint:disable-next-line
+                const size = this.config.size;
+                this.maskCanvas = createCanvas(size, size, this.canvasType);
+                this.maskContext = this.maskCanvas.getContext('2d');
+
+                // @ts-ignore
+                this.maskContext.drawImage(image, 0, 0, image.width, image.height, 0, 0, size, size);
+
+                this.maskContext.rect(0, 0, size, size);
+                this.maskContext.fillStyle = '#ffffff';
+                this.maskContext.fill();
+            } else {
+                // @ts-ignore
+               context.drawImage(image, 0, 0, image.width, image.height, 0, 0, size, size);
+               context.rect(0, 0, size, size);
+                context.fillStyle = this.config.backgroundDimming;
+                context.fill();
+            }
+        });
+    }
+    private async addCircularBackgroundImage(context: CanvasRenderingContext2D, size: number, coor: number, radius: number, backgroundImage: string) {
         return loadImage(backgroundImage, this.config.imageServerURL, this.config.imageServerRequestHeaders).then(image => {
             if (this.config.autoColor) {
                 // @ts-ignore
@@ -1628,10 +1681,11 @@ export class Drawing {
                 this.maskContext.fill();
             } else {
                 // @ts-ignore
-                context.drawImage(image, 0, 0, image.width, image.height, 0, 0, size, size);
-                context.rect(0, 0, size, size);
-                context.fillStyle = this.config.backgroundDimming;
-                context.fill();
+                
+                context.drawImage(image, 0, 0, size, size);
+                context.clip();
+                context.closePath();
+                context.restore();
             }
         });
     }

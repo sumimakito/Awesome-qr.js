@@ -194,22 +194,7 @@ export class SVGDrawing {
                 return canvas.svg();
             });
     }
-    private inShape(x: number, y: number,pt: number,side: number): boolean {
-        
-        const bottomX = pt ;
-        const bottomY = pt  ;
-        const topX = pt+side;
-        const topY = pt+side;
-        let inX = false,inY = false;
-        if (x>bottomX && x<topX) {
-            inX = true;
-        }
-        if(y> bottomY && y<topY) {
-            inY = true;
-        }
-       
-        return !(inX && inY);
-    }
+
     private checkCircle(x: number, y: number, r: number , cx: number) {
         if((x-cx)*(x-cx) + (y-cx) * (y-cx) <= r*r) {
             return true;
@@ -233,10 +218,108 @@ export class SVGDrawing {
         }
         return randomNumber;
     }
+    private async addDesignHelper(finalCanvas: object, canvas: object, gradient: string) {
+        const size = this.config.size;;
+        const color = this.config.backgroundColor?this.config.backgroundColor:'none' ;
+        const width = this.config.moduleSize; 
+        const pos = Math.sqrt(2)*size/2 + this.config.moduleSize;
+        const radius = (size)/Math.sqrt(2) + this.config.moduleSize/2;
+        const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
+        const moduleSize = this.config.dotScale*this.config.moduleSize;
+        const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
+        const shift = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ; 
+        const limit  = Math.sqrt(2)*size + 2*this.config.moduleSize;
+        const str = this.config.text;
+        const len = str.length;
+        let num = str.charCodeAt(0) + str.charCodeAt(len-1);
+        const randomArray: any = [];
+        const margin = 0.3*moduleSize;
+        for(let r = shift - moduleSize - margin; r >=0 ; r -= increment) {
+            for(let c = 0 ; c < limit  ; c += increment) {
+                const i  = r;
+                const j  = c ;
+                num = this.middleSquare(num*i+j);
+                if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
+                  randomArray.push({"i": i,"j": j});
+                }
+            }
+        }
+        num = str.charCodeAt(0) + str.charCodeAt(len-1);
+        for(let r = shift+ size + margin; r < limit ; r += increment) {
+            for(let c = 0 ; c < limit  ; c += increment) {
+                const i  = r;
+                const j  = c ;
+                num = this.middleSquare(num*i+j);
+                if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
+                  randomArray.push({"i": i,"j": j});
+                }
+            }
+        }
+        num = str.charCodeAt(0) + str.charCodeAt(len-1);
+        for(let r = 0; r < limit ; r += increment) {
+            for(let c = shift + size + margin ; c < limit  ; c += increment) {
+                const i  = r;
+                const j  = c ;
+                num = this.middleSquare(num*i+j);
+                if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
+                  randomArray.push({"i": i,"j": j});
+                }
+            }
+        }
+        num = str.charCodeAt(0) + str.charCodeAt(len-1);
+        for(let r = 0; r < limit ; r += increment) {
+            for(let c = shift - moduleSize - margin; c >= 0  ; c -= increment) {
+                const i  = r;
+                const j  = c ;
+                num = this.middleSquare(num*i+j);
+                if((num%2 === 1) && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
+                  randomArray.push({"i": i,"j": j});
+                }
+            }
+        }
+        
+        for(const values of Object.values(randomArray)) {
+            // @ts-ignore
+            const i  = values["i"];
+            // @ts-ignore
+            const j  = values["j"];
+            // @ts-ignore
+            let grad =  await (this.getColorFromCanvas(this.canvasQR, i*size/limit,j*size/limit));
+            if(this.config.gradientType === GradientType.RADIAL) {
+                grad = gradient;
+            }
+            switch (dataPattern) {
+                case DataPattern.CIRCLE:
+                    // @ts-ignore
+                this.drawCircle(i+moduleSize/2, j+moduleSize/2, finalCanvas, grad, moduleSize / 2, moduleSize / 2, false);
+                break;
+                case DataPattern.KITE:
+                    // @ts-ignore
+                    this.drawKite(i, j, finalCanvas, grad, moduleSize, moduleSize);
+                    break;   
+                case DataPattern.LEFT_DIAMOND:
+                    // @ts-ignore
+                    this.drawDiamond(i, j, finalCanvas, grad, moduleSize, moduleSize, false);
+                    break;   
+                case DataPattern.RIGHT_DIAMOND:
+                    // @ts-ignore
+                    this.drawDiamond(i, j, finalCanvas, grad, moduleSize, moduleSize, true);
+                    break;
+                default:
+                    // @ts-ignore
+                    this.drawSquare(i, j, finalCanvas, moduleSize, moduleSize, false, grad);
+                    break; 
+            }
+        }
+        // @ts-ignore
+        finalCanvas.add(canvas.move(shift,shift));
+        return finalCanvas;
+    }
     private async addDesign(canvas: object,gradient: string): Promise<object> {
         if (this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
             return canvas;
         }    
+
         const size = this.config.size;;
         const { createSVGWindow } = require('svgdom');
         const svgWindow = createSVGWindow();
@@ -244,8 +327,8 @@ export class SVGDrawing {
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
         const finalCanvas = SVG(svgDocument.documentElement).size(Math.sqrt(2)*size + 2*this.config.moduleSize, Math.sqrt(2)*size + 2*this.config.moduleSize);
         const color = this.config.backgroundColor?this.config.backgroundColor:'none' ;
-        const width = this.config.moduleSize;
-        
+        const width = this.config.moduleSize; 
+
         // @ts-ignore
         let grad; 
         const col1 = this.config.colorDark;
@@ -277,126 +360,15 @@ export class SVGDrawing {
         }
         const pos = Math.sqrt(2)*size/2 + this.config.moduleSize;
         const radius = (size)/Math.sqrt(2) + this.config.moduleSize/2;
-        finalCanvas.circle(size).attr({cx: pos,cy: pos, stroke:grad, 'stroke-width':width}).radius(radius).fill(color);
-        
-        const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
-        const moduleSize = this.config.dotScale*this.config.moduleSize;
-        const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
-        const shift = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ; 
-        const limit  = Math.sqrt(2)*size + 2*this.config.moduleSize;
-        const str = this.config.text;
-        const len = str.length;
-        let num = str.charCodeAt(0) + str.charCodeAt(len-1);
-        const randomArray: any = [];
-        for(let r = shift - 2*moduleSize; r >=0 ; r -= increment) {
-            for(let c = 0 ; c < limit  ; c += increment) {
-                const i  = r;
-                const j  = c ;
-                num = this.middleSquare(num*i+j);
-                if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
-                  randomArray.push({"i": i,"j": j});
-                }
-            }
-        }
-        num = str.charCodeAt(0) + str.charCodeAt(len-1);
-        for(let r = shift+ size + moduleSize; r < limit ; r += increment) {
-            for(let c = 0 ; c < limit  ; c += increment) {
-                const i  = r;
-                const j  = c ;
-                num = this.middleSquare(num*i+j);
-                if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
-                  randomArray.push({"i": i,"j": j});
-                }
-            }
-        }
-        num = str.charCodeAt(0) + str.charCodeAt(len-1);
-        for(let r = 0; r < limit ; r += increment) {
-            for(let c = shift + size + moduleSize ; c < limit  ; c += increment) {
-                const i  = r;
-                const j  = c ;
-                num = this.middleSquare(num*i+j);
-                if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
-                  randomArray.push({"i": i,"j": j});
-                }
-            }
-        }
-        num = str.charCodeAt(0) + str.charCodeAt(len-1);
-        for(let r = 0; r < limit ; r += increment) {
-            for(let c = shift - 2*moduleSize; c >= 0  ; c -= increment) {
-                const i  = r;
-                const j  = c ;
-                num = this.middleSquare(num*i+j);
-                if((num%2 === 1) && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
-                  randomArray.push({"i": i,"j": j});
-                }
-            }
+        if (this.config.backgroundImage) {
+            return this.addCircularBackgroundImage(finalCanvas, Math.sqrt(2)*size + 2*this.config.moduleSize, this.config.backgroundImage, pos, grad, width, radius).then(()=>{
+                return this.addDesignHelper(finalCanvas, canvas, gradient);
+            });
+        }else{
+            finalCanvas.circle(size).attr({cx: pos,cy: pos, stroke:grad, 'stroke-width':width}).radius(radius).fill(color);
+            return this.addDesignHelper(finalCanvas, canvas, gradient);
         }
         
-        for(const values of Object.values(randomArray)) {
-            // @ts-ignore
-            const i  = values["i"];
-            // @ts-ignore
-            const j  = values["j"];
-            // @ts-ignore
-            grad =  await (this.getColorFromCanvas(this.canvasQR, i*size/limit,j*size/limit));
-            if(this.config.gradientType === GradientType.RADIAL) {
-                grad = gradient;
-            }
-            switch (dataPattern) {
-                case DataPattern.CIRCLE:
-                    // @ts-ignore
-                this.drawCircle(i+moduleSize/2, j+moduleSize/2, finalCanvas, grad, moduleSize / 2, moduleSize / 2, false);
-                break;
-                case DataPattern.KITE:
-                    // @ts-ignore
-                    this.drawKite(i, j, finalCanvas, grad, moduleSize, moduleSize);
-                    break;   
-                case DataPattern.LEFT_DIAMOND:
-                    // @ts-ignore
-                    this.drawDiamond(i, j, finalCanvas, grad, moduleSize, moduleSize, false);
-                    break;   
-                case DataPattern.RIGHT_DIAMOND:
-                    // @ts-ignore
-                    this.drawDiamond(i, j, finalCanvas, grad, moduleSize, moduleSize, true);
-                    break;
-                default:
-                    // @ts-ignore
-                    this.drawSquare(i, j, finalCanvas, moduleSize, moduleSize, false, grad);
-                    break; 
-            }
-        }
-        // for(let i = 0; i < limit; i += increment) {
-        //     for(let j = 0; j < limit; j += increment) {
-        //         num = this.middleSquare(num*i+j);
-        //         if( (num%2) === 0 && this.checkCircle(i,j,radius - this.config.moduleSize / 2,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius -this.config.moduleSize / 2, pos) && this.inShape(i,j,shift,size) && this.inShape(i+moduleSize,j+moduleSize,shift,size) && this.inShape(i,j+moduleSize,shift,size) && this.inShape(i+moduleSize,j,shift,size)) { 
-        //             grad =  await (this.getColorFromCanvas(this.canvasQR, i*size/limit,j*size/limit));
-        //             if(this.config.gradientType === GradientType.RADIAL) {
-        //                 grad = gradient;
-        //             }
-        //             switch (dataPattern) {
-        //              case DataPattern.CIRCLE:
-        //                 this.drawCircle(i+moduleSize/2, j+moduleSize/2, finalCanvas, grad, moduleSize / 2, moduleSize / 2, false);
-        //                 break;
-        //             case DataPattern.KITE:
-        //                 this.drawKite(i, j, finalCanvas, grad, moduleSize, moduleSize);
-        //                 break;   
-        //             case DataPattern.LEFT_DIAMOND:
-        //                 this.drawDiamond(i, j, finalCanvas, grad, moduleSize, moduleSize, false);
-        //                 break;   
-        //             case DataPattern.RIGHT_DIAMOND:
-        //                 this.drawDiamond(i, j, finalCanvas, grad, moduleSize, moduleSize, true);
-        //                 break;
-        //             default:
-        //                 this.drawSquare(i, j, finalCanvas, moduleSize, moduleSize, false, grad);
-        //                 break;   
-        //           }
-        //         }
-
-        //     }
-        // }
-        // @ts-ignore
-        finalCanvas.add(canvas.move(shift,shift));
-        return finalCanvas;
     }
     private setupCanvasForGradient(ctx: CanvasRenderingContext2D, size: number) {
 
@@ -596,6 +568,9 @@ export class SVGDrawing {
             return;
         }
         this.config.backgroundColor = '';
+        if(this.config.frameStyle === QRCodeFrame.CIRCULAR) {
+            return;
+        }
         return this.addBackgroundImage(context, size, backgroundImage!);
     }
 
@@ -615,7 +590,23 @@ export class SVGDrawing {
 
         });
     }
+    private async addCircularBackgroundImage(context: object, size: number, backgroundImage: string, pos: number, grad: string, width: number, radius: number) {
+        return loadImage(backgroundImage, this.config.imageServerURL, this.config.imageServerRequestHeaders).then(image => {
 
+            // @ts-ignore
+            const cn = createCanvas(size, size);
+            const ct = cn.getContext('2d');
+            // @ts-ignore
+            ct.drawImage(image, 0, 0, image.width, image.height, 0, 0, size, size);
+            ct.save();
+            // @ts-ignore
+            const pattern  = context.pattern(size, size, function(add) {
+                add.image('').size(size, size).attr({ 'xlink:href': cn.toDataURL()})
+              });
+              // @ts-ignore
+            context.circle(size).attr({cx: pos,cy: pos, stroke:grad, 'stroke-width':width}).radius(radius).fill(pattern);
+        });
+    }
     private fillMargin(context: object) {
         const margin = this.config.margin;
         const size = this.config.size;
