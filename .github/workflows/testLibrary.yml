@@ -1,5 +1,5 @@
 name: Test Mobstac Awesome QR
- 
+
 on: [push]
 
 jobs:
@@ -14,7 +14,13 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run unit tests
-        run: npm run test
+        run: |
+          cp -r ./src/tests/qrTests/. ./src/tests/qrTestsOld
+          npm run test
+      - name: Compare files
+        run: |
+          chmod +x ./.github/workflows/compare_files.sh
+          exec ./.github/workflows/compare_files.sh
       - name: Test Failure
         if: ${{ failure() }}
         shell: bash

@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import 'mocha';
-import { QRErrorCorrectLevel } from '../Enums';
+import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame, QRErrorCorrectLevel } from '../Enums';
+import { QRCodeBuilder } from '../index';
 import { QR8bitByte, QRCode, QRPolynomial } from '../Models';
 import { QRCodeConfig } from '../Types';
-
 
 describe('QR8bitByte class tests', () => {
     it('QR8bitByte.getLength for non utf-8 chars', () => {
