@@ -1,10 +1,5 @@
 import {
     CanvasType,
-    DataPattern,
-    EyeBallShape,
-    EyeFrameShape,
-    GradientType,
-    QRCodeFrame,
     QRErrorCorrectLevel,
 } from './Enums';
 import { QRCode } from './Models';
