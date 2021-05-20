@@ -20,9 +20,9 @@ import { SVGDrawing } from './Svg';
 if (isNode) {
     // uncomment these for node
 
-    // const path = require('path');
-    // const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
-    // registerFont(fontPath, { family: 'Roboto' });
+    const path = require('path');
+    const fontPath = path.join(__dirname, '../src/assets/fonts/Roboto/Roboto-Regular.ttf');
+    registerFont(fontPath, { family: 'Roboto' });
 }
 
 
