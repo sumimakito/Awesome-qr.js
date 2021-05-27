@@ -194,6 +194,7 @@ const config9 = {
 
 const config10 = {
     text: sampleUrl,
+    logoImage: 'https://www.tutorialspoint.com/videotutorials/images/coding_ground_home.jpg',
     canvasType: CanvasType.SVG,
     frameStyle: QRCodeFrame.BALLOON_BOTTOM,
     dataPattern: DataPattern.SQUARE,
@@ -225,6 +226,22 @@ const config11 = {
 // frame + square qr code with v-card, with size: 1024 and error correction: 2 | type: svg
 const config12 = {
     text: vCardSampleData,
+    canvasType: CanvasType.SVG,
+    frameStyle: QRCodeFrame.BANNER_BOTTOM,
+    dataPattern: DataPattern.SQUARE,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    dotScale: 1,
+    margin: 80,
+    size: 1024,
+    isVCard: true,
+    useOpacity: true,
+    correctLevel: QRErrorCorrectLevel.H
+};
+const config13 = {
+    text: vCardSampleData,
+    logoImage: 'https://www.tutorialspoint.com/videotutorials/images/coding_ground_home.jpg',
+    logoBackground: false,
     canvasType: CanvasType.SVG,
     frameStyle: QRCodeFrame.BANNER_BOTTOM,
     dataPattern: DataPattern.SQUARE,
@@ -758,7 +775,21 @@ const configCasePNG13 = {
 
     text: "https://google.com",
 };
-
+const configCasePNG14 = {
+    text: sampleUrl,
+    logoImage: 'https://www.tutorialspoint.com/videotutorials/images/coding_ground_home.jpg',  
+    logoBackground: false,
+    canvasType: CanvasType.PNG,
+    dataPattern: DataPattern.SQUARE,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    dotScale: 1,
+    margin: 80,
+    size: 1024,
+    isVCard: false,
+    useOpacity: true,
+    correctLevel: QRErrorCorrectLevel.H
+};
 // for PNG
 function prepareImageBuffer(qrCode: QRCode, name: string) {
     const dataUrl = qrCode.canvas.toDataURL('image/png');
@@ -908,6 +939,17 @@ describe('Output QR code tests', () => {
 
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
             fs.writeFileSync(__dirname + '/qrTests/frame-plus-square-vcard.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+        }).catch(err => {
+            console.error(err);
+            done();
+        });
+    });
+    it('QR test SVG: frame-plus-square', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config13);
+
+        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
+            fs.writeFileSync(__dirname + '/qrTests/logo_no_background.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
             console.error(err);
@@ -1420,6 +1462,37 @@ describe('Output QR code tests', () => {
         });
     });
     
+    it('Main test QR 14 circular_no_logo_background', done => {
+        const qrCodeGenerator = new QRCodeBuilder(configCasePNG14);
+    
+        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
+            
+            
+                
+            const dataUrl = qrCode.canvas.toDataURL('image/png');
+            const matches: any = dataUrl.match(
+                    /^data:([A-Za-z-+\/]+);base64,(.+)$/
+                    ),
+                response: any  ={};
+            response.type = matches[1];
+            response.data = Buffer.from(matches[2], "base64");
+            const decodedImg = response;
+            const imageBuffer = decodedImg.data;
+            const extension ='png';
+            const fileName = '/circular_png_no_logo_background' + "." + extension;
+            fs.writeFileSync(__dirname + '/qrTests' + fileName, imageBuffer);
+            // console.log(dataUrl.substr(0,200));
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            done();
+            
+            
+            // 
+            // fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+            // done();
+        }).catch(err => {
+            done();
+        });
+    });
 });
 
 
