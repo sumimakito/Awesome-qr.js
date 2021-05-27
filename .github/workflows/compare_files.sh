@@ -2,11 +2,6 @@
 
 set -eo pipefail
 
-diff ./src/tests/qrTestsOld/test7.png ./src/tests/qrTests/test7.png
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-
 
 diff ./src/tests/qrTestsOld/defualt-test5.png ./src/tests/qrTests/defualt-test5.png
 if [ $? -ne 0 ]; then
@@ -21,12 +16,6 @@ fi
 
 
 diff ./src/tests/qrTestsOld/default-svg2.svg ./src/tests/qrTests/default-svg2.svg
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-
-
-diff ./src/tests/qrTestsOld/test8.png ./src/tests/qrTests/test8.png
 if [ $? -ne 0 ]; then
     exit 1
 fi
@@ -116,12 +105,6 @@ if [ $? -ne 0 ]; then
 fi
 
 
-diff ./src/tests/qrTestsOld/test6.png ./src/tests/qrTests/test6.png
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-
-
 diff ./src/tests/qrTestsOld/circular-circle.svg ./src/tests/qrTests/circular-circle.svg
 if [ $? -ne 0 ]; then
     exit 1
@@ -146,12 +129,6 @@ if [ $? -ne 0 ]; then
 fi
 
 
-diff ./src/tests/qrTestsOld/test5.png ./src/tests/qrTests/test5.png
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-
-
 diff ./src/tests/qrTestsOld/logo_no_background.svg ./src/tests/qrTests/logo_no_background.svg
 if [ $? -ne 0 ]; then
     exit 1
@@ -170,19 +147,7 @@ if [ $? -ne 0 ]; then
 fi
 
 
-diff ./src/tests/qrTestsOld/test2.png ./src/tests/qrTests/test2.png
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-
-
 diff ./src/tests/qrTestsOld/circular-leftdiamond.svg ./src/tests/qrTests/circular-leftdiamond.svg
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-
-
-diff ./src/tests/qrTestsOld/test3.png ./src/tests/qrTests/test3.png
 if [ $? -ne 0 ]; then
     exit 1
 fi
@@ -225,12 +190,6 @@ fi
 
 
 diff ./src/tests/qrTestsOld/circular-circle.png ./src/tests/qrTests/circular-circle.png
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-
-
-diff ./src/tests/qrTestsOld/test.png ./src/tests/qrTests/test.png
 if [ $? -ne 0 ]; then
     exit 1
 fi
