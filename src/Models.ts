@@ -614,7 +614,7 @@ export class Drawing {
         return false;
     }
     private inShape(x: number, y: number,pt: number,side: number): boolean {
-        
+
         const bottomX = pt ;
         const bottomY = pt  ;
         const topX = pt+side;
@@ -626,7 +626,7 @@ export class Drawing {
         if(y> bottomY && y<topY) {
             inY = true;
         }
-       
+
         return !(inX && inY);
     }
     private middleSquare(seed: number) {
@@ -647,7 +647,7 @@ export class Drawing {
         return randomNumber;
     }
     private async addDesignHelper(finalCanvas: Canvas,canvas: Canvas,gradient: CanvasGradient | string) {
-       
+
         const size = this.config.rawSize;
         const finalContext = finalCanvas.getContext('2d');
         if(this.config.backgroundImage) {
@@ -670,7 +670,7 @@ export class Drawing {
         finalContext.strokeStyle = gradient;
         finalContext.lineWidth = 2*this.config.moduleSize;
         finalContext.stroke();
-        
+
 
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
@@ -733,7 +733,7 @@ export class Drawing {
             // @ts-ignore
             const i  = values["i"];
             const j  = values["j"];
-            
+
             switch (dataPattern) {
                 case DataPattern.CIRCLE:
                     this.drawCircle(i+moduleSize/2,j+moduleSize/2,finalContext,moduleSize/2);
@@ -753,14 +753,14 @@ export class Drawing {
             }
         }
         const context = canvas.getContext('2d');
-        finalContext.drawImage(canvas,coor,coor,size,size);   
+        finalContext.drawImage(canvas,coor,coor,size,size);
         return finalCanvas;
     }
     private async addDesign(canvas: Canvas, gradient: CanvasGradient | string) {
         const size = this.config.rawSize;
         const finalCanvas: Canvas = createCanvas(Math.sqrt(2)*size + 2*this.config.moduleSize, Math.sqrt(2)*size + 2*this.config.moduleSize,this.canvasType);
         const finalContext = finalCanvas.getContext('2d');
-       
+
         const design = this.config.frameStyle?this.config.frameStyle:'none';
         switch(design){
             case QRCodeFrame.CIRCULAR:
@@ -769,10 +769,10 @@ export class Drawing {
                 finalContext.fillStyle = this.config.backgroundColor?this.config.backgroundColor:'white' ;
                 finalContext.lineWidth = 10;
                 finalContext.fill();
-                finalContext.clip();    
+                finalContext.clip();
                 break;
             default:
-              
+
             return canvas;
         }
        if(this.config.backgroundImage) {
@@ -1546,7 +1546,7 @@ export class Drawing {
 
     private drawAlignPatterns(context: CanvasRenderingContext2D, gradient: CanvasGradient | string) {
         const moduleCount = this.moduleCount;
-        const xyOffset = (1 - this.config.dotScale) * 0.5; 
+        const xyOffset = (1 - this.config.dotScale) * 0.5;
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
 
         for (let row = 0; row < moduleCount; row++) {
@@ -1693,7 +1693,7 @@ export class Drawing {
                 this.maskContext.fill();
             } else {
                 // @ts-ignore
-                
+
                 context.drawImage(image, 0, 0, size, size);
                 context.clip();
                 context.closePath();
