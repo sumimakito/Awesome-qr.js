@@ -14,13 +14,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-
-diff ./src/tests/qrTestsOld/default-svg2.svg ./src/tests/qrTests/default-svg2.svg
-if [ $? -ne 0 ]; then
-    exit 1
-fi
-
-
 diff ./src/tests/qrTestsOld/circular_png_no_logo_background.png ./src/tests/qrTests/circular_png_no_logo_background.png
 if [ $? -ne 0 ]; then
     exit 1
