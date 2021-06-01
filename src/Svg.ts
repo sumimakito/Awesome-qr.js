@@ -479,9 +479,10 @@ export class SVGDrawing {
                     .then((r: { text: () => void; }) => r.text())
                     .then((text: any) => {
                         const color = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
-                        // @ts-ignore
-                        context.rect(logoSize + logoMargin, logoSize + logoMargin).fill(color).move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
-
+                        if(this.config.logoBackground !== false) {
+                            // @ts-ignore
+                            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill(color).move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
+                        }
                         text = text.substring(text.indexOf('<svg'));
                         text = text.substring(0, text.indexOf('</svg>') + 6);
                         let extraText = '';
@@ -560,8 +561,9 @@ export class SVGDrawing {
             //
             const colorNew = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
             // @ts-ignore
-            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill(colorNew).move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
-
+            if(this.config.logoBackground !== false) {
+                context.rect(logoSize + logoMargin, logoSize + logoMargin).fill(colorNew).move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
+            }
             // @ts-ignore
             context.image('').size(logoSize, logoSize)
                 .attr({ 'xlink:href': cn.toDataURL() })
