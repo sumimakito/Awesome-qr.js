@@ -15,6 +15,7 @@ export interface QRCodeConfig {
     logoScale: number;
     logoMargin: number;
     logoCornerRadius: number;
+    logoBackground?: boolean;
     whiteMargin?: boolean;
     dotScale: number;
     autoColor?: boolean;
@@ -59,6 +60,7 @@ export interface QRDrawingConfig {
     logoScale: number;
     logoMargin: number;
     logoCornerRadius: number;
+    logoBackground?: boolean;
     maskedDots: boolean;
     canvasType?: CanvasType;
     eyeBallShape?: EyeBallShape;
