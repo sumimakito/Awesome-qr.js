@@ -1086,7 +1086,7 @@ export class Drawing {
         const coordinate = 0.5 * (this.config.size - logoSize);
         const centreCoordinate = coordinate - logoMargin - mainMargin;
         if (this.config.logoBackground !== false) {
-            context.fillStyle = '#ffffff';
+            context.fillStyle = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
             context.save();
             CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate, centreCoordinate, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
             context.clip();
