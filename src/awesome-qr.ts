@@ -12,7 +12,7 @@ export type ComponentOptions = {
   data?: {
     /**
      * Scale factor for data/ECC dots.
-     * @default 0.4
+     * @default 1
      */
     scale?: number;
   };
@@ -23,7 +23,7 @@ export type ComponentOptions = {
   timing?: {
     /**
      * Scale factor for timing patterns.
-     * @default 0.5
+     * @default 1
      */
     scale?: number;
 
@@ -40,7 +40,7 @@ export type ComponentOptions = {
   alignment?: {
     /**
      * Scale factor for alignment patterns.
-     * @default 0.5
+     * @default 1
      */
     scale?: number;
 
@@ -57,7 +57,7 @@ export type ComponentOptions = {
   cornerAlignment?: {
     /**
      * Scale factor for alignment pattern on the bottom-right corner.
-     * @default 0.5
+     * @default 1
      */
     scale?: number;
 
@@ -248,18 +248,18 @@ export class AwesomeQR {
 
   private static defaultComponentOptions: ComponentOptions = {
     data: {
-      scale: 0.4,
+      scale: 1,
     },
     timing: {
-      scale: 0.5,
+      scale: 1,
       protectors: false,
     },
     alignment: {
-      scale: 0.5,
+      scale: 1,
       protectors: false,
     },
     cornerAlignment: {
-      scale: 0.5,
+      scale: 1,
       protectors: true,
     },
   };
