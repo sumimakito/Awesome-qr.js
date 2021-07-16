@@ -235,9 +235,9 @@ export class SVGDrawing {
         return randomNumber;
     }
     private async addDesignHelper(finalCanvas: object, canvas: object, gradient: string) {
-        const size = this.config.size;;
+        const size = this.config.size;
         const color = this.config.backgroundColor?this.config.backgroundColor:'none' ;
-        const width = this.config.moduleSize; 
+        const width = this.config.moduleSize;
         const pos = Math.sqrt(2)*size/2 + this.config.moduleSize;
         const radius = (size)/Math.sqrt(2) + this.config.moduleSize/2;
         // @ts-ignore
@@ -251,11 +251,11 @@ export class SVGDrawing {
             // @ts-ignore
             finalCanvas.add(maskCanvas);
         }
-        
+
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
         const moduleSize = this.config.dotScale*this.config.moduleSize;
         const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
-        const shift = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ; 
+        const shift = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ;
         const limit  = Math.sqrt(2)*size + 2*this.config.moduleSize;
         const str = this.config.text;
         const len = str.length;
@@ -305,7 +305,7 @@ export class SVGDrawing {
                 }
             }
         }
-        
+
         for(const values of Object.values(randomArray)) {
             // @ts-ignore
             const i  = values["i"];
@@ -324,11 +324,11 @@ export class SVGDrawing {
                 case DataPattern.KITE:
                     // @ts-ignore
                     this.drawKite(i, j, finalCanvas, grad, moduleSize, moduleSize);
-                    break;   
+                    break;
                 case DataPattern.LEFT_DIAMOND:
                     // @ts-ignore
                     this.drawDiamond(i, j, finalCanvas, grad, moduleSize, moduleSize, false);
-                    break;   
+                    break;
                 case DataPattern.RIGHT_DIAMOND:
                     // @ts-ignore
                     this.drawDiamond(i, j, finalCanvas, grad, moduleSize, moduleSize, true);
@@ -336,7 +336,7 @@ export class SVGDrawing {
                 default:
                     // @ts-ignore
                     this.drawSquare(i, j, finalCanvas, moduleSize, moduleSize, false, grad);
-                    break; 
+                    break;
             }
         }
         // @ts-ignore
@@ -346,7 +346,7 @@ export class SVGDrawing {
     private async addDesign(canvas: object,gradient: string): Promise<object> {
         if (this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
             return canvas;
-        }    
+        }
 
         const size = this.config.size;;
         const { createSVGWindow } = require('svgdom');
@@ -355,10 +355,10 @@ export class SVGDrawing {
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
         const finalCanvas = SVG(svgDocument.documentElement).size(Math.sqrt(2)*size + 2*this.config.moduleSize, Math.sqrt(2)*size + 2*this.config.moduleSize);
         const color = this.config.backgroundColor?this.config.backgroundColor:'none' ;
-        const width = this.config.moduleSize; 
+        const width = this.config.moduleSize;
 
         // @ts-ignore
-        let grad; 
+        let grad;
         const col1 = this.config.colorDark;
         const col2 = this.config.colorLight;
         switch (this.config.gradientType) {
@@ -396,7 +396,7 @@ export class SVGDrawing {
             finalCanvas.circle(size).attr({cx: pos,cy: pos, stroke:grad, 'stroke-width':width}).radius(radius).fill(color);
             return this.addDesignHelper(finalCanvas, canvas, gradient);
         }
-        
+
     }
     private setupCanvasForGradient(ctx: CanvasRenderingContext2D, size: number) {
 
@@ -450,7 +450,7 @@ export class SVGDrawing {
         }
         return ((r << 16) | (g << 8) | b).toString(16);
     }
-    
+
     private async drawLogoImage(context: object) {
         if (!this.config.logoImage) {
             return;
@@ -593,7 +593,7 @@ export class SVGDrawing {
                 const color = backgroundColor ? backgroundColor : '#ffffff';
                     // @ts-ignore
                     context.rect(size,size).fill(color).move(this.shiftX,this.shiftY).radius(this.config.moduleSize);
-                
+
             }
             return;
         }
@@ -706,7 +706,12 @@ export class SVGDrawing {
                     const coordinate = 0.5 * (this.config.size - logoSize);
                     const centreCoordinate = coordinate - logoMargin - mainMargin;
                     const moduleSize = (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize;
-                    if(!this.inShape(nLeft + moduleSize,nTop,centreCoordinate,logoSize) || !this.inShape(nLeft,nTop  + moduleSize,centreCoordinate,logoSize) || !this.inShape(nLeft + moduleSize,nTop  + moduleSize,centreCoordinate,logoSize) || !this.inShape(nLeft - moduleSize,nTop  - moduleSize,centreCoordinate,logoSize) || !this.inShape(nLeft - moduleSize,nTop,centreCoordinate,logoSize) || !this.inShape(nLeft,nTop - moduleSize,centreCoordinate,logoSize)) {
+                    if(this.config.logoBackground && (!this.inShape(nLeft + moduleSize,nTop,centreCoordinate,logoSize) ||
+                        !this.inShape(nLeft,nTop  + moduleSize,centreCoordinate,logoSize) ||
+                        !this.inShape(nLeft + moduleSize,nTop  + moduleSize,centreCoordinate,logoSize) ||
+                        !this.inShape(nLeft - moduleSize,nTop  - moduleSize,centreCoordinate,logoSize) ||
+                        !this.inShape(nLeft - moduleSize,nTop,centreCoordinate,logoSize) ||
+                        !this.inShape(nLeft,nTop - moduleSize,centreCoordinate,logoSize))) {
                         continue;
                     }
                 }

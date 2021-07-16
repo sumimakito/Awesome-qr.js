@@ -1589,7 +1589,12 @@ export class Drawing {
                     const coordinate = 0.5 * (this.config.size - logoSize);
                     const centreCoordinate = coordinate - logoMargin - mainMargin;
                     const moduleSize = (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize;
-                    if(!this.inShape(nLeft + moduleSize,nTop,centreCoordinate,logoSize) || !this.inShape(nLeft,nTop  + moduleSize,centreCoordinate,logoSize) || !this.inShape(nLeft + moduleSize,nTop  + moduleSize,centreCoordinate,logoSize) || !this.inShape(nLeft - moduleSize,nTop  - moduleSize,centreCoordinate,logoSize) || !this.inShape(nLeft - moduleSize,nTop,centreCoordinate,logoSize) || !this.inShape(nLeft,nTop - moduleSize,centreCoordinate,logoSize)) {
+                    if(this.config.logoBackground && (!this.inShape(nLeft + moduleSize,nTop,centreCoordinate,logoSize) ||
+                        !this.inShape(nLeft,nTop  + moduleSize,centreCoordinate,logoSize) ||
+                        !this.inShape(nLeft + moduleSize,nTop  + moduleSize,centreCoordinate,logoSize) ||
+                        !this.inShape(nLeft - moduleSize,nTop  - moduleSize,centreCoordinate,logoSize) ||
+                        !this.inShape(nLeft - moduleSize,nTop,centreCoordinate,logoSize) ||
+                        !this.inShape(nLeft,nTop - moduleSize,centreCoordinate,logoSize))) {
                         continue;
                     }
                 }
