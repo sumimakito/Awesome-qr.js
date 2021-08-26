@@ -59,6 +59,8 @@ describe('QRCode class tests', () => {
             colorLight: '#ffffff',
             correctLevel: QRErrorCorrectLevel.M,
             backgroundDimming: 'rgba(0,0,0,0)',
+            widthScale: 1,
+            heightScale: 1,
             logoScale: 0.2,
             logoMargin: 6,
             logoCornerRadius: 8,
