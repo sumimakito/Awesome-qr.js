@@ -1083,9 +1083,28 @@ export class Drawing {
             logoCornerRadius = 0;
         }
         context.restore();
-
-        const logoWidth = this.config.widthScale*this.config.viewportSize * logoScale;
-        const logoHeight = this.config.heightScale*this.config.viewportSize * logoScale;
+        let logoWidth =  this.config.viewportSize ;
+        let logoHeight = this.config.viewportSize ;
+        const maxWH = 2 * this.config.viewportSize;
+        if(this.config.rectangular){
+            if(this.config.widthSize && this.config.heightSize) {
+                if(this.config.widthSize <= maxWH && this.config.heightSize <= maxWH) {
+                    logoWidth  = this.config.widthSize;
+                    logoHeight = this.config.heightSize;
+                }else{
+                    const ratio = this.config.heightSize  / this.config.widthSize;
+                    if(ratio>1){
+                        logoHeight = maxWH;
+                        logoWidth = logoHeight / ratio; 
+                    }else{
+                        logoWidth = maxWH;
+                        logoHeight = logoWidth * ratio;
+                    }
+                }
+            }
+        }
+        logoWidth = logoWidth  * logoScale;
+        logoHeight = logoHeight * logoScale;
         const mainMargin = this.config.margin;
         const coordinateX = 0.5 * (this.config.size - logoWidth);
         const coordinateY = 0.5 * (this.config.size - logoHeight);
@@ -1593,13 +1612,33 @@ export class Drawing {
                         logoCornerRadius = 0;
                     }
 
-        const logoWidth = this.config.widthScale*this.config.viewportSize * logoScale ;
-        const logoHeight = this.config.heightScale*this.config.viewportSize * logoScale ;
-        const mainMargin = this.config.margin;
-        const coordinateX = 0.5 * (this.config.size - logoWidth);
-        const coordinateY = 0.5 * (this.config.size - logoHeight);
-        const centreCoordinateX = coordinateX - logoMargin - mainMargin;
-        const centreCoordinateY = coordinateY - logoMargin - mainMargin;
+                    let logoWidth =  this.config.viewportSize ;
+                    let logoHeight = this.config.viewportSize ;
+                    const maxWH = 2 * this.config.viewportSize;
+                    if(this.config.rectangular){
+                        if(this.config.widthSize && this.config.heightSize) {
+                            if(this.config.widthSize <= maxWH && this.config.heightSize <= maxWH) {
+                                logoWidth  = this.config.widthSize;
+                                logoHeight = this.config.heightSize;
+                            }else{
+                                const ratio = this.config.heightSize  / this.config.widthSize;
+                                if(ratio>1){
+                                    logoHeight = maxWH;
+                                    logoWidth = logoHeight / ratio; 
+                                }else{
+                                    logoWidth = maxWH;
+                                    logoHeight = logoWidth * ratio;
+                                }
+                            }
+                        }
+                    }
+                    logoWidth = logoWidth  * logoScale;
+                    logoHeight = logoHeight * logoScale;
+                    const mainMargin = this.config.margin;
+                    const coordinateX = 0.5 * (this.config.size - logoWidth);
+                    const coordinateY = 0.5 * (this.config.size - logoHeight);
+                    const centreCoordinateX = coordinateX - logoMargin - mainMargin;
+                    const centreCoordinateY = coordinateY - logoMargin - mainMargin;
 
                  //   const logoSize = this.config.viewportSize * logoScale + 2*logoMargin;
                  //   const mainMargin = this.config.margin;

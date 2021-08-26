@@ -457,6 +457,7 @@ export class SVGDrawing {
     }
 
     private async drawLogoImage(context: object) {
+        
         if (!this.config.logoImage) {
             return;
         }
@@ -499,8 +500,28 @@ export class SVGDrawing {
                 return fetch(this.config.logoImage)
                     .then((r: { text: () => void; }) => r.text())
                     .then((text: any) => {
-                        const logoWidth = logoSize * this.config.widthScale;
-                        const logoHeight = logoSize * this.config.heightScale;
+                        let logoWidth =  logoSize ;
+                        let logoHeight = logoSize ;
+                        const maxWH = 2 * logoSize;
+                        if(this.config.rectangular){
+                            if(this.config.widthSize && this.config.heightSize) {
+                                if(this.config.widthSize <= maxWH && this.config.heightSize <= maxWH) {
+                                    logoWidth  = this.config.widthSize;
+                                    logoHeight = this.config.heightSize;
+                                }else{
+                                    const ratio = this.config.heightSize  / this.config.widthSize;
+                                    if(ratio>1){
+                                        logoHeight = maxWH;
+                                        logoWidth = logoHeight / ratio; 
+                                    }else{
+                                        logoWidth = maxWH;
+                                        logoHeight = logoWidth * ratio;
+                                    }
+                                }
+                            }
+                        }
+                        logoWidth = logoWidth  * logoScale;
+                        logoHeight = logoHeight * logoScale;
                         const coordinateX = 0.5 * (this.config.size - logoWidth);
                         const coordinateY =  0.5 * (this.config.size - logoHeight);
                         const centreCoordinateX = coordinateX - logoMargin - mainMargin;
@@ -570,8 +591,30 @@ export class SVGDrawing {
             // const ct = cn.getContext('2d');
             // ct.drawImage(image, 0, 0);
             // ct.save();
-            const logoWidth = logoSize * this.config.widthScale;
-            const logoHeight = logoSize * this.config.heightScale;
+            let logoWidth =  logoSize;
+            let logoHeight = logoSize;
+            const maxWH = 2 * logoSize;
+            if(this.config.rectangular){
+                if(this.config.widthSize && this.config.heightSize) {
+                    if(this.config.widthSize <= maxWH && this.config.heightSize <= maxWH) {
+                        logoWidth  = this.config.widthSize;
+                        logoHeight = this.config.heightSize;
+                    }else{
+                        const ratio = this.config.heightSize  / this.config.widthSize;
+                        if(ratio>1){
+                            logoHeight = maxWH;
+                            logoWidth = logoHeight / ratio; 
+                        }else{
+                            logoWidth = maxWH;
+                            logoHeight = logoWidth * ratio;
+                        }
+                    }
+                }
+            }
+
+            logoWidth = logoWidth  * this.config.logoScale;
+            logoHeight = logoHeight * this.config.logoScale;
+          
             const cn = createCanvas(logoWidth, logoHeight);
             const ct = cn.getContext('2d');
             ct.drawImage(image, 0, 0, logoWidth, logoHeight);
@@ -719,8 +762,29 @@ export class SVGDrawing {
                     if (logoCornerRadius < 0) {
                         logoCornerRadius = 0;
                     }
-                    const logoWidth = this.config.widthScale * this.config.viewportSize * logoScale + 2*logoMargin;
-                    const logoHeight = this.config.heightScale * this.config.viewportSize * logoScale + 2*logoMargin;
+                    let logoWidth =  this.config.viewportSize ;
+                    let logoHeight = this.config.viewportSize ;
+                    const maxWH = 2 * this.config.viewportSize;
+                    if(this.config.rectangular){
+                        if(this.config.widthSize && this.config.heightSize) {
+                            if(this.config.widthSize <= maxWH && this.config.heightSize <= maxWH) {
+                                logoWidth  = this.config.widthSize;
+                                logoHeight = this.config.heightSize;
+                            }else{
+                                const ratio = this.config.heightSize  / this.config.widthSize;
+                                if(ratio>1){
+                                    logoHeight = maxWH;
+                                    logoWidth = logoHeight / ratio; 
+                                }else{
+                                    logoWidth = maxWH;
+                                    logoHeight = logoWidth * ratio;
+                                }
+                            }
+                        }
+                    }
+                    logoWidth = logoWidth  * logoScale + 2*logoMargin;
+                    logoHeight = logoHeight * logoScale + 2*logoMargin;
+
                     const moduleSize = (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize;
                     const mainMargin = this.config.margin;
                     const coordinateX = 0.5 * (this.config.size - logoWidth);
