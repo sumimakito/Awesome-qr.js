@@ -520,8 +520,8 @@ export class SVGDrawing {
                                 }
                             }
                         }
-                        logoWidth = logoWidth  * logoScale;
-                        logoHeight = logoHeight * logoScale;
+                        logoWidth = logoWidth  ;
+                        logoHeight = logoHeight;           
                         const coordinateX = 0.5 * (this.config.size - logoWidth);
                         const coordinateY =  0.5 * (this.config.size - logoHeight);
                         const centreCoordinateX = coordinateX - logoMargin - mainMargin;
@@ -594,6 +594,7 @@ export class SVGDrawing {
             let logoWidth =  logoSize;
             let logoHeight = logoSize;
             const maxWH = 2 * logoSize;
+            
             if(this.config.rectangular){
                 if(this.config.widthSize && this.config.heightSize) {
                     if(this.config.widthSize <= maxWH && this.config.heightSize <= maxWH) {
@@ -612,9 +613,8 @@ export class SVGDrawing {
                 }
             }
 
-            logoWidth = logoWidth  * this.config.logoScale;
-            logoHeight = logoHeight * this.config.logoScale;
-          
+            logoWidth = logoWidth;
+            logoHeight = logoHeight;
             const cn = createCanvas(logoWidth, logoHeight);
             const ct = cn.getContext('2d');
             ct.drawImage(image, 0, 0, logoWidth, logoHeight);
@@ -784,7 +784,6 @@ export class SVGDrawing {
                     }
                     logoWidth = logoWidth  * logoScale + 2*logoMargin;
                     logoHeight = logoHeight * logoScale + 2*logoMargin;
-
                     const moduleSize = (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize;
                     const mainMargin = this.config.margin;
                     const coordinateX = 0.5 * (this.config.size - logoWidth);
