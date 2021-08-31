@@ -504,12 +504,12 @@ export class SVGDrawing {
                         let logoHeight = logoSize ;
                         const maxWH = 2 * logoSize;
                         if(this.config.rectangular){
-                            if(this.config.widthSize && this.config.heightSize) {
-                                if(this.config.widthSize <= maxWH && this.config.heightSize <= maxWH) {
-                                    logoWidth  = this.config.widthSize;
+                            if(this.config.logoWidth && this.config.heightSize) {
+                                if(this.config.logoWidth <= maxWH && this.config.heightSize <= maxWH) {
+                                    logoWidth  = this.config.logoWidth;
                                     logoHeight = this.config.heightSize;
                                 }else{
-                                    const ratio = this.config.heightSize  / this.config.widthSize;
+                                    const ratio = this.config.heightSize  / this.config.logoWidth;
                                     if(ratio>1){
                                         logoHeight = maxWH;
                                         logoWidth = logoHeight / ratio; 
@@ -596,12 +596,12 @@ export class SVGDrawing {
             const maxWH = 2 * logoSize;
             
             if(this.config.rectangular){
-                if(this.config.widthSize && this.config.heightSize) {
-                    if(this.config.widthSize <= maxWH && this.config.heightSize <= maxWH) {
-                        logoWidth  = this.config.widthSize;
+                if(this.config.logoWidth && this.config.heightSize) {
+                    if(this.config.logoWidth <= maxWH && this.config.heightSize <= maxWH) {
+                        logoWidth  = this.config.logoWidth;
                         logoHeight = this.config.heightSize;
                     }else{
-                        const ratio = this.config.heightSize  / this.config.widthSize;
+                        const ratio = this.config.heightSize  / this.config.logoWidth;
                         if(ratio>1){
                             logoHeight = maxWH;
                             logoWidth = logoHeight / ratio; 
@@ -766,12 +766,12 @@ export class SVGDrawing {
                     let logoHeight = this.config.viewportSize ;
                     const maxWH = 2 * this.config.viewportSize;
                     if(this.config.rectangular){
-                        if(this.config.widthSize && this.config.heightSize) {
-                            if(this.config.widthSize <= maxWH && this.config.heightSize <= maxWH) {
-                                logoWidth  = this.config.widthSize;
+                        if(this.config.logoWidth && this.config.heightSize) {
+                            if(this.config.logoWidth <= maxWH && this.config.heightSize <= maxWH) {
+                                logoWidth  = this.config.logoWidth;
                                 logoHeight = this.config.heightSize;
                             }else{
-                                const ratio = this.config.heightSize  / this.config.widthSize;
+                                const ratio = this.config.heightSize  / this.config.logoWidth;
                                 if(ratio>1){
                                     logoHeight = maxWH;
                                     logoWidth = logoHeight / ratio; 

@@ -60,7 +60,7 @@ describe('QRCode class tests', () => {
             correctLevel: QRErrorCorrectLevel.M,
             backgroundDimming: 'rgba(0,0,0,0)',
             rectangular: false,
-            widthSize: 0,
+            logoWidth: 0,
             heightSize: 0,
             logoScale: 0.2,
             logoMargin: 6,
