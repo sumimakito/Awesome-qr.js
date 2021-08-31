@@ -20,7 +20,7 @@ export interface QRCodeConfig {
     dotScale: number;
     rectangular?: boolean;
     logoWidth?: number;
-    heightSize?: number;
+    logoHeight?: number;
     autoColor?: boolean;
     text: string;
     maskedDots: boolean;
@@ -56,7 +56,7 @@ export interface QRDrawingConfig {
     dotScale: number;
     rectangular?: boolean;
     logoWidth?: number;
-    heightSize?: number;
+    logoHeight?: number;
     moduleSize: number;
     backgroundDimming: string;
     backgroundImage?: string;

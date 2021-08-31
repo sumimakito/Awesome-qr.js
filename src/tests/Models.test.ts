@@ -61,7 +61,7 @@ describe('QRCode class tests', () => {
             backgroundDimming: 'rgba(0,0,0,0)',
             rectangular: false,
             logoWidth: 0,
-            heightSize: 0,
+            logoHeight: 0,
             logoScale: 0.2,
             logoMargin: 6,
             logoCornerRadius: 8,

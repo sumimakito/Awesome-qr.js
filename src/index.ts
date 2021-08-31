@@ -22,7 +22,7 @@ export class QRCodeBuilder {
             logoCornerRadius: 8,
             rectangular: false,
             logoWidth: 0,
-            heightSize: 0,
+            logoHeight: 0,
             dotScale: 0.35,
             text: '',
             maskedDots: false,

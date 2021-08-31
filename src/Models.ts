@@ -1087,12 +1087,12 @@ export class Drawing {
         let logoHeight = this.config.viewportSize ;
         const maxWH = 2 * this.config.viewportSize;
         if(this.config.rectangular){
-            if(this.config.logoWidth && this.config.heightSize) {
-                if(this.config.logoWidth <= maxWH && this.config.heightSize <= maxWH) {
+            if(this.config.logoWidth && this.config.logoHeight) {
+                if(this.config.logoWidth <= maxWH && this.config.logoHeight <= maxWH) {
                     logoWidth  = this.config.logoWidth;
-                    logoHeight = this.config.heightSize;
+                    logoHeight = this.config.logoHeight;
                 }else{
-                    const ratio = this.config.heightSize  / this.config.logoWidth;
+                    const ratio = this.config.logoHeight  / this.config.logoWidth;
                     if(ratio>1){
                         logoHeight = maxWH;
                         logoWidth = logoHeight / ratio; 
@@ -1616,12 +1616,12 @@ export class Drawing {
                     let logoHeight = this.config.viewportSize ;
                     const maxWH = 2 * this.config.viewportSize;
                     if(this.config.rectangular){
-                        if(this.config.logoWidth && this.config.heightSize) {
-                            if(this.config.logoWidth <= maxWH && this.config.heightSize <= maxWH) {
+                        if(this.config.logoWidth && this.config.logoHeight) {
+                            if(this.config.logoWidth <= maxWH && this.config.logoHeight <= maxWH) {
                                 logoWidth  = this.config.logoWidth;
-                                logoHeight = this.config.heightSize;
+                                logoHeight = this.config.logoHeight;
                             }else{
-                                const ratio = this.config.heightSize  / this.config.logoWidth;
+                                const ratio = this.config.logoHeight  / this.config.logoWidth;
                                 if(ratio>1){
                                     logoHeight = maxWH;
                                     logoWidth = logoHeight / ratio; 

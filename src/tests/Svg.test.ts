@@ -20,7 +20,7 @@ describe('SVG QRCode class tests', () => {
             logoScale: 0.2,
             rectangular: false,
             logoWidth: 0,
-            heightSize: 0,
+            logoHeight: 0,
             logoMargin: 6,
             logoCornerRadius: 8,
             dotScale: 0.35,
