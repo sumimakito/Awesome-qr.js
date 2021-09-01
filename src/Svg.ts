@@ -201,12 +201,17 @@ export class SVGDrawing {
         }
         return false;
     }
-    private inShape(x: number, y: number,pt: number,side: number): boolean {
+    
+    private inShape(x: number, y: number,pt: number,side: number,pty: number = 0,height :number = 0, square: boolean = true): boolean {
+        let bottomX = pt ;
+        let bottomY = pt  ;
+        let topX = pt+side;
+        let topY = pt+side;
+        if(!square){
+            bottomY = pty;
+            topY = pty + height;
+        }
 
-        const bottomX = pt ;
-        const bottomY = pt  ;
-        const topX = pt+side;
-        const topY = pt+side;
         let inX = false,inY = false;
         if (x>bottomX && x<topX) {
             inX = true;
@@ -452,6 +457,7 @@ export class SVGDrawing {
     }
 
     private async drawLogoImage(context: object) {
+        
         if (!this.config.logoImage) {
             return;
         }
@@ -494,10 +500,36 @@ export class SVGDrawing {
                 return fetch(this.config.logoImage)
                     .then((r: { text: () => void; }) => r.text())
                     .then((text: any) => {
+                        let logoWidth =  logoSize ;
+                        let logoHeight = logoSize ;
+                        const maxWH = 2 * logoSize;
+                        if(this.config.rectangular){
+                            if(this.config.logoWidth && this.config.logoHeight) {
+                                if(this.config.logoWidth <= maxWH && this.config.logoHeight <= maxWH) {
+                                    logoWidth  = this.config.logoWidth;
+                                    logoHeight = this.config.logoHeight;
+                                }else{
+                                    const ratio = this.config.logoHeight  / this.config.logoWidth;
+                                    if(ratio>1){
+                                        logoHeight = maxWH;
+                                        logoWidth = logoHeight / ratio; 
+                                    }else{
+                                        logoWidth = maxWH;
+                                        logoHeight = logoWidth * ratio;
+                                    }
+                                }
+                            }
+                        }
+                        logoWidth = logoWidth  ;
+                        logoHeight = logoHeight;           
+                        const coordinateX = 0.5 * (this.config.size - logoWidth);
+                        const coordinateY =  0.5 * (this.config.size - logoHeight);
+                        const centreCoordinateX = coordinateX - logoMargin - mainMargin;
+                        const centreCoordinateY = coordinateY - logoMargin - mainMargin;
                         const color = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
                         if(this.config.logoBackground !== false) {
                             // @ts-ignore
-                            context.rect(logoSize + logoMargin, logoSize + logoMargin).fill(color).move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
+                            context.rect(logoWidth + logoMargin, logoHeight + logoMargin).fill(color).move(centreCoordinateX + this.config.margin + this.shiftX, centreCoordinateY + this.config.margin + this.shiftY).radius(logoCornerRadius);
                         }
                         text = text.substring(text.indexOf('<svg'));
                         text = text.substring(0, text.indexOf('</svg>') + 6);
@@ -537,7 +569,7 @@ export class SVGDrawing {
                         try {
                             // @ts-ignore
                             context.svg(text
-                                .replace('<svg', `<svg fill='#000'` + extraText + ` x="${centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftX}" y="${centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftY}" width="${logoSize}" height="${logoSize}"`));
+                                .replace('<svg', `<svg fill='#000'` + extraText + ` x="${centreCoordinateX + logoMargin / 2 + this.config.margin + this.shiftX}" y="${centreCoordinateY + logoMargin / 2 + this.config.margin + this.shiftY}" width="${logoWidth}" height="${logoHeight}"`));
                         } catch (e) {
                             console.log(e);
                             // console.log('here')
@@ -559,11 +591,40 @@ export class SVGDrawing {
             // const ct = cn.getContext('2d');
             // ct.drawImage(image, 0, 0);
             // ct.save();
+            let logoWidth =  logoSize;
+            let logoHeight = logoSize;
+            const maxWH = 2 * logoSize;
+            
+            if(this.config.rectangular){
+                if(this.config.logoWidth && this.config.logoHeight) {
+                    if(this.config.logoWidth <= maxWH && this.config.logoHeight <= maxWH) {
+                        logoWidth  = this.config.logoWidth;
+                        logoHeight = this.config.logoHeight;
+                    }else{
+                        const ratio = this.config.logoHeight  / this.config.logoWidth;
+                        if(ratio>1){
+                            logoHeight = maxWH;
+                            logoWidth = logoHeight / ratio; 
+                        }else{
+                            logoWidth = maxWH;
+                            logoHeight = logoWidth * ratio;
+                        }
+                    }
+                }
+            }
 
-            const cn = createCanvas(logoSize, logoSize);
+            logoWidth = logoWidth;
+            logoHeight = logoHeight;
+            const cn = createCanvas(logoWidth, logoHeight);
             const ct = cn.getContext('2d');
-            ct.drawImage(image, 0, 0, logoSize, logoSize);
+            ct.drawImage(image, 0, 0, logoWidth, logoHeight);
             ct.save();
+
+            const mainMargin = this.config.margin;
+            const coordinateX = 0.5 * (this.config.size - logoWidth);
+            const coordinateY =  0.5 * (this.config.size - logoHeight);
+            const centreCoordinateX = coordinateX - logoMargin - mainMargin;
+            const centreCoordinateY = coordinateY - logoMargin - mainMargin;
 
             // const color = this.config.backgroundColor ? this.config.backgroundColor : this.config.useOpacity ? '#ffffff' : '#ffffff99';
             //
@@ -578,12 +639,12 @@ export class SVGDrawing {
             const colorNew = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
             // @ts-ignore
             if(this.config.logoBackground !== false) {
-                context.rect(logoSize + logoMargin, logoSize + logoMargin).fill(colorNew).move(centreCoordinate + this.config.margin + this.shiftX, centreCoordinate + this.config.margin + this.shiftY).radius(logoCornerRadius);
+                context.rect(logoWidth + logoMargin, logoHeight + logoMargin).fill(colorNew).move(centreCoordinateX + this.config.margin + this.shiftX, centreCoordinateY + this.config.margin + this.shiftY).radius(logoCornerRadius);
             }
             // @ts-ignore
-            context.image('').size(logoSize, logoSize)
+            context.image('').size(logoWidth, logoHeight)
                 .attr({ 'xlink:href': cn.toDataURL() })
-                .move(centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftX, centreCoordinate + logoMargin / 2 + this.config.margin + this.shiftY);
+                .move(centreCoordinateX + logoMargin / 2 + this.config.margin + this.shiftX, centreCoordinateY + logoMargin / 2 + this.config.margin + this.shiftY);
         });
     }
 
@@ -701,17 +762,40 @@ export class SVGDrawing {
                     if (logoCornerRadius < 0) {
                         logoCornerRadius = 0;
                     }
-                    const logoSize = this.config.viewportSize * logoScale + 2*logoMargin;
-                    const mainMargin = this.config.margin;
-                    const coordinate = 0.5 * (this.config.size - logoSize);
-                    const centreCoordinate = coordinate - logoMargin - mainMargin;
+                    let logoWidth =  this.config.viewportSize ;
+                    let logoHeight = this.config.viewportSize ;
+                    const maxWH = 2 * this.config.viewportSize;
+                    if(this.config.rectangular){
+                        if(this.config.logoWidth && this.config.logoHeight) {
+                            if(this.config.logoWidth <= maxWH && this.config.logoHeight <= maxWH) {
+                                logoWidth  = this.config.logoWidth;
+                                logoHeight = this.config.logoHeight;
+                            }else{
+                                const ratio = this.config.logoHeight  / this.config.logoWidth;
+                                if(ratio>1){
+                                    logoHeight = maxWH;
+                                    logoWidth = logoHeight / ratio; 
+                                }else{
+                                    logoWidth = maxWH;
+                                    logoHeight = logoWidth * ratio;
+                                }
+                            }
+                        }
+                    }
+                    logoWidth = logoWidth  * logoScale + 2*logoMargin;
+                    logoHeight = logoHeight * logoScale + 2*logoMargin;
                     const moduleSize = (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize;
-                    if(this.config.logoBackground && (!this.inShape(nLeft + moduleSize,nTop,centreCoordinate,logoSize) ||
-                        !this.inShape(nLeft,nTop  + moduleSize,centreCoordinate,logoSize) ||
-                        !this.inShape(nLeft + moduleSize,nTop  + moduleSize,centreCoordinate,logoSize) ||
-                        !this.inShape(nLeft - moduleSize,nTop  - moduleSize,centreCoordinate,logoSize) ||
-                        !this.inShape(nLeft - moduleSize,nTop,centreCoordinate,logoSize) ||
-                        !this.inShape(nLeft,nTop - moduleSize,centreCoordinate,logoSize))) {
+                    const mainMargin = this.config.margin;
+                    const coordinateX = 0.5 * (this.config.size - logoWidth);
+                    const coordinateY =  0.5 * (this.config.size - logoHeight);
+                    const centreCoordinateX = coordinateX - logoMargin - mainMargin;
+                    const centreCoordinateY = coordinateY - logoMargin - mainMargin;
+                    if(this.config.logoBackground && (!this.inShape(nLeft + moduleSize,nTop,centreCoordinateX, logoWidth, centreCoordinateY, logoHeight, false) ||
+                        !this.inShape(nLeft,nTop  + moduleSize, centreCoordinateX, logoWidth, centreCoordinateY, logoHeight, false) ||
+                        !this.inShape(nLeft + moduleSize,nTop  + moduleSize, centreCoordinateX, logoWidth, centreCoordinateY, logoHeight, false) ||
+                        !this.inShape(nLeft - moduleSize,nTop  - moduleSize, centreCoordinateX, logoWidth, centreCoordinateY, logoHeight, false) ||
+                        !this.inShape(nLeft - moduleSize,nTop, centreCoordinateX, logoWidth, centreCoordinateY, logoHeight, false) ||
+                        !this.inShape(nLeft,nTop - moduleSize, centreCoordinateX, logoWidth, centreCoordinateY, logoHeight, false))) {
                         continue;
                     }
                 }

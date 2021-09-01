@@ -18,6 +18,9 @@ export interface QRCodeConfig {
     logoBackground?: boolean;
     whiteMargin?: boolean;
     dotScale: number;
+    rectangular?: boolean;
+    logoWidth?: number;
+    logoHeight?: number;
     autoColor?: boolean;
     text: string;
     maskedDots: boolean;
@@ -51,6 +54,9 @@ export interface QRDrawingConfig {
     whiteMargin?: boolean;
     autoColor?: boolean;
     dotScale: number;
+    rectangular?: boolean;
+    logoWidth?: number;
+    logoHeight?: number;
     moduleSize: number;
     backgroundDimming: string;
     backgroundImage?: string;
