@@ -572,7 +572,7 @@ export class Drawing {
                 return this.drawAlignPatterns(mainContext, gradient);
             })
             .then(() => {
-                return this.drawPositionProtectors(mainContext);
+               return this.drawPositionProtectors(mainContext);
             })
             .then(() => {
                 return this.drawAlignProtectors(mainContext);
@@ -613,12 +613,16 @@ export class Drawing {
         }
         return false;
     }
-    private inShape(x: number, y: number,pt: number,side: number): boolean {
+    private inShape(x: number, y: number,pt: number,side: number,pty: number = 0,height :number = 0, square: boolean = true): boolean {
+        let bottomX = pt ;
+        let bottomY = pt  ;
+        let topX = pt+side;
+        let topY = pt+side;
+        if(!square){
+            bottomY = pty;
+            topY = pty + height;
+        }
 
-        const bottomX = pt ;
-        const bottomY = pt  ;
-        const topX = pt+side;
-        const topY = pt+side;
         let inX = false,inY = false;
         if (x>bottomX && x<topX) {
             inX = true;
@@ -1079,16 +1083,37 @@ export class Drawing {
             logoCornerRadius = 0;
         }
         context.restore();
-
-        const logoSize = this.config.viewportSize * logoScale;
-
+        let logoWidth =  this.config.viewportSize ;
+        let logoHeight = this.config.viewportSize ;
+        const maxWH = 2 * this.config.viewportSize;
+        if(this.config.rectangular){
+            if(this.config.logoWidth && this.config.logoHeight) {
+                if(this.config.logoWidth <= maxWH && this.config.logoHeight <= maxWH) {
+                    logoWidth  = this.config.logoWidth;
+                    logoHeight = this.config.logoHeight;
+                }else{
+                    const ratio = this.config.logoHeight  / this.config.logoWidth;
+                    if(ratio>1){
+                        logoHeight = maxWH;
+                        logoWidth = logoHeight / ratio; 
+                    }else{
+                        logoWidth = maxWH;
+                        logoHeight = logoWidth * ratio;
+                    }
+                }
+            }
+        }
+        logoWidth = logoWidth  * logoScale;
+        logoHeight = logoHeight * logoScale;
         const mainMargin = this.config.margin;
-        const coordinate = 0.5 * (this.config.size - logoSize);
-        const centreCoordinate = coordinate - logoMargin - mainMargin;
-        if (this.config.logoBackground !== false) {
-            context.fillStyle = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+        const coordinateX = 0.5 * (this.config.size - logoWidth);
+        const coordinateY = 0.5 * (this.config.size - logoHeight);
+        const centreCoordinateX = coordinateX - logoMargin - mainMargin;
+        const centreCoordinateY = coordinateY - logoMargin - mainMargin;
+        if(this.config.logoBackground !== false) {
+            context.fillStyle = '#ffffff';
             context.save();
-            CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate, centreCoordinate, logoSize + 2 * logoMargin, logoSize + 2 * logoMargin, logoCornerRadius);
+            CanvasUtil.prepareRoundedCornerClip(context, centreCoordinateX, centreCoordinateY, logoWidth + 2 * logoMargin, logoHeight + 2 * logoMargin, logoCornerRadius);
             context.clip();
             context.fill();
             context.restore();
@@ -1096,9 +1121,9 @@ export class Drawing {
         context.save();
 
         return loadImage(this.config.logoImage!, this.config.imageServerURL, this.config.imageServerRequestHeaders).then((image: any) => {
-            CanvasUtil.prepareRoundedCornerClip(context, centreCoordinate + logoMargin, centreCoordinate + logoMargin, logoSize, logoSize, logoCornerRadius);
+            CanvasUtil.prepareRoundedCornerClip(context, centreCoordinateX + logoMargin, centreCoordinateY + logoMargin, logoWidth, logoHeight, logoCornerRadius);
             context.clip();
-            context.drawImage(image, centreCoordinate + logoMargin, centreCoordinate + logoMargin, logoSize, logoSize);
+            context.drawImage(image, centreCoordinateX + logoMargin, centreCoordinateY + logoMargin, logoWidth, logoHeight);
             context.restore();
         });
     }
@@ -1549,6 +1574,7 @@ export class Drawing {
         const xyOffset = (1 - this.config.dotScale) * 0.5;
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
 
+
         for (let row = 0; row < moduleCount; row++) {
             for (let col = 0; col < moduleCount; col++) {
                 const bIsDark = this.isDark.bind(this)(row, col) || false;
@@ -1571,6 +1597,7 @@ export class Drawing {
 
                 const nLeft = col * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
                 const nTop = row * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
+
                 if (this.config.logoImage) {
                     let logoScale = this.config.logoScale;
                     let logoMargin = this.config.logoMargin;
@@ -1584,18 +1611,48 @@ export class Drawing {
                     if (logoCornerRadius < 0) {
                         logoCornerRadius = 0;
                     }
-                    const logoSize = this.config.viewportSize * logoScale + 2*logoMargin;
+
+                    let logoWidth =  this.config.viewportSize ;
+                    let logoHeight = this.config.viewportSize ;
+                    const maxWH = 2 * this.config.viewportSize;
+                    if(this.config.rectangular){
+                        if(this.config.logoWidth && this.config.logoHeight) {
+                            if(this.config.logoWidth <= maxWH && this.config.logoHeight <= maxWH) {
+                                logoWidth  = this.config.logoWidth;
+                                logoHeight = this.config.logoHeight;
+                            }else{
+                                const ratio = this.config.logoHeight  / this.config.logoWidth;
+                                if(ratio>1){
+                                    logoHeight = maxWH;
+                                    logoWidth = logoHeight / ratio; 
+                                }else{
+                                    logoWidth = maxWH;
+                                    logoHeight = logoWidth * ratio;
+                                }
+                            }
+                        }
+                    }
+                    logoWidth = logoWidth  * logoScale;
+                    logoHeight = logoHeight * logoScale;
                     const mainMargin = this.config.margin;
-                    const coordinate = 0.5 * (this.config.size - logoSize);
-                    const centreCoordinate = coordinate - logoMargin - mainMargin;
+                    const coordinateX = 0.5 * (this.config.size - logoWidth);
+                    const coordinateY = 0.5 * (this.config.size - logoHeight);
+                    const centreCoordinateX = coordinateX - logoMargin - mainMargin;
+                    const centreCoordinateY = coordinateY - logoMargin - mainMargin;
+
+                 //   const logoSize = this.config.viewportSize * logoScale + 2*logoMargin;
+                 //   const mainMargin = this.config.margin;
+                   // const coordinate = 0.5 * (this.config.size - logoSize);
+                   // const centreCoordinate = coordinate - logoMargin - mainMargin;
+                   
                     const moduleSize = (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize;
-                    if(this.config.logoBackground && (!this.inShape(nLeft + moduleSize,nTop,centreCoordinate,logoSize) ||
-                        !this.inShape(nLeft,nTop  + moduleSize,centreCoordinate,logoSize) ||
-                        !this.inShape(nLeft + moduleSize,nTop  + moduleSize,centreCoordinate,logoSize) ||
-                        !this.inShape(nLeft - moduleSize,nTop  - moduleSize,centreCoordinate,logoSize) ||
-                        !this.inShape(nLeft - moduleSize,nTop,centreCoordinate,logoSize) ||
-                        !this.inShape(nLeft,nTop - moduleSize,centreCoordinate,logoSize))) {
-                        continue;
+                    if(this.config.logoBackground && (!this.inShape(nLeft + moduleSize,nTop,centreCoordinateX,logoWidth, centreCoordinateY, logoHeight, false) ||
+                        !this.inShape(nLeft,nTop  + moduleSize,centreCoordinateX,logoWidth, centreCoordinateY, logoHeight, false) ||
+                        !this.inShape(nLeft + moduleSize,nTop  + moduleSize,centreCoordinateX,logoWidth, centreCoordinateY, logoHeight, false) ||
+                        !this.inShape(nLeft - moduleSize,nTop  - moduleSize,centreCoordinateX,logoWidth, centreCoordinateY, logoHeight, false) ||
+                        !this.inShape(nLeft - moduleSize,nTop,centreCoordinateX,logoWidth, centreCoordinateY, logoHeight, false) ||
+                        !this.inShape(nLeft,nTop - moduleSize,centreCoordinateX,logoWidth, centreCoordinateY, logoHeight, false))) {
+                            continue;
                     }
                 }
                 if (patternPosition.length === 0) {
