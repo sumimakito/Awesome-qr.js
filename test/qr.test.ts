@@ -1,3 +1,5 @@
+// Still working on this
+
 import { AwesomeQR, QRErrorCorrectLevel } from "../src/index";
 import Jimp from "jimp";
 import crypto from "crypto";
