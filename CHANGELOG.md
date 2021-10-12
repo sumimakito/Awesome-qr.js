@@ -1,5 +1,9 @@
 # Changelog
 
+## Ver 2.1.5
+
+- Fixed prebuilt libraries.
+
 ## Ver. 2.1.4
 
 - Updated Webpack to v5.
