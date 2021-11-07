@@ -500,9 +500,10 @@ export class SVGDrawing {
                 return fetch(this.config.logoImage)
                     .then((r: { text: () => void; }) => r.text())
                     .then((text: any) => {
-                        let logoWidth =  logoSize ;
-                        let logoHeight = logoSize ;
-                        const maxWH = 2 * logoSize;
+                        let logoWidth =  this.config.viewportSize;
+                        let logoHeight = this.config.viewportSize;
+                        const maxWH = 1.5 * this.config.viewportSize;
+
                         if(this.config.rectangular){
                             if(this.config.logoWidth && this.config.logoHeight) {
                                 if(this.config.logoWidth <= maxWH && this.config.logoHeight <= maxWH) {
@@ -520,8 +521,8 @@ export class SVGDrawing {
                                 }
                             }
                         }
-                        logoWidth = logoWidth  ;
-                        logoHeight = logoHeight;           
+                        logoWidth = logoWidth * logoScale;
+                        logoHeight = logoHeight * logoScale;
                         const coordinateX = 0.5 * (this.config.size - logoWidth);
                         const coordinateY =  0.5 * (this.config.size - logoHeight);
                         const centreCoordinateX = coordinateX - logoMargin - mainMargin;
@@ -529,7 +530,7 @@ export class SVGDrawing {
                         const color = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
                         if(this.config.logoBackground !== false) {
                             // @ts-ignore
-                            context.rect(logoWidth + logoMargin, logoHeight + logoMargin).fill(color).move(centreCoordinateX + this.config.margin + this.shiftX, centreCoordinateY + this.config.margin + this.shiftY).radius(logoCornerRadius);
+                            context.rect(logoWidth + 2 * logoMargin, logoHeight + 2 * logoMargin).fill(color).move(centreCoordinateX + this.config.margin + this.shiftX, centreCoordinateY + this.config.margin + this.shiftY).radius(logoCornerRadius);
                         }
                         text = text.substring(text.indexOf('<svg'));
                         text = text.substring(0, text.indexOf('</svg>') + 6);
@@ -591,9 +592,10 @@ export class SVGDrawing {
             // const ct = cn.getContext('2d');
             // ct.drawImage(image, 0, 0);
             // ct.save();
-            let logoWidth =  logoSize;
-            let logoHeight = logoSize;
-            const maxWH = 2 * logoSize;
+            const logoScale = this.config.logoScale;
+            let logoWidth =  this.config.viewportSize;
+            let logoHeight = this.config.viewportSize;
+            const maxWH = 1.5 * this.config.viewportSize;
             
             if(this.config.rectangular){
                 if(this.config.logoWidth && this.config.logoHeight) {
@@ -613,8 +615,8 @@ export class SVGDrawing {
                 }
             }
 
-            logoWidth = logoWidth;
-            logoHeight = logoHeight;
+            logoWidth = logoWidth * logoScale;
+            logoHeight = logoHeight * logoScale;
             const cn = createCanvas(logoWidth, logoHeight);
             const ct = cn.getContext('2d');
             ct.drawImage(image, 0, 0, logoWidth, logoHeight);
@@ -639,7 +641,7 @@ export class SVGDrawing {
             const colorNew = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
             // @ts-ignore
             if(this.config.logoBackground !== false) {
-                context.rect(logoWidth + logoMargin, logoHeight + logoMargin).fill(colorNew).move(centreCoordinateX + this.config.margin + this.shiftX, centreCoordinateY + this.config.margin + this.shiftY).radius(logoCornerRadius);
+                context.rect(logoWidth + 2 * logoMargin, logoHeight + 2 * logoMargin).fill(colorNew).move(centreCoordinateX + this.config.margin + this.shiftX, centreCoordinateY + this.config.margin + this.shiftY).radius(logoCornerRadius);
             }
             // @ts-ignore
             context.image('').size(logoWidth, logoHeight)
@@ -762,9 +764,9 @@ export class SVGDrawing {
                     if (logoCornerRadius < 0) {
                         logoCornerRadius = 0;
                     }
-                    let logoWidth =  this.config.viewportSize ;
-                    let logoHeight = this.config.viewportSize ;
-                    const maxWH = 2 * this.config.viewportSize;
+                    let logoWidth =  this.config.viewportSize;
+                    let logoHeight = this.config.viewportSize;
+                    const maxWH = 1.5 * this.config.viewportSize;
                     if(this.config.rectangular){
                         if(this.config.logoWidth && this.config.logoHeight) {
                             if(this.config.logoWidth <= maxWH && this.config.logoHeight <= maxWH) {
@@ -774,7 +776,7 @@ export class SVGDrawing {
                                 const ratio = this.config.logoHeight  / this.config.logoWidth;
                                 if(ratio>1){
                                     logoHeight = maxWH;
-                                    logoWidth = logoHeight / ratio; 
+                                    logoWidth = logoHeight / ratio;
                                 }else{
                                     logoWidth = maxWH;
                                     logoHeight = logoWidth * ratio;
@@ -782,8 +784,8 @@ export class SVGDrawing {
                             }
                         }
                     }
-                    logoWidth = logoWidth  * logoScale + 2*logoMargin;
-                    logoHeight = logoHeight * logoScale + 2*logoMargin;
+                    logoWidth = logoWidth  * logoScale;
+                    logoHeight = logoHeight * logoScale;
                     const moduleSize = (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize;
                     const mainMargin = this.config.margin;
                     const coordinateX = 0.5 * (this.config.size - logoWidth);

@@ -1083,9 +1083,9 @@ export class Drawing {
             logoCornerRadius = 0;
         }
         context.restore();
-        let logoWidth =  this.config.viewportSize ;
-        let logoHeight = this.config.viewportSize ;
-        const maxWH = 2 * this.config.viewportSize;
+        let logoWidth =  this.config.viewportSize;
+        let logoHeight = this.config.viewportSize;
+        const maxWH = 1.5 * this.config.viewportSize;
         if(this.config.rectangular){
             if(this.config.logoWidth && this.config.logoHeight) {
                 if(this.config.logoWidth <= maxWH && this.config.logoHeight <= maxWH) {
@@ -1612,9 +1612,9 @@ export class Drawing {
                         logoCornerRadius = 0;
                     }
 
-                    let logoWidth =  this.config.viewportSize ;
-                    let logoHeight = this.config.viewportSize ;
-                    const maxWH = 2 * this.config.viewportSize;
+                    let logoWidth =  this.config.viewportSize;
+                    let logoHeight = this.config.viewportSize;
+                    const maxWH = 1.5 * this.config.viewportSize;
                     if(this.config.rectangular){
                         if(this.config.logoWidth && this.config.logoHeight) {
                             if(this.config.logoWidth <= maxWH && this.config.logoHeight <= maxWH) {
@@ -1624,7 +1624,7 @@ export class Drawing {
                                 const ratio = this.config.logoHeight  / this.config.logoWidth;
                                 if(ratio>1){
                                     logoHeight = maxWH;
-                                    logoWidth = logoHeight / ratio; 
+                                    logoWidth = logoHeight / ratio;
                                 }else{
                                     logoWidth = maxWH;
                                     logoHeight = logoWidth * ratio;
@@ -1644,7 +1644,7 @@ export class Drawing {
                  //   const mainMargin = this.config.margin;
                    // const coordinate = 0.5 * (this.config.size - logoSize);
                    // const centreCoordinate = coordinate - logoMargin - mainMargin;
-                   
+
                     const moduleSize = (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize;
                     if(this.config.logoBackground && (!this.inShape(nLeft + moduleSize,nTop,centreCoordinateX,logoWidth, centreCoordinateY, logoHeight, false) ||
                         !this.inShape(nLeft,nTop  + moduleSize,centreCoordinateX,logoWidth, centreCoordinateY, logoHeight, false) ||
@@ -1655,6 +1655,7 @@ export class Drawing {
                             continue;
                     }
                 }
+
                 if (patternPosition.length === 0) {
                     // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
                     if (!bProtected) {
