@@ -777,7 +777,7 @@ const configCasePNG13 = {
 };
 const configCasePNG14 = {
     text: sampleUrl,
-    logoImage: 'https://www.tutorialspoint.com/videotutorials/images/coding_ground_home.jpg',  
+    logoImage: 'https://www.tutorialspoint.com/videotutorials/images/coding_ground_home.jpg',
     logoBackground: false,
     canvasType: CanvasType.PNG,
     dataPattern: DataPattern.SQUARE,
@@ -959,7 +959,7 @@ describe('Output QR code tests', () => {
     it('Main test SVG 2', done => {
         const qrCodeGenerator = new QRCodeBuilder(configCase2);
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            
+
             fs.writeFileSync(__dirname + '/qrTests/default-svg2.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
@@ -969,9 +969,9 @@ describe('Output QR code tests', () => {
     });
     it('Main test SVG 3', done => {
         const qrCodeGenerator = new QRCodeBuilder(configCase3);
-    
+
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            
+
             fs.writeFileSync(__dirname + '/qrTests/default-svg3.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
@@ -981,9 +981,9 @@ describe('Output QR code tests', () => {
     });
     it('Main test SVG 4', done => {
         const qrCodeGenerator = new QRCodeBuilder(configCase4);
-    
+
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            
+
             fs.writeFileSync(__dirname + '/qrTests/default-svg4.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
@@ -993,9 +993,9 @@ describe('Output QR code tests', () => {
     });
     it('Main test SVG 5', done => {
         const qrCodeGenerator = new QRCodeBuilder(configCase5);
-    
+
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            
+
             fs.writeFileSync(__dirname + '/qrTests/default-svg5.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
@@ -1005,9 +1005,9 @@ describe('Output QR code tests', () => {
     });
     it('Main test SVG 6 circular', done => {
         const qrCodeGenerator = new QRCodeBuilder(configCase6);
-    
+
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            
+
             fs.writeFileSync(__dirname + '/qrTests/circular-kite.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
@@ -1017,9 +1017,9 @@ describe('Output QR code tests', () => {
     });
     it('Main test SVG 7 circular with large text', done => {
         const qrCodeGenerator = new QRCodeBuilder(configCase7);
-    
+
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            
+
             fs.writeFileSync(__dirname + '/qrTests/circular-circle.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
@@ -1029,9 +1029,9 @@ describe('Output QR code tests', () => {
     });
     it('Main test SVG 8 circular', done => {
         const qrCodeGenerator = new QRCodeBuilder(configCase8);
-    
+
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            
+
             fs.writeFileSync(__dirname + '/qrTests/circular-leftdiamond.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
@@ -1041,9 +1041,9 @@ describe('Output QR code tests', () => {
     });
     it('Main test SVG 9 circular', done => {
         const qrCodeGenerator = new QRCodeBuilder(configCase9);
-    
+
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            
+
             fs.writeFileSync(__dirname + '/qrTests/circular-rightdiamond.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
@@ -1053,9 +1053,9 @@ describe('Output QR code tests', () => {
     });
     it('Main test SVG 10 circular', done => {
         const qrCodeGenerator = new QRCodeBuilder(configCase10);
-    
+
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            
+
             fs.writeFileSync(__dirname + '/qrTests/circular-sqaure.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
@@ -1194,7 +1194,7 @@ describe('Output QR code tests', () => {
             console.error(err);
             done();
         });
-        
+
     });
     it('Main test QR 13 circular', done => {
         const qrCodeGenerator = new QRCodeBuilder(configCasePNG13);
@@ -1207,7 +1207,7 @@ describe('Output QR code tests', () => {
             done();
         });
     });
-    
+
     it('Main test QR 14 circular_no_logo_background', done => {
         const qrCodeGenerator = new QRCodeBuilder(configCasePNG14);
         qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
