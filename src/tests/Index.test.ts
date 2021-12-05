@@ -2,6 +2,10 @@ import { Gradient } from '@svgdotjs/svg.js';
 import 'mocha';
 import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame, QRErrorCorrectLevel } from '../Enums';
 import { QRCodeBuilder } from '../index';
+import { QRCode } from '../Models';
+
+// tslint:disable-next-line:no-var-requires
+const fs =  require('fs');
 
 const vCardSampleData = `BEGIN:VCARD
 VERSION:3.0
@@ -12,26 +16,20 @@ TITLE:fdgdfg
 TEL;TYPE=work:213213
 TEL;TYPE=mobile:523355
 TEL;TYPE=home:342524
-EMAIL:souro.com@gmail.com
+EMAIL:demo@mobstac.com
 ADR;TYPE=WORK:;;eafe, thgsh;Bangalore;KA;560008;India
-URL:souro.comf
+URL:mobstac.com
 REV:2008-04-24T19:52:43Z
 END:VCARD`;
 
 const config = {
     text: 'https://beaconstac.com',
-  //  backgroundImage: 'https://i.pinimg.com/474x/d4/48/2b/d4482ba4e7ebdbff7b8ba73e7d39aceb.jpg',
- // backgroundImage:'https://www.fnordware.com/superpng/pnggrad16rgb.png',
- // backgroundImage:'https://png.pngtree.com/png-clipart/20200721/original/pngtree-design-scene-prototype-renderings-logo-sample-material-png-image_4913697.jpg',
-  logoImage:'https://svgsilh.com/svg/1295041.svg', 
- // logoImage: 'https://content.internetretailing.net/AcuCustom/Sitename/DAM/027/HSS-Hire-logo-3D2-1024x369.jpg',   
-backgroundColor:'white',
-logoBackground: true,
+    backgroundColor:'white',
+    logoBackground: true,
     canvasType: CanvasType.SVG,
     dataPattern: DataPattern.KITE,
     dotScale: 1,
-    eyeBallShape: EyeBallShape.CIRCLE,
-    // eyeFrameColor: "",
+    eyeBallShape: EyeBallShape.LEFT_DIAMOND,
     eyeFrameShape: EyeFrameShape.CIRCLE,
     frameStyle: QRCodeFrame.NONE,
     frameColor: "blue",
@@ -41,22 +39,49 @@ logoBackground: true,
     rectangular: true,
     logoWidth: 2500,
     logoHeight: 5000,
-  //  useOpacity: true,
-   // imageServerURL: "https://beaconstacqa.mobstac.com/api/2.0/validate_url/",
     size:2048,
 };
 
-describe('QR code tests', () => {
-    it('Main test SVG 1', done => {
+function prepareImageBuffer(qrCode: QRCode, name: string) {
+    const dataUrl = qrCode.canvas.toDataURL('image/png');
+    const matches: any = dataUrl.match(
+        /^data:([A-Za-z-+\/]+);base64,(.+)$/
+        ),
+        response: any  ={};
+    response.type = matches[1];
+    response.data = Buffer.from(matches[2], "base64");
+    const decodedImg = response;
+    const imageBuffer = decodedImg.data;
+    const extension ='png';
+    const fileName = `/${name}` + "." + extension;
+
+    return {
+        name: fileName,
+        buffer: imageBuffer
+    };
+
+}
+
+describe('QR code main tests', () => {
+    it('QR main test PNG', done => {
+        const qrCodeGenerator = new QRCodeBuilder(config);
+        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
+            const bufferObject = prepareImageBuffer(qrCode, 'test');
+            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
+            done();
+        }).catch(err => {
+            console.error(err);
+            done();
+        });
+    });
+    it('QR main test SVG', done => {
         const qrCodeGenerator = new QRCodeBuilder(config);
 
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            
-            const fs = require('fs');
             fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
             done();
         }).catch(err => {
-           console.error(err);
+            console.error(err);
             done();
         });
     });

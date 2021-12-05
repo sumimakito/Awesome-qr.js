@@ -8,6 +8,7 @@
     "types": "lib/index.d.ts",
     "scripts": {
         "test": "nyc mocha",
+        "testMain": "nyc mocha -g 'QR code main tests'",
         "build": "tsc && webpack",
         "coverage": "nyc --reporter=text npm run test",
         "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
