@@ -33,7 +33,7 @@ const config = {
     eyeBallShape: EyeBallShape.LEFT_DIAMOND,
     eyeFrameShape: EyeFrameShape.CIRCLE,
     frameStyle: QRCodeFrame.BOX_BOTTOM,
-    frameText: "Abcdefghijklmnopqrstuvwxyz1234",
+    frameText: "Abcdefghijklmnopqr",
     frameColor: "#6a5acd",
     gradientType: GradientType.NONE,
     logoScale: 1,

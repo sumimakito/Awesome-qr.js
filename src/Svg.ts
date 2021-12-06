@@ -1569,7 +1569,7 @@ export class SVGDrawing {
         const moduleSize = this.config.moduleSize;
         const rawSize = this.config.rawSize;
         const size = rawSize + moduleSize * 2;
-        const text = frameText ? frameText.toUpperCase() : 'SCAN ME';
+        const text = frameText || 'SCAN ME';
 
         let borderX = 0, borderY = 0, bannerX = 0, bannerY = 0,
             textX = 0, textY = 0, logoX = 0, logoY = 0, cornerRadius = 0;
@@ -1705,11 +1705,13 @@ export class SVGDrawing {
             textY = textY + (moduleSize * 2.5)
         } else {
             // @ts-ignore
-            textX = canvas.width()/2 + 1.5 * moduleSize;
+            textX = canvas.width()/2;
         }
+
+        const fontSize = text.length > 15 ? this.config.size / 15 : this.config.size / 10;
         // @ts-ignore
         canvas.plain(text).move(textX, textY)
-            .font({ fill: '#fff', family: 'Roboto', size: this.config.size / 10, leading: 0, anchor: 'middle'}).attr({y: textY});
+            .font({ fill: '#fff', family: 'Roboto', size: fontSize, leading: 0, anchor: 'middle'}).attr({y: textY});
 
         if (this.config.isVCard) {
             // @ts-ignore
@@ -1721,12 +1723,14 @@ export class SVGDrawing {
             logoY = logoY + (moduleSize * 0.3)
         }
 
-        const cellphone = cellPhoneSVGPath.replace('<<x-axis>>', String(logoX))
-            .replace('<<y-axis>>', String(logoY))
-            .replace('<<width>>', String(size / 10))
-            .replace('<<height>>', String(size / 10));
-        // @ts-ignore
-        return canvas.svg(cellphone);
+        return canvas;
+
+        // const cellphone = cellPhoneSVGPath.replace('<<x-axis>>', String(logoX))
+        //     .replace('<<y-axis>>', String(logoY))
+        //     .replace('<<width>>', String(size / 10))
+        //     .replace('<<height>>', String(size / 10));
+        // // @ts-ignore
+        // return canvas.svg(cellphone);
 
         // return loadImage('https://static.beaconstac.com/assets/img/mobstac-awesome-qr/cellphone.svg').then(image => {
         //
