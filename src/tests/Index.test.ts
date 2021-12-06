@@ -29,17 +29,17 @@ const config = {
     canvasType: CanvasType.SVG,
     dataPattern: DataPattern.KITE,
     dotScale: 1,
+    colorDark: "#6a5acd",
     eyeBallShape: EyeBallShape.LEFT_DIAMOND,
     eyeFrameShape: EyeFrameShape.CIRCLE,
-    frameStyle: QRCodeFrame.NONE,
-    frameColor: "blue",
-    frameText: "",
+    frameStyle: QRCodeFrame.BOX_BOTTOM,
+    frameText: "Abcdefghijklmnopqrstuvwxyz1234",
+    frameColor: "#6a5acd",
     gradientType: GradientType.NONE,
     logoScale: 1,
-    rectangular: true,
-    logoWidth: 2500,
-    logoHeight: 5000,
-    size:2048,
+    size:1024,
+    margin: 80
+
 };
 
 function prepareImageBuffer(qrCode: QRCode, name: string) {
