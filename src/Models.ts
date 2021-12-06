@@ -792,6 +792,7 @@ export class Drawing {
         }
 
         const color = frameColor ? frameColor : '#000000';
+        const textColor = this.config.frameTextColor || '#ffffff';
         const moduleSize = this.config.moduleSize;
         const rawSize = this.config.rawSize;
         const size = rawSize + moduleSize * 2;
@@ -981,8 +982,8 @@ export class Drawing {
                 return canvas;
         }
 
-        finalContext.fillStyle = '#ffffff';
-        finalContext.strokeStyle = '#ffffff';
+        finalContext.fillStyle = textColor || '#ffffff';
+        finalContext.strokeStyle = textColor || '#ffffff';
 
         finalContext.lineWidth = cornerRadius;
         finalContext.textAlign = 'center';
@@ -991,7 +992,7 @@ export class Drawing {
 
         textX = finalCanvas.width/2;
         if (this.config.isVCard) {
-            textX = textX + moduleSize * 3;
+            textX = textX;
             textY = textY + moduleSize;
             logoX = logoX - moduleSize * 2;
             logoY = logoY + moduleSize * 2;

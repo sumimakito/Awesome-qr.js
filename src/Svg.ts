@@ -1566,6 +1566,7 @@ export class SVGDrawing {
         }
 
         const color = frameColor ? frameColor : '#000000';
+        const textColor = this.config.frameTextColor || '#ffffff';
         const moduleSize = this.config.moduleSize;
         const rawSize = this.config.rawSize;
         const size = rawSize + moduleSize * 2;
@@ -1701,7 +1702,7 @@ export class SVGDrawing {
         // canvas.fontface('Roboto', `url(https://beaconstacqa.mobstac.com/static/fonts/Roboto-Regular.ttf)`);
         if (this.config.isVCard) {
             // @ts-ignore
-            textX = canvas.width()/2 + 5.1 * moduleSize;
+            textX = canvas.width()/2;
             textY = textY + (moduleSize * 2.5)
         } else {
             // @ts-ignore
@@ -1711,7 +1712,7 @@ export class SVGDrawing {
         const fontSize = text.length > 15 ? this.config.size / 15 : this.config.size / 10;
         // @ts-ignore
         canvas.plain(text).move(textX, textY)
-            .font({ fill: '#fff', family: 'Roboto', size: fontSize, leading: 0, anchor: 'middle'}).attr({y: textY});
+            .font({ fill: textColor, family: 'Roboto', size: fontSize, leading: 0, anchor: 'middle'}).attr({y: textY});
 
         if (this.config.isVCard) {
             // @ts-ignore

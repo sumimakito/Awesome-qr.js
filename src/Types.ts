@@ -35,6 +35,7 @@ export interface QRCodeConfig {
     frameStyle?: QRCodeFrame;
     frameColor?: string;
     frameText?: string;
+    frameTextColor?: string;
     isVCard?: boolean;
     useCanvas?: boolean;
     useOpacity?: boolean;
@@ -79,6 +80,7 @@ export interface QRDrawingConfig {
     frameStyle?: QRCodeFrame;
     frameColor?: string;
     frameText?: string;
+    frameTextColor?: string;
     isVCard?: boolean;
     useCanvas?: boolean;
     useOpacity?: boolean;

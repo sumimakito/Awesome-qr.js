@@ -23,22 +23,25 @@ REV:2008-04-24T19:52:43Z
 END:VCARD`;
 
 const config = {
-    text: 'https://beaconstac.com',
+    text: vCardSampleData,
+    // text: "www.beaconstac.com",
     backgroundColor:'white',
     logoBackground: true,
     canvasType: CanvasType.SVG,
     dataPattern: DataPattern.KITE,
     dotScale: 1,
-    colorDark: "#6a5acd",
+    colorDark: "#290a5e",
     eyeBallShape: EyeBallShape.LEFT_DIAMOND,
     eyeFrameShape: EyeFrameShape.CIRCLE,
     frameStyle: QRCodeFrame.BOX_BOTTOM,
     frameText: "Abcdefghijklmnopqr",
-    frameColor: "#6a5acd",
+    frameColor: "#290a5e",
+    frameTextColor: "#b89fe3",
     gradientType: GradientType.NONE,
     logoScale: 1,
     size:1024,
-    margin: 80
+    margin: 80,
+    isVCard: true
 
 };
 
