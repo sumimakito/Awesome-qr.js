@@ -13,7 +13,7 @@ import {
     QRMode,
 } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
-import { isNode, loadImage } from './Util';
+import { isNode, loadImage, getFrameTextSize } from './Util';
 
 import { SVGDrawing } from './Svg';
 
@@ -978,6 +978,49 @@ export class Drawing {
                 this.drawSquare(padX + cornerRadius / 2, padY + cornerRadius / 2, finalContext, size - cornerRadius + moduleSize, padHeight - cornerRadius, true);
                 cornerRadius = moduleSize;
                 break;
+            case QRCodeFrame.TEXT_ONLY:
+                cornerRadius = moduleSize;
+                finalContext.lineJoin = 'round';
+                finalContext.lineWidth = cornerRadius;
+                borderX = cornerRadius / 2;
+                borderY = cornerRadius / 2;
+                padX = 0;
+                padY = 1.05 * size + cornerRadius / 2;
+                padHeight = size / 5;
+                textX = size / 2 + moduleSize;
+                textY = size * 1.17 + cornerRadius / 2 - moduleSize;
+                qrX = moduleSize + cornerRadius / 2;
+                qrY = moduleSize + cornerRadius / 2;
+                finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+                finalContext.fillRect(borderX + cornerRadius / 6, borderY + cornerRadius / 6, canvasWidth - 1.5 * cornerRadius, canvasWidth - 1.5 * cornerRadius);
+                finalContext.fillStyle = color;
+                finalContext.strokeStyle = color;
+                cornerRadius = moduleSize;
+                finalContext.lineWidth = cornerRadius;
+                cornerRadius = moduleSize;
+                break;
+            case QRCodeFrame.FOCUS:
+                cornerRadius = moduleSize;
+                finalContext.lineJoin = 'round';
+                finalContext.lineWidth = cornerRadius;
+                borderX = cornerRadius / 2;
+                borderY = cornerRadius / 2;
+                padX = 0;
+                padY = 1.05 * size + cornerRadius / 2;
+                padHeight = size / 5;
+                textX = size / 2 + moduleSize;
+                textY = size * 1.17 + cornerRadius / 2 - moduleSize;
+                qrX = moduleSize + cornerRadius / 2;
+                qrY = moduleSize + cornerRadius / 2;
+                finalContext.fillStyle = this.config.backgroundImage ? '#ffffff' : this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+                finalContext.fillRect(borderX + cornerRadius / 6, borderY + cornerRadius / 6, canvasWidth - 1.5 * cornerRadius, canvasWidth - 1.5 * cornerRadius);
+                finalContext.fillStyle = color;
+                finalContext.strokeStyle = color;
+                this.drawFocus(borderX, borderY, finalContext, size, size, false);
+                cornerRadius = moduleSize;
+                finalContext.lineWidth = cornerRadius;
+                cornerRadius = moduleSize;
+                break;
             default:
                 return canvas;
         }
@@ -987,7 +1030,12 @@ export class Drawing {
 
         finalContext.lineWidth = cornerRadius;
         finalContext.textAlign = 'center';
-        const fontSize = text.length > 15 ? this.config.size / 15 : this.config.size / 10;
+        const fontSize = getFrameTextSize(this.config.size, text.length);
+        if (frameStyle === QRCodeFrame.BALLOON_BOTTOM || frameStyle === QRCodeFrame.BOX_BOTTOM
+            || frameStyle === QRCodeFrame.BANNER_BOTTOM || frameStyle === QRCodeFrame.BANNER_TOP || frameStyle === QRCodeFrame.BOX_TOP
+            || frameStyle === QRCodeFrame.BALLOON_TOP) {
+            textY = textY - (text.length - 12);
+        }
         finalContext.font = `${fontSize}px "Roboto"`;
 
         textX = finalCanvas.width/2;
@@ -1241,6 +1289,33 @@ export class Drawing {
         context.fillRect(startX, startY, width, height);
         context.clearRect(startX + 1 * moduleSize, startY + 1 * moduleSize, width - 2 * moduleSize, height - 2 * moduleSize);
 
+    }
+
+    private drawFocus(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound: boolean) {
+        const moduleSize = this.config.moduleSize;
+        const r = startX + width;
+        const radius = moduleSize / 2;
+        const b = startY + height;
+        context.beginPath();
+        context.lineWidth = moduleSize / 1.5;
+        context.moveTo(startX + radius, startY);
+        context.lineTo((r - radius) / 3, startY);
+        context.moveTo(2 * (r - radius) / 3, startY);
+        context.lineTo(r - radius, startY);
+        context.quadraticCurveTo(r, startY, r, startY + radius);
+        context.lineTo(r, startY + (height - radius) / 3);
+        context.moveTo(r, startY + 2 * (height - radius) / 3);
+        context.lineTo(r, startY + height - radius);
+        context.quadraticCurveTo(r, b, r - radius, b);
+        context.lineTo(2 * (r - radius) / 3, b);
+        context.moveTo((r - radius) / 3, b);
+        context.lineTo(startX + radius, b);
+        context.quadraticCurveTo(startX, b, startX, b - radius);
+        context.lineTo(startX, startY + 2 * (height - radius) / 3);
+        context.moveTo(startX, startY + (height - radius) / 3);
+        context.lineTo(startX, startY + radius);
+        context.quadraticCurveTo(startX, startY, startX + radius, startY);
+        context.stroke();
     }
 
     private drawSquareFrame(startX: number, startY: number, context: CanvasRenderingContext2D, width: number, height: number, isRound: boolean) {

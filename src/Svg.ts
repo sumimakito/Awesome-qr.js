@@ -4,7 +4,7 @@ import { Canvas, CanvasGradient, CanvasPattern, CanvasRenderingContext2D, create
 import { CanvasUtil } from './Common';
 import { CanvasType,DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame } from './Enums';
 import { QRCodeConfig, QRDrawingConfig } from './Types';
-import { cellPhoneSVGPath, isNode, isSvgFile, loadImage } from './Util';
+import { cellPhoneSVGPath, isNode, isSvgFile, loadImage, getFrameTextSize } from './Util';
 const fetch = require("node-fetch");
 
 export class SVGDrawing {
@@ -146,6 +146,14 @@ export class SVGDrawing {
                 case QRCodeFrame.BOX_TOP:
                     this.shiftX = 1.5 * this.config.moduleSize;
                     this.shiftY = 2.5 * this.config.moduleSize + size / 5;
+                    break;
+                case QRCodeFrame.TEXT_ONLY:
+                    this.shiftX = 1.5 * this.config.moduleSize;
+                    this.shiftY = 1.5 * this.config.moduleSize;
+                    break;
+                case QRCodeFrame.FOCUS:
+                    this.shiftX = 1.5 * this.config.moduleSize;
+                    this.shiftY = 1.5 * this.config.moduleSize;
                     break;
                 default:
                     break;
@@ -1550,6 +1558,38 @@ export class SVGDrawing {
 
     }
 
+    private async drawFocus(startX: number, startY: number, canvas: object, gradient: string | undefined, width: number, height: number) {
+        const moduleSize = this.config.moduleSize;
+        const backgroundColor = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+        const radius = moduleSize;
+        // @ts-ignore
+        canvas.rect(width, height).fill(gradient ? gradient : '#000000').radius(radius).move(startX, startY);
+        // @ts-ignore
+        canvas.rect(width - 2 * moduleSize, height - 2 * moduleSize).fill(backgroundColor).radius(radius).move(startX + moduleSize, startY + moduleSize);
+        // @ts-ignore
+        canvas.line(0, 0, width/3, 0).move(startX + width/3, startY + moduleSize/2)
+        .stroke({ color: backgroundColor, width: 1.1*moduleSize, linecap: 'none' })
+        // @ts-ignore
+        canvas.line(0, 0, 0, width/3).move(startX + width - moduleSize/2, startY + height/3)
+        .stroke({ color: backgroundColor, width: 1.1*moduleSize, linecap: 'none' })
+        // @ts-ignore
+        canvas.line(0, 0, width/3, 0).move(startX + width/3, startY - moduleSize/2 + height)
+        .stroke({ color: backgroundColor, width: 1.1*moduleSize, linecap: 'none' })
+        // @ts-ignore
+        canvas.line(0, 0, 0, width/3).move(startX + moduleSize/2, startY + height/3)
+        .stroke({ color: backgroundColor, width: 1.1*moduleSize, linecap: 'none' })
+    }
+
+    private async drawTextOnlyBackground(startX: number, startY: number, canvas: object, gradient: string | undefined, width: number, height: number) {
+        const moduleSize = this.config.moduleSize;
+        const backgroundColor = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
+        const radius = moduleSize;
+        // @ts-ignore
+        canvas.rect(width, height).fill(backgroundColor).radius(radius).move(startX, startY);
+        // @ts-ignore
+        canvas.rect(width - 2 * moduleSize, height - 2 * moduleSize).fill(backgroundColor).radius(radius).move(startX + moduleSize, startY + moduleSize);
+    }
+
     private async drawSquareFrame(startX: number, startY: number, canvas: object, gradient: string | undefined, width: number, height: number) {
         const moduleSize = this.config.moduleSize;
         const backgroundColor = this.config.backgroundColor ? this.config.backgroundColor : '#ffffff';
@@ -1653,12 +1693,41 @@ export class SVGDrawing {
                 logoX = size / 3 - size / 9;
                 logoY = this.config.isVCard ? moduleSize * 3 : moduleSize * 2;
                 break;
+            case QRCodeFrame.TEXT_ONLY:
+                borderX = moduleSize / 2;
+                borderY = moduleSize / 2;
+                bannerX = moduleSize / 2;
+                bannerY = size + moduleSize * 1.5;
+                textX = size / 3;
+                textY = size + moduleSize * 2 + size / 10;
+                logoX = size / 3 - size / 9;
+                logoY = size + moduleSize * 3;
+                break;
+            case QRCodeFrame.FOCUS:
+                borderX = moduleSize / 2;
+                borderY = moduleSize / 2;
+                bannerX = moduleSize / 2;
+                bannerY = size + moduleSize * 1.5;
+                textX = size / 3;
+                textY = size + moduleSize * 2 + size / 10;
+                logoX = size / 3 - size / 9;
+                logoY = size + moduleSize * 3;
+                break;
             default:
                 break;
         }
 
-        if (frameStyle !== QRCodeFrame.BALLOON_TOP && frameStyle !== QRCodeFrame.BALLOON_BOTTOM) {
+        if (frameStyle !== QRCodeFrame.BALLOON_TOP && frameStyle !== QRCodeFrame.BALLOON_BOTTOM
+            && frameStyle !== QRCodeFrame.TEXT_ONLY && frameStyle !== QRCodeFrame.FOCUS) {
             this.drawSquareFrame(borderX, borderY, canvas, color, size, size);
+        }
+
+        if (frameStyle === QRCodeFrame.TEXT_ONLY) {
+            this.drawTextOnlyBackground(borderX, borderY, canvas, color, size, size)
+        }
+
+        if (frameStyle === QRCodeFrame.FOCUS) {
+            this.drawFocus(borderX, borderY, canvas, color, size, size)
         }
 
         if (frameStyle === QRCodeFrame.BALLOON_BOTTOM) {
@@ -1673,9 +1742,11 @@ export class SVGDrawing {
         }
 
         // Banner for frame text
-        // @ts-ignore
-        canvas.rect(size, size / 5).fill(color).radius(moduleSize)
+        if (frameStyle !== QRCodeFrame.TEXT_ONLY && frameStyle !== QRCodeFrame.FOCUS) {
+            // @ts-ignore
+            canvas.rect(size, size / 5).fill(color).radius(moduleSize)
             .move(bannerX, bannerY);
+        }
 
         if (frameStyle === QRCodeFrame.BANNER_BOTTOM) {
             // @ts-ignore
@@ -1709,7 +1780,14 @@ export class SVGDrawing {
             textX = canvas.width()/2;
         }
 
-        const fontSize = text.length > 15 ? this.config.size / 15 : this.config.size / 10;
+        const fontSize = getFrameTextSize(this.config.size, text.length);
+
+        if (frameStyle === QRCodeFrame.BALLOON_BOTTOM || frameStyle === QRCodeFrame.BOX_BOTTOM
+            || frameStyle === QRCodeFrame.BANNER_BOTTOM || frameStyle === QRCodeFrame.BANNER_TOP || frameStyle === QRCodeFrame.BOX_TOP
+            || frameStyle === QRCodeFrame.BALLOON_TOP) {
+            textY = textY - (text.length - 12);
+        }
+
         // @ts-ignore
         canvas.plain(text).move(textX, textY)
             .font({ fill: textColor, family: 'Roboto', size: fontSize, leading: 0, anchor: 'middle'}).attr({y: textY});
