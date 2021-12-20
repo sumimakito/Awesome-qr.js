@@ -572,7 +572,7 @@ const configCasePNG4 = {
     dotScale: 1,
     gradientType: GradientType.HORIZONTAL,
     frameColor: 'blue',
-    frameText: 'HEY QR frame text len greater than twelve',
+    frameText: 'HEY QR frame text len greater than thirty!',
     logoMargin: 20,
     logoScale: 0.25,
     margin: 80,

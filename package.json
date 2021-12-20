@@ -1,6 +1,6 @@
 {
     "name": "mobstac-awesome-qr",
-    "version": "3.0.8",
+    "version": "3.0.9",
     "description": "MobStac Awesome QR code library",
     "homepage": "https://github.com/mobstac/mobstac-awesome-qr",
     "bugs": "https://github.com/mobstac/mobstac-awesome-qr/issues",
@@ -8,6 +8,8 @@
     "types": "lib/index.d.ts",
     "scripts": {
         "test": "nyc mocha",
+        "testMain": "nyc mocha -g 'QR code main tests'",
+        "testFrame": "nyc mocha -g 'QR code frame tests'",
         "build": "tsc && webpack",
         "coverage": "nyc --reporter=text npm run test",
         "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
