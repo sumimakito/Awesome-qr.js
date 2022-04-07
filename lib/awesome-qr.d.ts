@@ -6,7 +6,7 @@ export declare type ComponentOptions = {
     data?: {
         /**
          * Scale factor for data/ECC dots.
-         * @default 0.4
+         * @default 1
          */
         scale?: number;
     };
@@ -16,7 +16,7 @@ export declare type ComponentOptions = {
     timing?: {
         /**
          * Scale factor for timing patterns.
-         * @default 0.5
+         * @default 1
          */
         scale?: number;
         /**
@@ -31,7 +31,7 @@ export declare type ComponentOptions = {
     alignment?: {
         /**
          * Scale factor for alignment patterns.
-         * @default 0.5
+         * @default 1
          */
         scale?: number;
         /**
@@ -46,7 +46,7 @@ export declare type ComponentOptions = {
     cornerAlignment?: {
         /**
          * Scale factor for alignment pattern on the bottom-right corner.
-         * @default 0.5
+         * @default 1
          */
         scale?: number;
         /**

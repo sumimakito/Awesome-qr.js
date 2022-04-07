@@ -1,23 +1,23 @@
-const assert = require("assert");
-const { AwesomeQR, QRErrorCorrectLevel } = require("../lib/index");
-const QrReader = require("qrcode-reader");
-const Jimp = require("jimp");
-const crypto = require("crypto");
+// Still working on this
+
+import { AwesomeQR, QRErrorCorrectLevel } from "../src/index";
+import Jimp from "jimp";
+import crypto from "crypto";
+import assert from "assert";
+import jsQR from "jsqr";
 
 describe("Common tests", () => {
   it("Should draw and decode QR code without errors", (done) => {
     (async () => {
       try {
         const expected = "Awesome-qr.js🧡";
-        const qr = new AwesomeQR({ text: expected });
-        const buf = await qr.draw();
+        const qr = new AwesomeQR({ text: expected, size: 400, margin: 10 });
+        const buf = (await qr.draw()) as Buffer;
         const image = await Jimp.read(buf);
-        const reader = new QrReader();
-        const decoded = await new Promise((resolve, reject) => {
-          reader.callback = (err, v) => (err != null ? reject(err) : resolve(v));
-          reader.decode(image.bitmap);
+        const decoded = jsQR(Uint8ClampedArray.from(image.bitmap.data), image.bitmap.width, image.bitmap.height, {
+          inversionAttempts: "attemptBoth",
         });
-        assert.strictEqual(expected, decoded.result);
+        assert.strictEqual(expected, decoded?.data);
         done();
       } catch (err) {
         if (err instanceof Error) {
@@ -28,6 +28,7 @@ describe("Common tests", () => {
       }
     })();
   });
+
   it("Should fail drawing QR code due to excessive data", (done) => {
     (async () => {
       try {
