@@ -61,6 +61,8 @@ export class SVGDrawing {
     private modules: Array<Array<boolean | null>>;
     private shiftX = 0;
     private shiftY = 0;
+    private widthSVG = 0;
+    private widthView = 0;
 
     private canvasQR: Canvas;
 
@@ -114,10 +116,24 @@ export class SVGDrawing {
                 canvasHeight = 1.25 * size;
             }
 
-            mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth, canvasHeight);
-
-            // @ts-ignore
-            mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff');
+            if(frameStyle === QRCodeFrame.CIRCULAR){
+                if(this.config.size >= 1024){
+                    this.widthSVG = 12;
+                    this.widthView = 15;
+                }
+                else{
+                    this.widthSVG = 38;
+                    this.widthView = 38;
+                }
+                mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth+this.widthSVG, canvasHeight);
+                // @ts-ignore
+                mainCanvas.viewbox(0, 0, canvasWidth+this.widthView, canvasHeight).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff');
+            }
+            else{
+                mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth, canvasHeight);
+                // @ts-ignore
+                mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff');
+            }
 
             switch (frameStyle) {
                 case QRCodeFrame.BALLOON_BOTTOM:
