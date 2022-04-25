@@ -116,20 +116,18 @@ export class SVGDrawing {
                 canvasHeight = 1.25 * size;
             }
 
-            if(frameStyle === QRCodeFrame.CIRCULAR){
-                if(this.config.size >= 1024){
+            if (frameStyle === QRCodeFrame.CIRCULAR) {
+                if(this.config.size >= 1024) {
                     this.widthSVG = 12;
                     this.widthView = 15;
-                }
-                else{
+                } else {
                     this.widthSVG = 38;
                     this.widthView = 38;
                 }
                 mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth+this.widthSVG, canvasHeight);
                 // @ts-ignore
                 mainCanvas.viewbox(0, 0, canvasWidth+this.widthView, canvasHeight).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff');
-            }
-            else{
+            } else {
                 mainCanvas = SVG(svgDocument.documentElement).size(canvasWidth, canvasHeight);
                 // @ts-ignore
                 mainCanvas.viewbox(0, 0, canvasWidth, canvasHeight).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff');
