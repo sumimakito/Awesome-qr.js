@@ -1,6 +1,6 @@
 {
     "name": "mobstac-awesome-qr",
-    "version": "3.0.9",
+    "version": "3.0.10",
     "description": "MobStac Awesome QR code library",
     "homepage": "https://github.com/mobstac/mobstac-awesome-qr",
     "bugs": "https://github.com/mobstac/mobstac-awesome-qr/issues",
@@ -17,7 +17,8 @@
         "prepare": "npm run build",
         "prepublishOnly": "npm test",
         "version": "npm run format && git add -A src",
-        "postversion": "git push && git push --tags"
+        "postversion": "git push && git push --tags",
+        "testCircular": "nyc mocha -g 'Circular QR code tests'"
     },
     "nyc": {
         "include": [
@@ -66,7 +67,7 @@
     "dependencies": {
         "@svgdotjs/svg.js": "3.0.16",
         "@types/node": "11.13.0",
-        "canvas": "2.5.0",
+        "canvas": "2.8.0",
         "node-fetch": "^2.6.1",
         "svgdom": "^0.1.8",
         "xmlhttprequest": "^1.8.0"
