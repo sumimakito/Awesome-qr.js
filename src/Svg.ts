@@ -545,6 +545,7 @@ export class SVGDrawing {
                         }
                         logoWidth = logoWidth * logoScale;
                         logoHeight = logoHeight * logoScale;
+                        logoMargin = this.config.viewportSize * logoMargin;
                         const coordinateX = 0.5 * (this.config.size - logoWidth);
                         const coordinateY =  0.5 * (this.config.size - logoHeight);
                         const centreCoordinateX = coordinateX - logoMargin - mainMargin;

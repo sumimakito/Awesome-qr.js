@@ -1149,6 +1149,7 @@ export class Drawing {
         }
         logoWidth = logoWidth  * logoScale;
         logoHeight = logoHeight * logoScale;
+        logoMargin = this.config.viewportSize * logoMargin;
         const mainMargin = this.config.margin;
         const coordinateX = 0.5 * (this.config.size - logoWidth);
         const coordinateY = 0.5 * (this.config.size - logoHeight);

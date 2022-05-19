@@ -57,6 +57,34 @@ export class QRCodeBuilder {
         }
 
 
+        //Limiting the logoMargin and logoScale
+                        
+        let tempLogoMargin = this.config.logoMargin;
+        let tempLogoScale = this.config.logoScale;
+        
+        if(tempLogoMargin > 0.12)
+            tempLogoMargin = 0.12;
+        if(tempLogoScale > 0.35)
+            tempLogoScale = 0.35
+
+
+        let maxAreaPossible = 0.35;
+        if(this.config.rectangular){
+            maxAreaPossible = 0.30;
+            tempLogoMargin = ( tempLogoMargin / 0.35 )  * 0.30
+            tempLogoScale = ( tempLogoScale / 0.35 )  * 0.30
+        }
+        
+        if( (( 2 * tempLogoMargin ) + tempLogoScale ) > maxAreaPossible){
+            let excessAreaCovered =  2 * tempLogoMargin + tempLogoScale - maxAreaPossible;
+            tempLogoScale -= excessAreaCovered;
+        }
+
+
+        this.config.logoMargin = tempLogoMargin;
+        this.config.logoScale = tempLogoScale;
+
+
         const qrCode: QRCode = new QRCode(-1, this.config);
 
         // for dashboard use only is block comment out else
