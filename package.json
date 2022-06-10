@@ -1,6 +1,6 @@
 {
   "name": "awesome-qr",
-  "version": "2.1.5-rc.0",
+  "version": "2.1.6-rc.1",
   "description": "An awesome but simple QR code generator written in JavaScript.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -39,7 +39,7 @@
     "tmp": "^0.2.1",
     "ts-loader": "^8.0.18",
     "ts-node": "^10.1.0",
-    "typescript": "^3.9.6",
+    "typescript": "^4.5.2",
     "webpack": "^5.27.2",
     "webpack-cli": "^4.5.0"
   }

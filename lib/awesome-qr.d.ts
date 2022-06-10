@@ -205,6 +205,7 @@ export declare type Options = {
      * @deafultValue 0.4
      */
     dotScale?: number;
+    file?: string;
 };
 export declare class AwesomeQR {
     private canvas;

@@ -12,15 +12,15 @@ declare class GIFEncoder {
     pixels: Uint8Array | null;
     indexedPixels: Uint8Array | null;
     colorDepth: number | null;
-    colorTab: any;
-    neuQuant: import("./TypedNeuQuant.js") | null;
+    colorTab: true | any[] | null;
+    neuQuant: NeuQuant | null;
     usedEntry: any[];
     palSize: number;
     dispose: number;
     firstFrame: boolean;
     sample: number;
     dither: boolean;
-    globalPalette: any;
+    globalPalette: boolean;
     out: ByteArray;
     setDelay(milliseconds: any): void;
     setFrameRate(fps: any): void;
@@ -49,6 +49,7 @@ declare class GIFEncoder {
     writePixels(): void;
     stream(): ByteArray;
 }
+import NeuQuant = require("./TypedNeuQuant.js");
 declare function ByteArray(): void;
 declare class ByteArray {
     page: number;
@@ -62,6 +63,6 @@ declare class ByteArray {
     writeBytes(array: any, offset: any, length: any): void;
 }
 declare namespace ByteArray {
-    export const pageSize: number;
-    export const charMap: {};
+    const pageSize: number;
+    const charMap: {};
 }
