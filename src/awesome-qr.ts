@@ -236,6 +236,8 @@ export type Options = {
    * @deafultValue 0.4
    */
   dotScale?: number;
+
+  file?: string;
 };
 
 export class AwesomeQR {
@@ -280,6 +282,7 @@ export class AwesomeQR {
     whiteMargin: true,
     components: AwesomeQR.defaultComponentOptions,
     autoColor: true,
+    file: "png",
   };
 
   constructor(options: Partial<Options>) {
@@ -470,6 +473,7 @@ export class AwesomeQR {
     const nCount = this.qrCode?.moduleCount!;
     const rawSize = this.options.size!;
     let rawMargin = this.options.margin!;
+    const file = this.options.file || 'png';
 
     if (rawMargin < 0 || rawMargin * 2 >= rawSize) {
       rawMargin = 0;
@@ -498,7 +502,6 @@ export class AwesomeQR {
 
     let parsedGIFBackground = null;
     let gifFrames: any[] = [];
-
     if (!!this.options.gifBackground) {
       const gif = parseGIF(this.options.gifBackground);
       parsedGIFBackground = gif;
@@ -851,12 +854,13 @@ export class AwesomeQR {
       outCanvasContext.drawImage(mainCanvas.getContext('2d').canvas, 0, 0, rawSize, rawSize);
       this.canvas = outCanvas;
 
-      const format = this.options.gifBackground ? "gif" : "png";
-
+      const format = this.options.gifBackground ? "gif" : file;
+      
       if (isElement(this.canvas)) {
+        // @ts-ignore
         return Promise.resolve(this.canvas.toDataURL(format));
       }
-
+      // @ts-ignore
       return Promise.resolve(this.canvas.toBuffer(format));
     }
   }

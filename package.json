@@ -1,6 +1,6 @@
 {
-  "name": "awesome-qr",
-  "version": "2.1.5-rc.0",
+  "name": "@activate-inc/awesome-qr",
+  "version": "2.2.0",
   "description": "An awesome but simple QR code generator written in JavaScript.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -9,21 +9,21 @@
     "build": "webpack --config webpack.config.js && tsc",
     "prepublishOnly": "webpack --config webpack.config.js && tsc"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SumiMakito/Awesome-qr.js.git"
-  },
   "keywords": [
     "qr",
     "qrcode",
     "barcode"
   ],
-  "author": "Makito <sumimakito@hotmail.com>",
+  "author": "activate.dev",
   "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/SumiMakito/Awesome-qr.js/issues"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Activate-Inc/Awesome-qr.js.git"
   },
-  "homepage": "https://github.com/SumiMakito/Awesome-qr.js#readme",
+  "bugs": {
+    "url": "https://github.com/Activate-Inc/Awesome-qr.js/issues"
+  },
+  "homepage": "https://github.com/Activate-Inc/Awesome-qr.js#readme",
   "dependencies": {
     "buffer": "^6.0.3",
     "js-binary-schema-parser": "^2.0.0",
@@ -39,7 +39,7 @@
     "tmp": "^0.2.1",
     "ts-loader": "^8.0.18",
     "ts-node": "^10.1.0",
-    "typescript": "^3.9.6",
+    "typescript": "^4.5.2",
     "webpack": "^5.27.2",
     "webpack-cli": "^4.5.0"
   }
