@@ -73,7 +73,7 @@ const { AwesomeQR } = require("awesome-qr");
 const fs = require("fs");
 
 // ...
-
+async function create(){
 const background = fs.readFileSync("background.png");
 
 const buffer = await new AwesomeQR({
@@ -83,6 +83,8 @@ const buffer = await new AwesomeQR({
 }).draw();
 
 fs.writeFileSync("qrcode.png", buffer);
+}
+create();
 ```
 
 ### Browsers
