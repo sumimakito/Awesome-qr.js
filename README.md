@@ -353,7 +353,7 @@ Corner radius of the logo image in pixels.
 
 Use [components](#components) to control the scaling in a more advanced way.
 
-> This option is yet to be removed. You can still use this option to control the scaling of the QR code parts in the lagacy way.
+> This option is yet to be removed. You can still use this option to control the scaling of the QR code parts in the legacy way.
 
 Ratio of the real size to the full size of the blocks.
 
