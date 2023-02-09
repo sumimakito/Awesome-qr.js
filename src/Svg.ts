@@ -99,6 +99,7 @@ export class SVGDrawing {
         }
     }
 
+    // Root function for  creating SVGs
     public async drawSVG(): Promise<any> {
         const frameStyle = this.config.frameStyle;
 
@@ -145,6 +146,7 @@ export class SVGDrawing {
                 
             }
 
+            // Change the value by which QR Code should be shifted for different frames
             switch (frameStyle) {
                 case QRCodeFrame.BALLOON_BOTTOM:
                     this.shiftX = 1.5 * this.config.moduleSize;
@@ -200,6 +202,16 @@ export class SVGDrawing {
         if(this.config.frameStyle === QRCodeFrame.CIRCULAR ){
             this.config.size = this.config.viewportSize;
         }
+
+        /* The Svg is drawn in layers 
+            - drawFrame() : used to draw frame (if any)
+            - drawAlignPatterns() : used to for plotting actual data dots of Qr Code
+            - drawPositionProtectors() : used for drawing area around eyes ( Not used in new version)
+            - drawAlignProtectoers() : Used for drawing alignment eyes
+            - drawPositionPatterns() : this function creates eyes
+            - drawLogoImage() : used for adding  logo , this handles different cases for different file types and size of logo
+            - addDesign() : This is explicitly for circular frames , above functions may not run for circular frames.
+        */
 
         return this.drawFrame(mainCanvas, this.config.frameStyle, this.config.frameColor, this.config.frameText)
             .then(() => {
