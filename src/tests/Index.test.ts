@@ -3,6 +3,7 @@ import 'mocha';
 import { CanvasType, DataPattern, EyeBallShape, EyeFrameShape, GradientType, QRCodeFrame, QRErrorCorrectLevel } from '../Enums';
 import { QRCodeBuilder } from '../index';
 import { QRCode } from '../Models';
+const sharp = require("sharp")
 
 // tslint:disable-next-line:no-var-requires
 const fs =  require('fs');
@@ -24,63 +25,44 @@ END:VCARD`;
 
 const config = {
     // text: vCardSampleData,
-    text: "www.beaconstac.com",
+    text: "https://qr.beaconstac.com/qwertyuioplkjhgfdsa",
     logoBackground: true,
+    backgroundColor: "rgba(255,255,255,0)",
     canvasType: CanvasType.SVG,
     dataPattern: DataPattern.SQUARE,
     dotScale: 1,
-    colorDark: "#13544A",
-    eyeBallShape: EyeBallShape.LEFT_DIAMOND,
-    eyeFrameShape: EyeFrameShape.CIRCLE,
-    frameStyle: QRCodeFrame.FOCUS,
-    frameText: "QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ",
-    frameColor: "#0E9E88",
-    frameTextColor: "#0E9E88",
-    gradientType: GradientType.NONE,
-    logoScale: 1,
-    size:512,
+    colorDark: "#000000",
+    colorLight : '#00FFFF',
+    eyeBallShape: EyeBallShape.SQUARE,
+    eyeFrameShape: EyeFrameShape.SQUARE,
+    eyeFrameColor : '#000000',
+    eyeBallColor : '#000000',
+    frameStyle: QRCodeFrame.CIRCULAR,
+    frameText: "SCAN ME",
+    frameColor: "#724DDB",
+    frameTextColor: "#FFFFFF",
+    gradientType: GradientType.HORIZONTAL,
+    logoScale: 0.24,
+    backgroundImage :'https://s3.amazonaws.com/beaconstac-content-qa/5118/890b88c1e2c2406cafa6f6eec5240287',
+    // logoImage : 'https://media.architecturaldigest.com/photos/57c7003fdc03716f7c8289dd/master/pass/IMG%20Worlds%20of%20Adventure%20-%201.jpg',
+    size: 1024,
     margin: 40,
-    // isVCard: true
+    correctLevel: QRErrorCorrectLevel.Q,
+    // isVCard : true
 
 };
 
-function prepareImageBuffer(qrCode: QRCode, name: string) {
-    const dataUrl = qrCode.canvas.toDataURL('image/png');
-    const matches: any = dataUrl.match(
-        /^data:([A-Za-z-+\/]+);base64,(.+)$/
-        ),
-        response: any  ={};
-    response.type = matches[1];
-    response.data = Buffer.from(matches[2], "base64");
-    const decodedImg = response;
-    const imageBuffer = decodedImg.data;
-    const extension ='png';
-    const fileName = `/${name}` + "." + extension;
-
-    return {
-        name: fileName,
-        buffer: imageBuffer
-    };
-
-}
 
 describe('QR code main tests', () => {
-    it('QR main test PNG', done => {
-        const qrCodeGenerator = new QRCodeBuilder(config);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, 'test');
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
     it('QR main test SVG', done => {
         const qrCodeGenerator = new QRCodeBuilder(config);
 
-        qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+        qrCodeGenerator.build(CanvasType.SVG).then(async qrCode => {
+            await fs.writeFileSync(__dirname + '/test.' + CanvasType.SVG.toLowerCase(), qrCode.svg);
+            let jpeg  = await sharp(__dirname + '/test.svg').toFile(__dirname + '/test.jpeg' );
+            // console.log(jpeg)
+            await sharp(__dirname + '/test.svg').toFile(__dirname + '/test.png' );
+            // console.log(jpeg)
             done();
         }).catch(err => {
             console.error(err);

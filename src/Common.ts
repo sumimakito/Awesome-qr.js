@@ -1,4 +1,4 @@
-import { CanvasRenderingContext2D, createCanvas, Image } from 'canvas';
+// import { CanvasRenderingContext2D, createCanvas, Image } from 'canvas';
 import * as constants from './Constants';
 import { QRMaskPattern, QRMode } from './Enums';
 import { QRCode, QRPolynomial } from './Models';
@@ -69,79 +69,6 @@ class _QRMath {
 export const QRMath = new _QRMath();
 
 export const CanvasUtil = {
-    getAverageRGB(image: Image, size: number) {
-        const blockSize = 5,
-            defaultRGB = {
-                r: 0,
-                g: 0,
-                b: 0,
-            },
-            canvas = createCanvas(size, size),
-            context = canvas.getContext('2d'),
-            rgb = {
-                r: 0,
-                g: 0,
-                b: 0,
-            };
-        let i = -4,
-            count = 0,
-            data,
-            width,
-            height,
-            length;
-        if (!context) {
-            return defaultRGB;
-        }
-
-        height = canvas.height = image.naturalHeight || image.height;
-        width = canvas.width = image.naturalWidth || image.width;
-        context.drawImage(image, 0, 0);
-
-        try {
-            data = context.getImageData(0, 0, width, height);
-        } catch (e) {
-            return defaultRGB;
-        }
-
-        length = data.data.length;
-
-        while ((i += blockSize * 4) < length) {
-            if (data.data[i] > 200 || data.data[i + 1] > 200 || data.data[i + 2] > 200) {
-                continue;
-            }
-            ++count;
-            rgb.r += data.data[i];
-            rgb.g += data.data[i + 1];
-            rgb.b += data.data[i + 2];
-        }
-
-        rgb.r = ~~(rgb.r / count);
-        rgb.g = ~~(rgb.g / count);
-        rgb.b = ~~(rgb.b / count);
-
-        return rgb;
-    },
-
-    prepareRoundedCornerClip(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.arcTo(x + w, y, x + w, y + h, r);
-        ctx.arcTo(x + w, y + h, x, y + h, r);
-        ctx.arcTo(x, y + h, x, y, r);
-        ctx.arcTo(x, y, x + w, y, r);
-        ctx.closePath();
-    },
-
-    drawAlignProtector(
-        context: CanvasRenderingContext2D,
-        centerX: number,
-        centerY: number,
-        nWidth: number,
-        nHeight: number,
-    ) {
-        context.clearRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
-        context.fillRect((centerX - 2) * nWidth, (centerY - 2) * nHeight, 5 * nWidth, 5 * nHeight);
-    },
 
     drawSVGAlignProtector(
         context: object,

@@ -9,7 +9,7 @@ const fs = require('fs');
 const svgLogo = 'https://d1bqobzsowu5wu.cloudfront.net/21660/bf7654bc97224acba11e9b4448f2671d';
 const pngLogo = 'https://d1bqobzsowu5wu.cloudfront.net/72074/bcda8a37fb954460a135195856af9d64';
 
-const logoURL = pngLogo;
+const logoURL = svgLogo;
 
 const rect1024 = {
     text: 'https://beaconstac.com',
@@ -139,25 +139,6 @@ const square4096 = {
     size:4096,
 };
 
-function prepareImageBuffer(qrCode: QRCode, name: string) {
-    const dataUrl = qrCode.canvas.toDataURL('image/png');
-    const matches: any = dataUrl.match(
-            /^data:([A-Za-z-+\/]+);base64,(.+)$/
-        ),
-        response: any  ={};
-    response.type = matches[1];
-    response.data = Buffer.from(matches[2], "base64");
-    const decodedImg = response;
-    const imageBuffer = decodedImg.data;
-    const extension ='png';
-    const fileName = `/logoTests/${name}` + "." + extension;
-
-    return {
-        name: fileName,
-        buffer: imageBuffer
-    };
-
-}
 
 describe('QR code Logo main test', () => {
     // logo tests for size: 1024
@@ -175,28 +156,6 @@ describe('QR code Logo main test', () => {
         const qrCodeGenerator = new QRCodeBuilder(square1024);
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
             fs.writeFileSync(__dirname + '/logoTests/square_1024.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Logo test PNG rectangular 1024', done => {
-        const qrCodeGenerator = new QRCodeBuilder(rect1024);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, '/rect_1024');
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Logo test PNG square 1024', done => {
-        const qrCodeGenerator = new QRCodeBuilder(square1024);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, '/square_1024');
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
             done();
         }).catch(err => {
             console.error(err);
@@ -224,28 +183,6 @@ describe('QR code Logo main test', () => {
             done();
         });
     });
-    it('Logo test PNG rectangular 512', done => {
-        const qrCodeGenerator = new QRCodeBuilder(rect512);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, '/rect_512');
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Logo test PNG square 512', done => {
-        const qrCodeGenerator = new QRCodeBuilder(square512);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, '/square_512');
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
     // logo tests for size: 2048
     it('Logo test SVG rectangular 2048', done => {
         const qrCodeGenerator = new QRCodeBuilder(rect2048);
@@ -267,28 +204,6 @@ describe('QR code Logo main test', () => {
             done();
         });
     });
-    it('Logo test PNG rectangular 2048', done => {
-        const qrCodeGenerator = new QRCodeBuilder(rect2048);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, '/rect_2048');
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Logo test PNG square 2048', done => {
-        const qrCodeGenerator = new QRCodeBuilder(square2048);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, '/square_2048');
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
     // logo tests for size: 4096
     it('Logo test SVG rectangular 4096', done => {
         const qrCodeGenerator = new QRCodeBuilder(rect4096);
@@ -304,28 +219,6 @@ describe('QR code Logo main test', () => {
         const qrCodeGenerator = new QRCodeBuilder(square4096);
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
             fs.writeFileSync(__dirname + '/logoTests/square_4096.' + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Logo test PNG rectangular 4096', done => {
-        const qrCodeGenerator = new QRCodeBuilder(rect4096);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, '/rect_4096');
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Logo test PNG square 4096', done => {
-        const qrCodeGenerator = new QRCodeBuilder(square4096);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, '/square_4096');
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
             done();
         }).catch(err => {
             console.error(err);

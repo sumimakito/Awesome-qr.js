@@ -339,25 +339,6 @@ const config_circle = [
     }
 ]
 
-function prepareImageBuffer(qrCode: QRCode, name: string) {
-    const dataUrl = qrCode.canvas.toDataURL('image/png');
-    const matches: any = dataUrl.match(
-        /^data:([A-Za-z-+\/]+);base64,(.+)$/
-        ),
-        response: any  ={};
-    response.type = matches[1];
-    response.data = Buffer.from(matches[2], "base64");
-    const decodedImg = response;
-    const imageBuffer = decodedImg.data;
-    const extension ='png';
-    const fileName = `/${name}` + "." + extension;
-
-    return {
-        name: fileName,
-        buffer: imageBuffer
-    };
-
-}
 
 describe('Circular QR code tests', () => {
     for(let i=0 ; i<config_circle.length ; i++){
@@ -366,7 +347,7 @@ describe('Circular QR code tests', () => {
 
             qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
                 let test = '/test' + i + '.';
-                fs.writeFileSync(__dirname + '/CircularQRTests' + test + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
+                fs.writeFileSync(__dirname + '/CircularQRTests' + test + CanvasType.SVG.toLowerCase(), qrCode.svg);
                 done();
             }).catch(err => {
                 console.error(err);
