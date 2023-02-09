@@ -11,11 +11,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2-beta
         with:
-          node-version: '14'
+          node-version: '16'
       - name: Install dependencies
         run: npm install
-      - name: Run unit tests
-        run: npm run test
       - name: Login to npm
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,6 +1,6 @@
 {
     "name": "mobstac-awesome-qr",
-    "version": "3.0.10",
+    "version": "3.1.0-beta.51",
     "description": "MobStac Awesome QR code library",
     "homepage": "https://github.com/mobstac/mobstac-awesome-qr",
     "bugs": "https://github.com/mobstac/mobstac-awesome-qr/issues",
@@ -18,7 +18,13 @@
         "prepublishOnly": "npm test",
         "version": "npm run format && git add -A src",
         "postversion": "git push && git push --tags",
-        "testCircular": "nyc mocha -g 'Circular QR code tests'"
+        "testCircular": "nyc mocha -g 'Circular QR code tests'",
+        "listVersions": "npm view mobstac-awesome-qr versions --json",
+        "testLogos": "nyc mocha -g 'QR Code Logo Test'",
+        "testEyes": "nyc mocha -g 'QR Code Eye Test'",
+        "testDataPattern": "nyc mocha -g 'QR Code Data Pattern test'",
+        "testBackground": "nyc mocha -g 'QR Code Background test'",
+        "testFrames": "nyc mocha -g 'QR Code Frame Test'"
     },
     "nyc": {
         "include": [
@@ -46,7 +52,7 @@
         "@types/chai": "4.1.7",
         "@types/mocha": "5.2.6",
         "chai": "4.2.0",
-        "file-loader": "^4.2.0",
+        "file-loader": "^4.3.0",
         "json-loader": "^0.5.7",
         "mocha": "^6.2.0",
         "nyc": "^14.1.1",
@@ -57,8 +63,10 @@
         "tslint": "5.14.0",
         "tslint-config-prettier": "1.18.0",
         "typescript": "3.4.3",
+        "url-loader": "^4.1.1",
         "webpack": "4.29.6",
-        "webpack-cli": "3.3.0"
+        "webpack-cli": "3.3.0",
+        "webpack-node-externals": "^3.0.0"
     },
     "files": [
         "lib/**/*",
@@ -67,9 +75,13 @@
     "dependencies": {
         "@svgdotjs/svg.js": "3.0.16",
         "@types/node": "11.13.0",
-        "canvas": "2.8.0",
-        "node-fetch": "^2.6.1",
-        "svgdom": "^0.1.8",
+        "filereader": "^0.10.3",
+        "node-fetch": "^2.6.7",
+        "probe-image-size": "^7.2.3",
+        "request": "^2.88.2",
+        "sharp": "^0.30.7",
+        "svg.colorat.js": "^1.0.0",
+        "svgdom": "^0.1.10",
         "xmlhttprequest": "^1.8.0"
     }
 }
