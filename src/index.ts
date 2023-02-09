@@ -34,7 +34,7 @@ export class QRCodeBuilder {
     }
 
     public async build(format?: CanvasType): Promise<QRCode | never> {
-        this.config.canvasType = format ? format : CanvasType.PNG;
+        this.config.canvasType = format ? format : CanvasType.SVG;
         if (!this.config.text) {
             return Promise.reject('Setting text is necessary to generate the QRCode');
         }
@@ -59,14 +59,8 @@ export class QRCodeBuilder {
 
         const qrCode: QRCode = new QRCode(-1, this.config);
 
-        // for dashboard use only is block comment out else
-        if (this.config.canvasType !== CanvasType.SVG || this.config.useCanvas) {
-            qrCode.canvas = await qrCode.drawing.draw();
-            return Promise.resolve(qrCode);
-        } else {
-            qrCode.svg = await qrCode.svgDrawing.drawSVG();
-            return Promise.resolve(qrCode);
-        }
+        qrCode.svg = await qrCode.svgDrawing.drawSVG();
+        return Promise.resolve(qrCode);
 
     }
 }

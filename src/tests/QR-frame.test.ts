@@ -83,42 +83,12 @@ const c_30 = {
     margin: 40/512*size
 };
 
-function prepareImageBuffer(qrCode: QRCode, name: string) {
-    const dataUrl = qrCode.canvas.toDataURL('image/png');
-    const matches: any = dataUrl.match(
-            /^data:([A-Za-z-+\/]+);base64,(.+)$/
-        ),
-        response: any  ={};
-    response.type = matches[1];
-    response.data = Buffer.from(matches[2], "base64");
-    const decodedImg = response;
-    const imageBuffer = decodedImg.data;
-    const extension ='png';
-    const fileName = `/frameTests/${name}` + "." + extension;
-
-    return {
-        name: fileName,
-        buffer: imageBuffer
-    };
-
-}
 
 describe('QR code frame tests', () => {
     it('Frame test SVG 12 characters', done => {
         const qrCodeGenerator = new QRCodeBuilder(c_12);
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_12.` + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Frame test PNG 12 characters', done => {
-        const qrCodeGenerator = new QRCodeBuilder(c_12);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, `${fileNameSuffix}_12`);
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
+            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_12.` + CanvasType.SVG.toLowerCase(), qrCode.svg);
             done();
         }).catch(err => {
             console.error(err);
@@ -128,18 +98,7 @@ describe('QR code frame tests', () => {
     it('Frame test SVG 16 characters', done => {
         const qrCodeGenerator = new QRCodeBuilder(c_16);
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_16.` + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Frame test PNG 16 characters', done => {
-        const qrCodeGenerator = new QRCodeBuilder(c_16);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, `${fileNameSuffix}_16`);
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
+            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_16.` + CanvasType.SVG.toLowerCase(), qrCode.svg);
             done();
         }).catch(err => {
             console.error(err);
@@ -149,18 +108,7 @@ describe('QR code frame tests', () => {
     it('Frame test SVG 20 characters', done => {
         const qrCodeGenerator = new QRCodeBuilder(c_20);
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_20.` + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Frame test PNG 20 characters', done => {
-        const qrCodeGenerator = new QRCodeBuilder(c_20);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, `${fileNameSuffix}_20`);
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
+            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_20.` + CanvasType.SVG.toLowerCase(), qrCode.svg);
             done();
         }).catch(err => {
             console.error(err);
@@ -170,18 +118,7 @@ describe('QR code frame tests', () => {
     it('Frame test SVG 24 characters', done => {
         const qrCodeGenerator = new QRCodeBuilder(c_24);
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_24.` + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Frame test PNG 24 characters', done => {
-        const qrCodeGenerator = new QRCodeBuilder(c_24);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, `${fileNameSuffix}_24`);
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
+            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_24.` + CanvasType.SVG.toLowerCase(), qrCode.svg);
             done();
         }).catch(err => {
             console.error(err);
@@ -191,18 +128,7 @@ describe('QR code frame tests', () => {
     it('Frame test SVG 27 characters', done => {
         const qrCodeGenerator = new QRCodeBuilder(c_27);
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_27.` + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Frame test PNG 27 characters', done => {
-        const qrCodeGenerator = new QRCodeBuilder(c_27);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, `${fileNameSuffix}_27`);
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
+            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_27.` + CanvasType.SVG.toLowerCase(), qrCode.svg);
             done();
         }).catch(err => {
             console.error(err);
@@ -212,18 +138,7 @@ describe('QR code frame tests', () => {
     it('Frame test SVG 30 characters', done => {
         const qrCodeGenerator = new QRCodeBuilder(c_30);
         qrCodeGenerator.build(CanvasType.SVG).then(qrCode => {
-            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_30.` + CanvasType.SVG.toLowerCase(), qrCode.toBuffer());
-            done();
-        }).catch(err => {
-            console.error(err);
-            done();
-        });
-    });
-    it('Frame test PNG 30 characters', done => {
-        const qrCodeGenerator = new QRCodeBuilder(c_30);
-        qrCodeGenerator.build(CanvasType.PNG).then(qrCode => {
-            const bufferObject = prepareImageBuffer(qrCode, `${fileNameSuffix}_30`);
-            fs.writeFileSync(__dirname + bufferObject.name, bufferObject.buffer);
+            fs.writeFileSync(__dirname + `/frameTests/${fileNameSuffix}_30.` + CanvasType.SVG.toLowerCase(), qrCode.svg);
             done();
         }).catch(err => {
             console.error(err);

@@ -1,5 +1,4 @@
 import { BCH, QRMath, Util, CanvasUtil } from '../Common';
-import { Image } from 'canvas';
 import { expect } from 'chai';
 import 'mocha';
 
@@ -59,16 +58,3 @@ describe('Util tests', () => {
     });
 });
 
-describe('CanvasUtil tests', () => {
-    it('getAverageRGB test', done => {
-        const image = new Image();
-        image.onload = () => {
-            expect(CanvasUtil.getAverageRGB(image, 100)).to.eql({ b: 4, g: 10, r: 16 });
-            return done();
-        };
-        image.onerror = err => {
-            return done(err);
-        };
-        image.src = __dirname + '/pokemon.png';
-    });
-});

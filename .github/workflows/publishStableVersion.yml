@@ -27,7 +27,7 @@ jobs:
         if: ${{ failure() }}
         shell: bash
         env:
-          CHANNEL: 'engineering'
+          CHANNEL: 'deployments'
           TITLE: 'workflow-failed'
           REPOSITORY_NAME: 'mobstac-awesome-qr'
           RUN_ID: ${{ github.run_id }}
