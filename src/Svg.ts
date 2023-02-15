@@ -801,7 +801,8 @@ export class SVGDrawing {
         const imageUrlData = await fetch(backgroundImage);
         const buffer = await imageUrlData.arrayBuffer();
         const stringifiedBuffer = Buffer.from(buffer).toString('base64');
-        const contentType = imageUrlData.headers.get('content-type');
+        let contentType = imageUrlData.headers.get('content-type');
+        contentType =  contentType.substring(contentType.indexOf('/') + 1);
         const imageBase64 = `data:${contentType};base64,${stringifiedBuffer}`;
         return imageBase64;
     }
