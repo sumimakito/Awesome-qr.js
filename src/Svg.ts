@@ -68,6 +68,10 @@ export class SVGDrawing {
     private shiftY = 0;
     private widthSVG = 0;
     private widthView = 0;
+    public calculatedLogoWidth = 0;
+    public calculatedLogoHeight = 0;
+    public logoCordinateX = 0;
+    public logoCordinateY = 0
 
 
     constructor(moduleCount: number, patternPosition: number[], config: QRCodeConfig, isDark: any, modules: Array<Array<boolean | null>>) {
@@ -201,6 +205,11 @@ export class SVGDrawing {
         
         if(this.config.frameStyle === QRCodeFrame.CIRCULAR ){
             this.config.size = this.config.viewportSize;
+        }
+
+        if(this.config.logoImage){
+            await this.setLogoDimensions() ;
+            this.calculateLogoDimensions() ;
         }
 
         /* The Svg is drawn in layers 
@@ -600,64 +609,11 @@ export class SVGDrawing {
     }
 
     private async loadLogo( context: any) {
-        if(this.config.logoImage && (!this.config.logoHeight || !this.config.logoWidth)){
-            await this.setLogoDimensions();
-        }
-        let logoScale = this.config.logoScale;
-        let logoMargin = this.config.logoMargin ;
-        let logoWidth =  this.config.size;
-        let logoHeight = this.config.size;
-        
-        if (logoScale <= 0 || logoScale >= 1) {
-            logoScale = 0.2;
-        }
-        if (logoMargin < 0) {
-            logoMargin = 0;
-        }
-        if(this.config.rectangular){
-            let maxLogoSide = 0.24 * this.config.size ; 
-            if(this.config.logoHeight && this.config.logoWidth){
-                logoHeight = this.config.logoHeight ;
-                logoWidth = this.config.logoWidth ;
-                if(this.config.logoHeight > maxLogoSide || this.config.logoWidth > maxLogoSide){
-                    if(this.config.logoHeight > this.config.logoWidth){ 
-                        let ratio = this.config.logoWidth / this.config.logoHeight;
-                        logoHeight = maxLogoSide;
-                        logoWidth = ratio * logoHeight;
-                    } else {
-                        let ratio = this.config.logoHeight / this.config.logoWidth;
-                        logoWidth = maxLogoSide;
-                        logoHeight = ratio * logoWidth;
-                    }
-                    logoHeight = logoHeight * ( logoScale / 0.24);
-                    logoWidth = logoWidth * ( logoScale / 0.24);
-                } else {
-                    logoWidth = logoWidth * ( logoScale / 0.24);
-                    logoHeight = logoHeight * ( logoScale / 0.24);
-                }
-            } else {
-                logoWidth = logoWidth * logoScale ;
-                logoHeight = logoHeight * logoScale ;
-            }
-        } else {
-            let maxLength : any = 0;
-            if(this.config.logoHeight || this.config.logoWidth){
-                const logoSideLength : number | undefined= this.config.logoHeight ? this.config.logoHeight : this.config.logoWidth ;
-                if(logoSideLength && logoSideLength > 0.24 * this.config.size){
-                    maxLength = 0.24 * this.config.size ;
-                } else {
-                    maxLength = logoSideLength ;
-                }
-            }
-            logoWidth = maxLength * (logoScale / 0.24);
-            logoHeight = maxLength * ( logoScale / 0.24 );
-        }
-        const coordinateX = this.shiftX +  0.5 * (this.config.size - logoWidth);
-        const coordinateY = this.shiftY + 0.5 * (this.config.size - logoHeight);
-        if(this.config.logoBackground) {
-            //@ts-ignore
-            context.rect( logoWidth + logoMargin  , logoHeight + logoMargin ).fill('#ffffff').attr({ x: coordinateX - 5 , y: coordinateY - 5 })
-        }
+        const logoWidth = this.calculatedLogoWidth ;
+        const logoHeight = this.calculatedLogoHeight ;
+        const coordinateX = this.logoCordinateX ;
+        const coordinateY = this.logoCordinateY ;
+        const logoMargin = this.config.logoMargin ;
         if(this.config.logoImage){
             return isSvgFile(this.config.logoImage).then( async (isSvg: any) => {
                     if (isSvg) {
@@ -873,7 +829,7 @@ export class SVGDrawing {
         }
     }
 
-    private drawAlignPatterns(context: object, gradient: string) {
+    private async drawAlignPatterns(context: object, gradient: string) {
         const moduleCount = this.moduleCount;
         const xyOffset = (1 - this.config.dotScale) * 0.5;
 
@@ -894,6 +850,14 @@ export class SVGDrawing {
 
                 const nLeft = col * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
                 const nTop = row * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
+
+                let _isDataDotBehindLogo = false;
+                if( this.config.logoBackground && this.config.logoImage ){
+                    _isDataDotBehindLogo = this.isDataDotBehindLogo(nLeft , nTop );
+                }
+                if(_isDataDotBehindLogo ){
+                    continue
+                }
 
                 if (patternPosition.length === 0) {
                     // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
@@ -2003,5 +1967,107 @@ export class SVGDrawing {
         this.config.rectangular = this.config.logoWidth !== this.config.logoHeight;
     }
 
+
+    isDataDotBehindLogo( dataDotLeftPosition : number, dataDotTopPosition :number ) {
+
+        const dotLength = this.config.moduleSize ;        
+
+        const logoXPosition = this.logoCordinateX - this.config.margin - 5;
+        const logoYPosition = this.logoCordinateY - this.config.margin - 5;
+
+        const logoXLength = this.calculatedLogoWidth + 10;
+        const logoYLength = this.calculatedLogoHeight + 10;
+        const dotXPosition = dataDotLeftPosition ;
+        const dotYPosition = dataDotTopPosition ;
+
+        if( dotXPosition >= logoXPosition && 
+            dotXPosition <= logoXPosition + logoXLength && 
+            dotYPosition >= logoYPosition && 
+            dotYPosition <= logoYPosition + logoYLength)
+            return true;
+
+        if( dotXPosition + dotLength >= logoXPosition && 
+            dotXPosition + dotLength <= logoXPosition + logoXLength && 
+            dotYPosition >= logoYPosition && 
+            dotYPosition <= logoYPosition + logoYLength)
+            return true;
+        
+        if( dotXPosition >= logoXPosition && 
+            dotXPosition <= logoXPosition + logoXLength && 
+            dotYPosition + dotLength >= logoYPosition && 
+            dotYPosition + dotLength <= logoYPosition + logoYLength)
+            return true;
+
+        if( dotXPosition + dotLength >= logoXPosition && 
+            dotXPosition + dotLength <= logoXPosition + logoXLength && 
+            dotYPosition + dotLength >= logoYPosition && 
+            dotYPosition + dotLength <= logoYPosition + logoYLength)
+            return true;
+    
+        return false ;
+        
+    }   
+
+
+    calculateLogoDimensions(){
+        let logoHeight = this.config.size ;
+        let logoWidth = this.config.size ;
+        let logoScale = this.config.logoScale ;
+        let logoMargin = this.config.logoMargin ;
+        
+        if (logoScale <= 0 || logoScale >= 1) {
+            logoScale = 0.2;
+        }
+        if ( logoMargin < 0) {
+            logoMargin = 0;
+        }
+
+        if(this.config.rectangular){
+            let maxLogoSide = 0.24 * this.config.size ; 
+            if(this.config.logoHeight && this.config.logoWidth){
+                logoHeight = this.config.logoHeight ;
+                logoWidth = this.config.logoWidth ;
+                if(this.config.logoHeight > maxLogoSide || this.config.logoWidth > maxLogoSide){
+                    if(this.config.logoHeight > this.config.logoWidth){ 
+                        let ratio = this.config.logoWidth / this.config.logoHeight;
+                        logoHeight = maxLogoSide;
+                        logoWidth = ratio * logoHeight;
+                    } else {
+                        let ratio = this.config.logoHeight / this.config.logoWidth;
+                        logoWidth = maxLogoSide;
+                        logoHeight = ratio * logoWidth;
+                    }
+                    logoHeight = logoHeight * ( logoScale / 0.24);
+                    logoWidth = logoWidth * ( logoScale / 0.24);
+                } else {
+                    logoWidth = logoWidth * ( logoScale / 0.24);
+                    logoHeight = logoHeight * ( logoScale / 0.24);
+                }
+            } else {
+                logoWidth = logoWidth * logoScale ;
+                logoHeight = logoHeight * logoScale ;
+            }
+        } else {
+            let maxLength : any = 0;
+            if(this.config.logoHeight || this.config.logoWidth){
+                const logoSideLength : number | undefined= this.config.logoHeight ? this.config.logoHeight : this.config.logoWidth ;
+                if(logoSideLength && logoSideLength > 0.24 * this.config.size){
+                    maxLength = 0.24 * this.config.size ;
+                } else {
+                    maxLength = logoSideLength ;
+                }
+            }
+            logoWidth = maxLength * (logoScale / 0.24);
+            logoHeight = maxLength * ( logoScale / 0.24 );
+        }
+
+        this.calculatedLogoWidth = logoWidth ;
+        this.calculatedLogoHeight = logoHeight ;
+        this.logoCordinateX = this.shiftX + 0.5 * (this.config.size - logoWidth);
+        this.logoCordinateY = this.shiftY + 0.5 * (this.config.size - logoHeight);   
+    }
+
 }
+
+
 
