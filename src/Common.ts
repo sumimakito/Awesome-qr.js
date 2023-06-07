@@ -3,6 +3,7 @@ import * as constants from './Constants';
 import { QRMaskPattern, QRMode } from './Enums';
 import { QRCode, QRPolynomial } from './Models';
 
+export const maxLogoScale = 0.27 ;
 export const BCH = {
     digit(data: number) {
         let digit = 0;
