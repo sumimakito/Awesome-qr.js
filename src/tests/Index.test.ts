@@ -25,7 +25,7 @@ END:VCARD`;
 
 const config = {
     // text: vCardSampleData,
-    text: "https://qr.beaconstac.com/qwertyuioplkjhgfdsa",
+    text: "https://qr.beaconstac.com/aditya",
     logoBackground: true,
     backgroundColor: "#ffffff",
     canvasType: CanvasType.SVG,
@@ -33,8 +33,8 @@ const config = {
     dotScale: 1,
     colorDark: "#000000",
     colorLight : '#00FFFF',
-    eyeBallShape: EyeBallShape.LEFT_LEAF,
-    eyeFrameShape: EyeFrameShape.ROUNDED,
+    eyeBallShape: EyeBallShape.SQUARE,
+    eyeFrameShape: EyeFrameShape.SQUARE,
     eyeFrameColor : '#000000',
     eyeBallColor : '#000000',
     frameStyle: QRCodeFrame.NONE,
@@ -42,12 +42,13 @@ const config = {
     frameColor: "#724DDB",
     frameTextColor: "#FFFFFF",
     gradientType: GradientType.NONE,
-    logoScale: 0.24,
+    logoScale: 0.3,
     // backgroundImage :'https://s3.amazonaws.com/beaconstac-content-qa/5118/890b88c1e2c2406cafa6f6eec5240287',
-    // logoImage : 'https://media.architecturaldigest.com/photos/57c7003fdc03716f7c8289dd/master/pass/IMG%20Worlds%20of%20Adventure%20-%201.jpg',
+    logoImage : 'https://images.freeimages.com/images/previews/ac9/railway-hdr-1361893.jpg',
     size: 1024,
     margin: 40,
     correctLevel: QRErrorCorrectLevel.Q,
+    logoMargin : 0,
     // isVCard : true
 
 };
