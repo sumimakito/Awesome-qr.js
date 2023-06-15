@@ -2048,12 +2048,13 @@ export class SVGDrawing {
         if( rectangular ){
 
             let logoAreaMaxSide = maxLogoScale * this.config.size ;
-            let ratio = logoHeight / logoWidth ;
 
             if( logoHeight > logoWidth ){
+                let ratio = logoWidth / logoHeight ;
                 logoAreaHeight = logoAreaMaxSide;
                 logoAreaWidth = logoAreaHeight * ratio ;
             } else {
+                let ratio = logoHeight / logoWidth ;
                 logoAreaWidth = logoAreaMaxSide ;
                 logoAreaHeight = logoAreaWidth * ratio ;
             }
@@ -2082,7 +2083,6 @@ export class SVGDrawing {
         this.logoCordinateY = this.shiftY + 0.5 * (this.config.size - logoHeight);  
         this.logoAreaCordinateX = this.shiftX + 0.5 * ( this.config.size - logoAreaWidth )
         this.logoAreaCordinateY = this.shiftY + 0.5 * ( this.config.size - logoAreaHeight );
-
     }
 
 }
