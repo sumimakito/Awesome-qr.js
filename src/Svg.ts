@@ -12,10 +12,8 @@ const probe = require('probe-image-size');
 
 
 export class SVGDrawing {
-
     private static generateDrawingConfig(config: QRCodeConfig, qrModuleCount: number): QRDrawingConfig {
         const dotScale = config.dotScale;
-
         if (dotScale <= 0 || dotScale > 1) {
             throw new Error('Scale should be in range (0, 1].');
         }
@@ -76,6 +74,8 @@ export class SVGDrawing {
     public logoAreaCordinateY = 0;
     public logoCordinateX = 0;
     public logoCordinateY = 0
+    public TwoDArray: any;
+    public isSmoothPattern: boolean = false;
 
 
     constructor(moduleCount: number, patternPosition: number[], config: QRCodeConfig, isDark: any, modules: Array<Array<boolean | null>>) {
@@ -110,7 +110,6 @@ export class SVGDrawing {
     // Root function for  creating SVGs
     public async drawSVG(): Promise<any> {
         const frameStyle = this.config.frameStyle;
-
         let mainCanvas: object;
         let canvasHeight: number;
         let canvasWidth: number;
@@ -216,12 +215,21 @@ export class SVGDrawing {
             this.calculateLogoDimensions() ;
         }
 
+        if( this.config.dataPattern === DataPattern.SMOOTH_ROUND || this.config.dataPattern === DataPattern.SMOOTH_SHARP ) {
+            const xyOffset = (1 - this.config.dotScale) * 0.5;
+            this.create2DArrayOfDots(this.moduleCount,xyOffset)
+            this.isSmoothPattern = true;
+        } 
+
+        if( this.config.dataPattern === DataPattern.THIN_SQUARE ){
+            this.config.dotScale = 0.75
+        }
+
         /* The Svg is drawn in layers 
             - drawFrame() : used to draw frame (if any)
             - drawAlignPatterns() : used to for plotting actual data dots of Qr Code
-            - drawPositionProtectors() : used for drawing area around eyes ( Not used in new version)
-            - drawAlignProtectoers() : Used for drawing alignment eyes
-            - drawPositionPatterns() : this function creates eyes
+            - drawAlignProtectoers() : Used for drawing alignment eyes 
+            - drawPositionPatterns() : this function creates eyes and time-line
             - drawLogoImage() : used for adding  logo , this handles different cases for different file types and size of logo
             - addDesign() : This is explicitly for circular frames , above functions may not run for circular frames.
         */
@@ -232,9 +240,6 @@ export class SVGDrawing {
             })
             .then(() => {
                 return this.drawAlignPatterns(mainCanvas, gradient); //TODO Check Plotting of dots for Qr Codes with frame
-            })
-            .then(() => {
-                return this.drawPositionProtectors(mainCanvas);
             })
             .then(() => {
                 return this.drawAlignProtectors(mainCanvas);
@@ -286,67 +291,144 @@ export class SVGDrawing {
 
     private async addDesignHelper(finalCanvas: object, canvas: object, gradient: string) {
         const size = this.config.size;
-        const color = this.config.backgroundColor?this.config.backgroundColor:'none' ;
-        const width = this.config.moduleSize;
-        const pos = Math.sqrt(2)*size/2 + this.config.moduleSize;
-        const radius = (size)/Math.sqrt(2) + this.config.moduleSize/2;
+        const pos = Math.sqrt(2) * size / 2 + this.config.moduleSize;
+        const radius = size / Math.sqrt(2) + this.config.moduleSize / 2;
 
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
-        const moduleSize = this.config.dotScale*this.config.moduleSize;
-        const increment  = this.config.nSize + (1-this.config.dotScale)*0.5*this.config.nSize;
-        const shift = (Math.sqrt(2)*size + 2*this.config.moduleSize-size) / 2 ;
-        const limit  = Math.sqrt(2)*size + 2*this.config.moduleSize;
+        const moduleSize = this.config.dotScale * this.config.moduleSize;
+        const increment  = this.config.nSize + ( 1 - this.config.dotScale ) * 0.5 * this.config.nSize;
+        const shift = ( Math.sqrt(2) * size + 2 * this.config.moduleSize - size) / 2 ;
+        const limit  = Math.sqrt(2) * size + 2 * this.config.moduleSize;
         const str = this.config.text;
         const len = str.length;
         let num = str.charCodeAt(0) + str.charCodeAt(len-1);
         const randomArray: any = [];
-        const margin = 0.3*moduleSize;
+        const margin = 0.3 * moduleSize;
+
+
         //Left Side Dots 
-        for(let r = shift - moduleSize - margin; r >=0 ; r -= increment) {
-            for(let c = 0 ; c < limit  ; c += increment) {
+        let leftSideDots : Array<Array<boolean | object>> = [];
+        for(let r = shift - moduleSize - margin, row = 0; r >=0 ; r -= increment, row++) {
+            leftSideDots[row] = []
+            for(let c = 0 , col = 0; c < limit  ; c += increment, col++) {
                 const i  = r ;
                 const j  = c ;
                 num = this.middleSquare(num*i+j);
                 if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
-                  randomArray.push({"i": i,"j": j});
+                    randomArray.push({"i": i,"j": j});
+                    leftSideDots[row][col] =  {"i": i,"j": j };
+                } else {
+                    leftSideDots[row][col] = false ;
                 }
             }
+            leftSideDots[row].reverse();
         }
-        num = str.charCodeAt(0) + str.charCodeAt(len-1);
+
+        let tempLeftArray : Array<Array<boolean | object>> = [];
+        for(let row = 0 ; row < leftSideDots[0].length ; row++ ){
+            tempLeftArray[row] = []
+            for( let col = 0 ; col < leftSideDots.length ; col++ ){
+                tempLeftArray[row][col] = leftSideDots[col][row]
+            }
+            tempLeftArray[row].reverse();
+        }
+        tempLeftArray.reverse()
+        leftSideDots = tempLeftArray;
+
+
+
         //Right Side Dots
-        for(let r = shift+ size + margin; r < limit ; r += increment) {
-            for(let c = 0 ; c < limit  ; c += increment) {
+        num = str.charCodeAt(0) + str.charCodeAt(len-1);
+        let rightSideDots : Array<Array<boolean | object>> = [];
+        for(let r = shift+ size + margin, row = 0; r < limit ; r += increment, row++) {
+            rightSideDots[row] = []
+            for(let c = 0, col = 0 ; c < limit  ; c += increment, col++ ) {
                 const i  = r ;
                 const j  = c ;
                 num = this.middleSquare(num*i+j);
                 if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
-                  randomArray.push({"i": i,"j": j});
+                    randomArray.push({"i": i,"j": j});
+                    rightSideDots[row][col] = {"i": i,"j": j}
+                } else {
+                    rightSideDots[row][col] = false
                 }
             }
         }
+        let tempRightArray : Array<Array<boolean | object>> = [];
+        for(let row = 0 ; row < rightSideDots[0].length ; row++ ){
+            tempRightArray[row] = []
+            for( let col = 0 ; col < rightSideDots.length ; col++ ){
+                tempRightArray[row][col] = rightSideDots[col][row]
+            }
+        }
+        rightSideDots = tempRightArray;
+
+
+
         //Down Side Dots
         num = str.charCodeAt(0) + str.charCodeAt(len-1);
-        for(let r = 0; r < limit ; r += increment) {
-            for(let c = shift + size + margin ; c < limit  ; c += increment) {
+        let downSideDots : Array<Array<boolean | object>> = []
+        for(let r = 0, row = 0; r < limit ; r += increment, row++ ) {
+            downSideDots[row] = []
+            for(let c = shift + size + margin, col = 0 ; c < limit  ; c += increment, col++) {
                 const i  = r ;
                 const j  = c ;
                 num = this.middleSquare(num*i+j);
                 if((num%2) === 0 && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
-                  randomArray.push({"i": i,"j": j});
+                    randomArray.push({"i": i,"j": j});
+                    downSideDots[row][col] = {"i": i,"j": j}
+                } else {
+                    downSideDots[row][col] = false;
                 }
             }
         }
+        let tempDownArray : Array<Array<boolean | object>> = [];
+        for(let row = 0 ; row < downSideDots[0].length ; row++ ){
+            tempDownArray[row] = []
+            for( let col = 0 ; col < downSideDots.length ; col++ ){
+                tempDownArray[row][col] = downSideDots[col][row]
+            }
+        }
+        downSideDots = tempDownArray;
+
+
+
         //Up side Dots
+        let upSideDots : Array<Array<boolean | object>> = []
         num = str.charCodeAt(0) + str.charCodeAt(len-1);
-        for(let r = 0; r < limit ; r += increment) {
-            for(let c = shift - moduleSize - margin; c >= 0  ; c -= increment) {
+        for(let r = 0, row = 0; r < limit ; r += increment, row++) {
+            upSideDots[row] = []
+            for(let c = shift - moduleSize - margin, col = 0; c >= 0  ; c -= increment, col++) {
                 const i  = r;
                 const j  = c ;
                 num = this.middleSquare(num*i+j);
                 if((num%2 === 1) && this.checkCircle(i,j,radius,pos) && this.checkCircle(i+moduleSize , j+moduleSize, radius, pos)) {
-                  randomArray.push({"i": i,"j": j});
+                    randomArray.push({"i": i,"j": j});
+                    upSideDots[row][col] = {"i": i,"j": j}
+                } else {
+                    upSideDots[row][col] = false;
                 }
             }
+            upSideDots[row].reverse()
+        }
+        let tempUpArray : Array<Array<boolean | object>> = [];
+        for(let row = 0 ; row < upSideDots[0].length ; row++ ){
+            tempUpArray[row] = []
+            for( let col = 0 ; col < upSideDots.length ; col++ ){
+                tempUpArray[row][col] = upSideDots[col][row]
+            }
+        }
+        upSideDots = tempUpArray;
+
+
+        if( this.isSmoothPattern ){
+            this.addCircularFrameOuterDots(leftSideDots, finalCanvas);
+            this.addCircularFrameOuterDots(rightSideDots, finalCanvas);
+            this.addCircularFrameOuterDots(downSideDots, finalCanvas);
+            this.addCircularFrameOuterDots(upSideDots, finalCanvas);
+            // @ts-ignore
+            finalCanvas.add(canvas.move(shift,shift));
+            return finalCanvas;
         }
 
         for(const values of Object.values(randomArray)) {
@@ -375,6 +457,10 @@ export class SVGDrawing {
                     // @ts-ignore
                     this.drawDiamond(i, j, finalCanvas, grad, moduleSize, moduleSize, true);
                     break;
+                case DataPattern.THIN_SQUARE:
+                    // @ts-ignore
+                    this.drawThinSquare(i, j, finalCanvas, grad, moduleSize, moduleSize);
+                    break;
                 default:
                     // @ts-ignore
                     this.drawSquare(i, j, finalCanvas, moduleSize, moduleSize, false, grad);
@@ -385,6 +471,33 @@ export class SVGDrawing {
         finalCanvas.add(canvas.move(shift,shift));
         return finalCanvas;
     }
+
+    addCircularFrameOuterDots(randomArray: any, canvas: object) {
+        this.TwoDArray = randomArray;
+        const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
+        // Add dots to canvas
+        for( let row = 0 ; row < randomArray.length ; row++ ){
+            for( let col = 0 ; col < randomArray[0].length ; col++ ){
+                if(this.TwoDArray[row][col]){
+
+                    const positionX = this.TwoDArray[row][col].i
+                    const positionY = this.TwoDArray[row][col].j
+
+                    let gradient = this.config.colorDark;
+                    if( this.config.gradientType !== GradientType.RADIAL )
+                        gradient = this.getColorFromQrSvg(positionX, positionY, true)
+                        
+                    if( dataPattern === DataPattern.SMOOTH_ROUND ){
+                        this.drawSmoothRound(positionX, positionY, canvas, gradient, this.config.moduleSize, this.config.moduleSize, row, col)
+                    } else {
+                        this.drawSmoothSharp(positionX, positionY, canvas, gradient, this.config.moduleSize, this.config.moduleSize, row, col)
+                    }   
+                }
+            }
+        }        
+    }
+
+
     private async addDesign(canvas: object,gradient: string): Promise<object> {
         if (this.config.frameStyle !== QRCodeFrame.CIRCULAR) {
             return canvas;
@@ -396,7 +509,7 @@ export class SVGDrawing {
         const svgDocument = svgWindow.document;
         const { SVG, registerWindow } = require('@svgdotjs/svg.js');
         const finalCanvas = SVG(svgDocument.documentElement).size(Math.sqrt(2)*size + 2*this.config.moduleSize, Math.sqrt(2)*size + 2*this.config.moduleSize);
-        const color = this.config.backgroundColor?this.config.backgroundColor:'none' ;
+        const color = this.config.backgroundColor ? this.config.backgroundColor : 'none' ;
         const width = this.config.moduleSize;
         // @ts-ignore
         let grad : any;
@@ -837,18 +950,17 @@ export class SVGDrawing {
         const xyOffset = (1 - this.config.dotScale) * 0.5;
 
         const dataPattern = this.config.dataPattern ? this.config.dataPattern : DataPattern.SQUARE;
-
         for (let row = 0; row < moduleCount; row++) {
             for (let col = 0; col < moduleCount; col++) {
-                const bIsDark = this.isDark.bind(this)(row, col) || false;
+                const bIsDark = this.isDark.bind(this)(row, col) || false; //  data dot is black or white ( should not be drawn )
 
-                const isBlkPosCtr = (col < 8 && (row < 8 || row >= moduleCount - 8)) || (col >= moduleCount - 8 && row < 8);
-                let bProtected = row === 6 || col === 6 || isBlkPosCtr;
+                const isBlkPosCtr = (col < 8 && (row < 8 || row >= moduleCount - 8)) || (col >= moduleCount - 8 && row < 8); // data dot is behind an eye
+                let bProtected =  (row === 6 || col === 6 || isBlkPosCtr )  // data dot is in timeline
 
                 const patternPosition = this.patternPosition;
                 for (let i = 0; i < patternPosition.length - 1; i++) {
                     bProtected = bProtected || (row >= patternPosition[i] - 2 && row <= patternPosition[i] + 2 && col >= patternPosition[i] - 2 && col <= patternPosition[i] + 2);
-                }
+                } // data dot is alignment eye
 
 
                 const nLeft = col * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
@@ -862,9 +974,8 @@ export class SVGDrawing {
                     continue
                 }
 
-                if (patternPosition.length === 0) {
-                    // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
-                    if (!bProtected) {
+                if(this.isSmoothPattern){
+                    if(this.TwoDArray[row][col]){
                         this.fillRectWithMask(
                             context,
                             nLeft,
@@ -873,20 +984,41 @@ export class SVGDrawing {
                             (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize,
                             bIsDark,
                             dataPattern,
+                            row,
+                            col
                         );
                     }
                 } else {
-                    const inAgnRange = col < moduleCount - 4 && col >= moduleCount - 4 - 5 && row < moduleCount - 4 && row >= moduleCount - 4 - 5;
-                    if (!bProtected && !inAgnRange) {
-                        this.fillRectWithMask(
-                            context,
-                            nLeft,
-                            nTop,
-                            (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize,
-                            (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize,
-                            bIsDark,
-                            dataPattern,
-                        );
+                    if (patternPosition.length === 0) {
+                        // if align pattern list is empty, then it means that we don't need to leave room for the align patterns
+                        if (!bProtected ) {
+                            this.fillRectWithMask(
+                                context,
+                                nLeft,
+                                nTop,
+                                (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize,
+                                (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize,
+                                bIsDark,
+                                dataPattern,
+                                row,
+                                col
+                            );
+                        }
+                    } else {
+                        let inAgnRange = col < moduleCount - 4 && col >= moduleCount - 4 - 5 && row < moduleCount - 4 && row >= moduleCount - 4 - 5; // data is major alignment eye
+                        if ((!bProtected && !inAgnRange ) ) {
+                            this.fillRectWithMask(
+                                context,
+                                nLeft,
+                                nTop,
+                                (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize,
+                                (bProtected ? (isBlkPosCtr ? 1 : 1) : this.config.dotScale) * this.config.nSize,
+                                bIsDark,
+                                dataPattern,
+                                row,
+                                col
+                            );
+                        }
                     }
                 }
             }
@@ -895,7 +1027,7 @@ export class SVGDrawing {
 
 
     //Function to create data dots in QR.
-    private async fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern) {
+    private async fillRectWithMask(canvas: object, x: number, y: number, w: number, h: number, bIsDark: boolean, shape: DataPattern,row : number, col : number) {
         let gradient ;
         
         
@@ -904,7 +1036,6 @@ export class SVGDrawing {
         if (!bIsDark) {
             return ;
         }
-
 
         if (!this.maskCanvas) {
             const color = bIsDark ? gradient : this.config.backgroundColor ? this.config.backgroundColor : this.config.useOpacity ? '#ffffff' : '#ffffff';
@@ -926,6 +1057,15 @@ export class SVGDrawing {
                 case DataPattern.KITE:
                     this.drawKite(x, y, canvas, color, w, h, false, !bIsDark);
                     break;
+                case DataPattern.THIN_SQUARE:
+                    this.drawThinSquare(x, y, canvas, color, w, h, false, !bIsDark);
+                    break;
+                case DataPattern.SMOOTH_ROUND:
+                    this.drawSmoothRound(x, y, canvas, color, w, h, row, col, false, !bIsDark);
+                    break;
+                case DataPattern.SMOOTH_SHARP:
+                    this.drawSmoothSharp(x, y, canvas, color, w, h, row, col, false, !bIsDark);
+                    break;
                 default:
                     this.drawSquare(x, y, canvas, w, h, false, color, !bIsDark);
                     break;
@@ -938,8 +1078,311 @@ export class SVGDrawing {
             this.drawSquare(x, y, canvas, w, h, false, color, !bIsDark);
         }
     }
+    drawSmoothSharp(startX: number, startY: number, context: object, gradient: string, width: number, height: number, row : number, col : number, isRound?: boolean, isMask?: boolean) {
+        let op = isMask ? 0.6 : 1;
+        if(this.config.frameStyle === QRCodeFrame.CIRCULAR && this.config.backgroundImage && isMask) {
+            op = 0.0;
+        }
+        let array = this.TwoDArray;
+        if(!array[row][col])
+            return;
+        
+        const maxWidth = this.TwoDArray[0].length;
+        const maxHeight = this.TwoDArray.length;
+        if(gradient.length > 7 ){
+            // @ts-ignore
+            gradient = context.gradient( 'linear',function(add){
+                add.stop(0 , gradient.split(" ")[0])
+                add.stop(1 , gradient.split(" ")[1])
+            }).transform( { rotate : this.config.gradientType === GradientType.VERTICAL ? 90 : 0});
+        } 
+
+        let outerBorderRadiusPath = ''
+        let size = this.config.moduleSize ;
+        let dotPath = `M 0 ${size / 4} `
+
+        // If checks when not to draw the curved path
+        //Top Left
+        if( 
+            ( row == 0 && !array[row][col-1] ) ||
+            ( col == 0 && !array[row - 1][col] ) ||
+            ( !array[row][col-1] && !array[row-1][col] )
+        )
+            dotPath += ` A ${size / 4} ${size / 4} 0 0 1 ${size / 4 } 0 L ${ size * 3 / 4} 0 `
+        else 
+            dotPath += ` L 0 0 L ${size / 4 } 0 L ${ size * 3 / 4} 0 `
+        
+        if( row !== 0 &&
+            col !== 0 &&
+            row !== maxHeight - 1 &&
+            col !== maxWidth -1 && 
+            array[row-1][col-1] &&
+            !( array[row-1][col] && array[row][col-1] ) 
+        )  {
+
+            if( array[row-1][col] ){
+                outerBorderRadiusPath = `M 0 0 L -${size / 4} 0 A ${size / 4} ${size / 4} 0 0 1 0 ${size/4} L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX - size / 4, startY + this.config.margin + this.shiftY).fill(gradient)
+            }
+            if( array[row][col-1] ){
+                outerBorderRadiusPath = `M 0 0 L 0 -${size / 4} A ${size / 4} ${size / 4} 0 0 0 ${size/4} 0 L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX , startY + this.config.margin + this.shiftY - size / 4).fill(gradient)
+            }
+            
+        }
+    
+        //Top Right
+        if( 
+            ( row === 0 && !array[row][col+1] ) ||
+            ( col === maxWidth - 1 && !array[row-1][col] ) ||
+            ( !array[row][col+1] && !array[row-1][col])
+        )
+            dotPath += ` A ${size / 4} ${size / 4} 0 0 1 ${size  } ${ size / 4} L ${size} ${size * 3 / 4} `
+        else 
+            dotPath += ` L ${size} 0 L ${size} ${size / 4} L ${size} ${size * 3 / 4} `
+
+        if( row !== 0 &&
+            col !== 0 &&
+            row !== maxHeight - 1 &&
+            col !== maxWidth -1 && 
+            array[row-1][col+1] &&
+            !( array[row-1][col] && array[row][col+1] ) 
+        ) {  
+            
+            if( array[row-1][col] ){
+                outerBorderRadiusPath = `M 0 0 L ${size / 4} 0 A ${size / 4} ${size / 4} 0 0 0 0 ${size / 4} L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX + size , startY + this.config.margin + this.shiftY).fill(gradient)    
+            }
+            if( array[row][col+1] ){
+                outerBorderRadiusPath = `M 0 0 L 0 -${size / 4} A ${size / 4} ${size / 4} 0 0 1 -${size / 4}  0 L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX + size * 3 / 4, startY + this.config.margin + this.shiftY - size / 4).fill(gradient)
+            }
+        }
+        
+        // Bottom Right
+        if( 
+            ( row === maxHeight - 1 && !array[row][col+1] ) ||
+            ( col === maxWidth - 1 && !array[row+1][col] ) ||
+            ( !array[row][col+1] && !array[row+1][col] )
+        )
+            dotPath += ` A ${size / 4} ${size / 4} 0 0 1 ${size * 3 / 4 } ${ size } L ${size / 4 } ${size} `
+        else 
+            dotPath += ` L ${size } ${size } L ${size * 3 / 4 } ${ size } L ${size / 4 } ${size} `
+        if( row !== 0 &&
+            col !== 0 &&
+            row !== maxHeight - 1 &&
+            col !== maxWidth -1 && 
+            array[row+1][col+1] &&
+            !( array[row+1][col] && array[row][col+1] ) 
+        ) {  
+            
+            if( array[row+1][col] ){
+                outerBorderRadiusPath = `M 0 0 L 0 -${size/4} A${size/4} ${size/4} 0 0 0 ${size/4} 0 L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX + size , startY + this.config.margin + this.shiftY + size * 3 / 4).fill(gradient)    
+            }
+            if( array[row][col+1] ){
+                outerBorderRadiusPath = `M 0 0 L -${size / 4} 0 A ${size / 4} ${size / 4} 0 0 1 0 ${size / 4}   L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX + size * 3 / 4 , startY + this.config.margin + this.shiftY + size).fill(gradient)
+            }
+        }
+    
+        // Bottom Left
+        if( 
+            ( row === maxHeight - 1 && !array[row][col-1] ) ||
+            ( col === 0 && !array[row+1][col] ) ||
+            ( !array[row][col-1] && !array[row+1][col] )
+        )
+            dotPath += ` A ${size / 4} ${size / 4} 0 0 1 0 ${ size * 3 / 4 } L 0 ${size / 4} `
+        else 
+            dotPath += ` L ${0 } ${size } L ${0 } ${ size * 3 / 4 } L ${0 } ${size/4} `
+        
+        if( row !== 0 &&
+            col !== 0 &&
+            row !== maxHeight - 1 &&
+            col !== maxWidth -1 && 
+            array[row+1][col-1] &&
+            !( array[row+1][col] && array[row][col-1] ) 
+        ) {  
+            
+            if( array[row+1][col] ){
+                outerBorderRadiusPath = `M 0 0 L  -${size/4} 0  A${size/4} ${size/4} 0 0 0 0 -${size/4}  L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX - size / 4, startY + this.config.margin + this.shiftY + size * 3 / 4).fill(gradient)    
+            }
+            if( array[row][col-1] ){
+                outerBorderRadiusPath = `M 0 0 L ${size / 4} 0 A ${size / 4} ${size / 4} 0 0 0 0 ${size / 4}   L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX  , startY + this.config.margin + this.shiftY + size).fill(gradient)
+            }
+        }
+
+        // @ts-ignore
+        context.path(dotPath).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).attr( { 'data-pos' : `${row} ${col}`})
+
+    }
+    drawSmoothRound(startX: number, startY: number, context: object, gradient: string, width: number, height: number, row : number, col : number, isRound?: boolean, isMask?: boolean) {
+        let op = isMask ? 0.6 : 1;
+        if(this.config.frameStyle === QRCodeFrame.CIRCULAR && this.config.backgroundImage && isMask) {
+            op = 0.0;
+        }
+        let array = this.TwoDArray;
+        if(!array[row][col])
+            return;
+
+        const maxWidth = this.TwoDArray[0].length ;
+        const maxHeight = this.TwoDArray.length ;
+        if(gradient.length > 7 ){
+            // @ts-ignore
+            gradient = context.gradient( 'linear',function(add){
+                add.stop(0 , gradient.split(" ")[0])
+                add.stop(1 , gradient.split(" ")[1])
+            }).transform( { rotate : this.config.gradientType === GradientType.VERTICAL ? 90 : 0});
+        } 
+        let outerBorderRadiusPath = ''
+
+
+        let size = this.config.moduleSize ;
+        let dotPath = `M 0 ${size * 3 / 7} `
+
+        // If checks when not to draw the curved path
+        //Top Left
+        if( 
+            ( row == 0 && !array[row][col-1] ) ||
+            ( col == 0 && !array[row - 1][col] ) ||
+            ( !array[row][col-1] && !array[row-1][col] )
+        ){
+            dotPath += ` A ${size * 3 / 7 } ${size * 3 / 7} 0 0 1 ${ size * 3 / 7 } 0 L ${ size * 4 / 7} 0 `
+        } else {
+            dotPath += ` L 0 0 L ${size * 3 / 7 } 0 L ${ size * 4 / 7} 0 `
+        }
+
+        if( row !== 0 &&
+            col !== 0 &&
+            row !== maxHeight - 1 &&
+            col !== maxWidth -1 && 
+            array[row-1][col-1] &&
+            !( array[row-1][col] && array[row][col-1] ) 
+        )  {
+
+            if( array[row-1][col] ){
+                outerBorderRadiusPath = `M 0 0 L -${size * 3 / 7} 0 A ${size * 3 / 7} ${size * 3 / 7} 0 0 1 0 ${ size * 3 / 7} L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX - size * 3 / 7, startY + this.config.margin + this.shiftY).fill(gradient)
+            }
+            if( array[row][col-1] ){
+                outerBorderRadiusPath = `M 0 0 L 0 -${size * 3 / 7} A ${size * 3 / 7} ${size * 3 / 7} 0 0 0 ${size * 3 / 7} 0 L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX , startY + this.config.margin + this.shiftY - size * 3 / 7).fill(gradient)
+            }
+            
+        }
+
+    
+        //Top Right
+        if( 
+            ( row === 0 && !array[row][col+1] ) ||
+            ( col === maxWidth - 1 && !array[row-1][col] ) ||
+            ( !array[row][col+1] && !array[row-1][col])
+        )
+            dotPath += ` A ${size * 3 / 7} ${size * 3 / 7} 0 0 1 ${size } ${ size * 3 / 7} L ${size} ${size * 4 / 7} `
+        else 
+            dotPath += ` L ${size} 0 L ${size} ${size * 3 / 7} L ${size} ${size * 4 / 7} `
+
+        if( row !== 0 &&
+            col !== 0 &&
+            row !== maxHeight - 1 &&
+            col !== maxWidth - 1 && 
+            array[row-1][col+1] &&
+            !( array[row-1][col] && array[row][col+1] ) 
+        ) {  
+            
+            if( array[row-1][col] ){
+                outerBorderRadiusPath = `M 0 0 L ${size * 3 / 7} 0 A ${size * 3 / 7} ${size * 3 / 7} 0 0 0 0 ${size * 3/ 7} L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX + size , startY + this.config.margin + this.shiftY).fill(gradient)    
+            }
+            if( array[row][col+1] ){
+                outerBorderRadiusPath = `M 0 0 L 0 -${size * 3 / 7} A ${size * 3 / 7} ${size * 3 / 7} 0 0 1 -${size * 3 / 7}  0 L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX + size * 4 / 7, startY + this.config.margin + this.shiftY - size * 3 / 7).fill(gradient)
+            }
+        }
+    
+        
+        // Bottom Right
+        if( 
+            ( row === maxHeight - 1 && !array[row][col+1] ) ||
+            ( col === maxWidth - 1 && !array[row+1][col] ) ||
+            ( !array[row][col+1] && !array[row+1][col] )
+        )
+            dotPath += ` A ${size * 3 / 7} ${size * 3 / 7} 0 0 1 ${size * 4 / 7 } ${ size } L ${size * 3 / 7 } ${size} `
+        else 
+            dotPath += ` L ${size } ${size } L ${size * 4 / 7 } ${ size } L ${size * 3 / 7 } ${size} `
+
+        if( row !== 0 &&
+            col !== 0 &&
+            row !== maxHeight - 1 &&
+            col !== maxWidth -1 && 
+            array[row+1][col+1] &&
+            !( array[row+1][col] && array[row][col+1] ) 
+        ) {  
+            
+            if( array[row+1][col] ){
+                outerBorderRadiusPath = `M 0 0 L 0 -${size * 3 / 7 } A${size * 3 / 7} ${size * 3 / 7} 0 0 0 ${size * 3 / 7} 0 L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX + size , startY + this.config.margin + this.shiftY + size * 4 / 7).fill(gradient)    
+            }
+            if( array[row][col+1] ){
+                outerBorderRadiusPath = `M 0 0 L -${size * 3 / 7} 0 A ${size * 3 / 7} ${size * 3 / 7} 0 0 1 0 ${size * 3 / 7}   L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX + size * 4 / 7 , startY + this.config.margin + this.shiftY + size).fill(gradient)
+            }
+        }
+        
+
+        // Bottom Left
+        if( 
+            ( row === maxHeight -1 && !array[row][col-1] ) ||
+            ( col === 0 && !array[row+1][col] ) ||
+            ( !array[row][col-1] && !array[row+1][col] )
+        )
+            dotPath += ` A ${size * 3 / 7} ${size * 3 / 7} 0 0 1 0 ${ size * 4 / 7 } L 0 ${size * 3 / 7} `
+        else 
+            dotPath += ` L ${0 } ${size } L ${0 } ${ size * 4 / 7 } L ${0 } ${size * 3 / 7} `
+
+        if( row !== 0 &&
+            col !== 0 &&
+            row !== maxHeight - 1 &&
+            col !== maxWidth -1 && 
+            array[row+1][col-1] &&
+            !( array[row+1][col] && array[row][col-1] ) 
+        ) {  
+            
+            if( array[row+1][col] ){
+                outerBorderRadiusPath = `M 0 0 L  -${size * 3 / 7} 0  A${ size * 3 / 7} ${size * 3 / 7} 0 0 0 0 -${size * 3 / 7}  L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX - size * 3 / 7, startY + this.config.margin + this.shiftY + size * 4 / 7).fill(gradient)    
+            }
+            if( array[row][col-1] ){
+                outerBorderRadiusPath = `M 0 0 L ${size * 3 / 7} 0 A ${size * 3 / 7} ${size * 3 / 7} 0 0 0 0 ${size * 3 / 7}   L 0 0`
+                // @ts-ignore
+                context.path(outerBorderRadiusPath).move(startX + this.config.margin + this.shiftX  , startY + this.config.margin + this.shiftY + size).fill(gradient)
+            }
+        }
+        // @ts-ignore
+        context.path(dotPath).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).attr( { 'data-pos' : `${row} ${col}`})
+    }
 
     private drawAlignProtectors(context: object , disable : boolean = true) {
+
+        if(this.isSmoothPattern)
+            return;
         if(disable){
             return ;
         }
@@ -967,51 +1410,6 @@ export class SVGDrawing {
         }
     }
 
-    private drawPositionProtectors(context: object) {
-        return ;
-        let color = this.config.backgroundColor ? this.config.backgroundColor : this.config.useOpacity ? '#ffffff' : '#ffffff99';
-        // const color = '#0E9E88';
-        const size = this.config.moduleSize;
-        const moduleCount = this.moduleCount;
-
-        // h${width - moduleSize}
-        // v${height - moduleSize}
-        // h-${width - moduleSize}
-        // v-${height - moduleSize}`)
-
-        // if (!this.config.backgroundImage) {
-        //     console.log("return because of bkgImg")
-        //     return ;
-        // }
-        let opacityD = 0.6;
-        if (this.config.backgroundImage && this.config.frameStyle === QRCodeFrame.CIRCULAR) {
-            opacityD = 0.0;
-        }
-        if (this.config.useOpacity) {
-            // @ts-ignore
-            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY).attr({opacity: opacityD});
-            // @ts-ignore
-            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY).attr({opacity: opacityD});
-            // @ts-ignore
-            context.rect(8 * size, 8 * size).fill(color).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY).attr({opacity: opacityD});
-            // @ts-ignore
-            context.rect((moduleCount - 8 - 8) * size, size).fill(color).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY).attr({opacity: opacityD});
-            // @ts-ignore
-            context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY).attr({opacity: opacityD});
-        } else {
-            // @ts-ignore
-            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
-            // @ts-ignore
-            context.rect(8 * size, 8 * size).fill(color).move(0 + this.config.margin + this.shiftX, (moduleCount - 8) * size + this.config.margin + this.shiftY);
-            // @ts-ignore
-            context.rect(8 * size, 8 * size).fill(color).move((moduleCount - 8) * size + this.config.margin + this.shiftX, 0 + this.config.margin + this.shiftY);
-            // @ts-ignore
-            context.rect((moduleCount - 8 - 8) * size, size).fill(color).move(8 * size + this.config.margin + this.shiftX, 6 * size + this.config.margin + this.shiftY);
-            // @ts-ignore
-            context.rect(size, (moduleCount - 8 - 8) * size).fill(color).move(6 * size + this.config.margin + this.shiftX, 8 * size + this.config.margin + this.shiftY);
-        }
-    }
-
     private async drawPositionPatterns(context: object, gradient: string ) {
 
         const moduleSize = this.config.moduleSize;
@@ -1027,40 +1425,53 @@ export class SVGDrawing {
 
 
         // For drawing timeline
-        for (let i = 0; i < moduleCount - 15; i += 2) {
-
-            switch (dataPattern) {
-                case DataPattern.CIRCLE:
-                    const radius = moduleSize / 2;
-                    gradient = this.getColorFromQrSvg((8 + i) * moduleSize + radius, 6 * moduleSize + radius);
-                    this.drawCircle((8 + i) * moduleSize + radius, 6 * moduleSize + radius, context, gradient, radius, radius, false);
-                    gradient = this.getColorFromQrSvg( 6 * moduleSize + radius, (8 + i) * moduleSize + radius);
-                    this.drawCircle(6 * moduleSize + radius, (8 + i) * moduleSize + radius, context, gradient, radius, radius, false);
-                    break;
-                case DataPattern.KITE:
-                    gradient = this.getColorFromQrSvg((8 + i) * moduleSize, 6 * moduleSize);
-                    this.drawKite((8 + i) * moduleSize, 6 * moduleSize, context, gradient, moduleSize, moduleSize, false);
-                    gradient = this.getColorFromQrSvg( 6 * moduleSize, (8 + i) * moduleSize);
-                    this.drawKite(6 * moduleSize, (8 + i) * moduleSize, context, gradient, moduleSize, moduleSize, false);
-                    break;
-                case DataPattern.LEFT_DIAMOND:
-                    gradient = this.getColorFromQrSvg( (8 + i) * moduleSize, 6 * moduleSize);
-                    this.drawDiamond((8 + i) * moduleSize, 6 * moduleSize, context, gradient, moduleSize, moduleSize, false);
-                    gradient = this.getColorFromQrSvg( 6 * moduleSize, (8 + i) * moduleSize);
-                    this.drawDiamond(6 * moduleSize, (8 + i) * moduleSize, context, gradient, moduleSize, moduleSize, false);
-                    break;
-                case DataPattern.RIGHT_DIAMOND:
-                    gradient = this.getColorFromQrSvg( (8 + i) * moduleSize, 6 * moduleSize);
-                    this.drawDiamond((8 + i) * moduleSize, 6 * moduleSize, context, gradient, moduleSize, moduleSize, true);
-                    gradient = this.getColorFromQrSvg( 6 * moduleSize, (8 + i) * moduleSize);
-                    this.drawDiamond(6 * moduleSize, (8 + i) * moduleSize, context, gradient, moduleSize, moduleSize, true);
-                    break;
-                default:
-                    gradient = this.getColorFromQrSvg( (8 + i) * moduleSize, 6 * moduleSize);
-                    this.drawSquare((8 + i) * moduleSize, 6 * moduleSize, context, moduleSize, moduleSize, false, gradient);
-                    gradient = this.getColorFromQrSvg( 6 * moduleSize, (8 + i) * moduleSize);
-                    this.drawSquare(6 * moduleSize, (8 + i) * moduleSize, context, moduleSize, moduleSize, false, gradient);
-
+        if(!this.isSmoothPattern){
+            for (let i = 0; i < moduleCount - 15; i += 2) {
+                const dotSize = moduleSize * this.config.dotScale;
+                const sizeDifferenceAfterDotScale = moduleSize - dotSize;
+                let leftTimelineX = 6 * moduleSize + sizeDifferenceAfterDotScale / 2 ;
+                let leftTimelineY = (8 + i) * moduleSize + sizeDifferenceAfterDotScale / 2 ;
+                let topTimelineX = (8 + i) * moduleSize + sizeDifferenceAfterDotScale / 2;
+                let topTimelineY = 6 * moduleSize + sizeDifferenceAfterDotScale / 2;
+                switch (dataPattern) {
+                    case DataPattern.CIRCLE:
+                        const radius = dotSize / 2;
+                        gradient = this.getColorFromQrSvg(topTimelineX + radius, topTimelineY + radius);
+                        this.drawCircle(topTimelineX + radius, topTimelineY + radius, context, gradient, radius, radius, false);
+                        gradient = this.getColorFromQrSvg( leftTimelineX + radius, leftTimelineY + radius);
+                        this.drawCircle(leftTimelineX + radius, leftTimelineY + radius, context, gradient, radius, radius, false);
+                        break;
+                    case DataPattern.KITE:
+                        gradient = this.getColorFromQrSvg(topTimelineX, topTimelineY);
+                        this.drawKite(topTimelineX, topTimelineY, context, gradient, dotSize, dotSize, false);
+                        gradient = this.getColorFromQrSvg( leftTimelineX, leftTimelineY);
+                        this.drawKite(leftTimelineX, leftTimelineY, context, gradient, dotSize, dotSize, false);
+                        break;
+                    case DataPattern.LEFT_DIAMOND:
+                        gradient = this.getColorFromQrSvg( topTimelineX, topTimelineY);
+                        this.drawDiamond(topTimelineX, topTimelineY, context, gradient, dotSize, dotSize, false);
+                        gradient = this.getColorFromQrSvg( leftTimelineX, leftTimelineY);
+                        this.drawDiamond(leftTimelineX, leftTimelineY, context, gradient, dotSize, dotSize, false);
+                        break;
+                    case DataPattern.RIGHT_DIAMOND:
+                        gradient = this.getColorFromQrSvg( topTimelineX, topTimelineY);
+                        this.drawDiamond(topTimelineX, topTimelineY, context, gradient, dotSize, dotSize, true);
+                        gradient = this.getColorFromQrSvg( leftTimelineX, leftTimelineY);
+                        this.drawDiamond(leftTimelineX, leftTimelineY, context, gradient, dotSize, dotSize, true);
+                        break;
+                    case DataPattern.THIN_SQUARE:
+                        gradient = this.getColorFromQrSvg(topTimelineX, topTimelineY);
+                        this.drawThinSquare(topTimelineX, topTimelineY, context, gradient, dotSize, dotSize, false);
+                        gradient = this.getColorFromQrSvg( leftTimelineX, leftTimelineY);
+                        this.drawThinSquare(leftTimelineX, leftTimelineY, context, gradient, dotSize, dotSize, false);
+                        break;
+                    default:
+                        gradient = this.getColorFromQrSvg( topTimelineX, topTimelineY);
+                        this.drawSquare(topTimelineX, topTimelineY, context, dotSize, dotSize, false, gradient);
+                        gradient = this.getColorFromQrSvg( leftTimelineX, leftTimelineY);
+                        this.drawSquare(leftTimelineX, leftTimelineY, context, dotSize, dotSize, false, gradient);
+    
+                }
             }
         }
 
@@ -1096,7 +1507,6 @@ export class SVGDrawing {
                 isEyeBehindLogo = isEyeBehindLogo ||  this.isDataDotBehindLogo(rightBottom.x , rightBottom.y);
 
                 if(isEyeBehindLogo) continue;
-
                 if (agnX === 6 && (agnY === 6 || agnY === edgeCenter)) {
                 } else if (agnY === 6 && (agnX === 6 || agnX === edgeCenter)) {
                 } else if (agnX !== 6 && agnX !== edgeCenter && agnY !== 6 && agnY !== edgeCenter) {
@@ -1280,15 +1690,23 @@ export class SVGDrawing {
                 drawShape = this.drawDiamond.bind(this);
                 boolFlag = true;
                 break;
+            case DataPattern.THIN_SQUARE:
+                drawShape = this.drawThinSquare.bind(this);
+                break;
             default:
                 drawShape = this.drawSquare.bind(this);
                 break;
         }
 
+
         let x = shape === DataPattern.CIRCLE ? (centerX - 2) * nWidth + nWidth / 2 : (centerX - 2) * nWidth;
         let y = shape === DataPattern.CIRCLE ? (centerY - 2) * nHeight + nHeight / 2 : (centerY - 2) * nHeight;
-        const height = shape === DataPattern.CIRCLE ? nHeight / 2 : nHeight;
-        const width = shape === DataPattern.CIRCLE ? nWidth / 2 : nWidth;
+        let originalHeight = shape === DataPattern.CIRCLE ? nHeight  / 2 : nHeight;
+        let originalWidth = shape === DataPattern.CIRCLE ? nWidth / 2 : nWidth;
+        let height = originalHeight * this.config.dotScale;
+        let width = originalWidth * this.config.dotScale;
+        x = x + ( originalWidth - width) / 2
+        y = y + ( originalHeight - height ) / 2
 
 
         for (let i = 0; i < 4; i++) {
@@ -1306,6 +1724,8 @@ export class SVGDrawing {
 
         x = shape === DataPattern.CIRCLE ? (centerX + 2) * nWidth + nWidth / 2 : (centerX + 2) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY - 2 + 1) * nHeight + nHeight / 2 : (centerY - 2 + 1) * nHeight;
+        x = x + ( originalWidth - width) / 2
+        y = y + ( originalHeight - height ) / 2
 
 
         for (let i = 0; i < 4; i++) {
@@ -1323,6 +1743,8 @@ export class SVGDrawing {
 
         x = shape === DataPattern.CIRCLE ? (centerX - 2 + 1) * nWidth + nWidth / 2 : (centerX - 2 + 1) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY - 2) * nHeight + nHeight / 2 : (centerY - 2) * nHeight;
+        x = x + ( originalWidth - width) / 2
+        y = y + ( originalHeight - height ) / 2
 
 
         for (let i = 0; i < 4; i++) {
@@ -1339,6 +1761,8 @@ export class SVGDrawing {
 
         x = shape === DataPattern.CIRCLE ? (centerX - 2) * nWidth + nWidth / 2 : (centerX - 2) * nWidth;
         y = shape === DataPattern.CIRCLE ? (centerY + 2) * nHeight + nHeight / 2 : (centerY + 2) * nHeight;
+        x = x + ( originalWidth - width) / 2
+        y = y + ( originalHeight - height ) / 2
 
 
         for (let i = 0; i < 4; i++) {
@@ -1355,6 +1779,8 @@ export class SVGDrawing {
 
         x = shape === DataPattern.CIRCLE ? centerX * nWidth + nWidth / 2 : centerX * nWidth;
         y = shape === DataPattern.CIRCLE ? centerY * nHeight + nHeight / 2 : centerY * nHeight;
+        x = x + ( originalWidth - width) / 2
+        y = y + ( originalHeight - height ) / 2
 
         let gr = this.getColorFromQrSvg( x, y);
 
@@ -1385,28 +1811,10 @@ export class SVGDrawing {
         if (isRound) {
             if (this.config.useOpacity) {
                 // @ts-ignore
-                // canvas.path(`M0 0
-                //     h${width - height / 4 * 2.5}
-                //     a${height / 4},${height / 4} 0 0 1 ${height / 4},${height / 4}
-                //     v${height - height / 4 * 2.5}
-                //     a${height / 4},${height / 4} 0 0 1 -${height / 4},${height / 4}
-                //     h-${width - height / 4 * 2.5}
-                //     a${height / 4},${height / 4} 0 0 1 -${height / 4},-${height / 4}
-                //     v-${height - height / 4 * 2.5}
-                //     a${height / 4},${height / 4} 0 0 1 ${height / 4},-${height / 4}`)
                 canvas.rect(height, width).radius(height / 4)
                     .fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).attr({opacity: op});
             } else {
                 // @ts-ignore
-                // canvas.path(`M0 0
-                //     h${width - height / 4 * 2.5}
-                //     a${height / 4},${height / 4} 0 0 1 ${height / 4},${height / 4}
-                //     v${height - height / 4 * 2.5}
-                //     a${height / 4},${height / 4} 0 0 1 -${height / 4},${height / 4}
-                //     h-${width - height / 4 * 2.5}
-                //     a${height / 4},${height / 4} 0 0 1 -${height / 4},-${height / 4}
-                //     v-${height - height / 4 * 2.5}
-                //     a${height / 4},${height / 4} 0 0 1 ${height / 4},-${height / 4}`)
                     canvas.rect(height, width).radius(height / 4)
                     .fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
             }
@@ -1414,33 +1822,14 @@ export class SVGDrawing {
         }
         if (this.config.useOpacity) {
             //@ts-ignore
-            //@ts-ignore
-            // console.log(gradient)
-            // TODO: Move back to path based implementation
-            // @ts-ignore
-            // canvas.path(`M0 0
-            // h${width}
-            // v${height}
-            // h-${width}
-            // v-${height} Z`)
-            let rect = canvas.rect(height, width).
+            canvas.rect(height, width).
             move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY).
             attr({opacity: op }).
             fill(gradient).
             transform({ rotate : rotate})
-
-            
-
         } else {
-            // TODO: Move back to path based implementation
             // @ts-ignore
-            // canvas.path(`M0 0
-            // h${width}
-            // v${height}
-            // h-${width}
-            // v-${height} Z`)
             canvas.rect(height, width).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
-            
         }
     }
 
@@ -1502,6 +1891,7 @@ export class SVGDrawing {
         }
     }
 
+
     private drawDiamond(startX: number, startY: number, context: object, gradient: string , width: number, height: number, isRight?: boolean, isMask?: boolean) {
         const op = isMask ? 0.6 : 1;
         if(gradient.length > 7 ){
@@ -1515,28 +1905,7 @@ export class SVGDrawing {
         if(this.config.gradientType === GradientType.VERTICAL){
             rotate = 90;
         }
-        // const coordinates = isRight ? [
-        //     [startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
-        //     [startX + width + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
-        //     [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
-        //     [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
-        //     [startX + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
-        //     [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
-        // ] : [
-        //     [startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
-        //     [startX + width / 2 + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY],
-        //     [startX + width + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
-        //     [startX + width + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
-        //     [startX + width / 2 + this.config.margin + this.shiftX, startY + height + this.config.margin + this.shiftY],
-        //     [startX + this.config.margin + this.shiftX, startY + height / 2 + this.config.margin + this.shiftY],
-        // ];
         const d = width/2;
-        // const polygon = context.polygon(coordinates);
-        // if (this.config.useOpacity) {
-        //     polygon.fill(gradient).attr({opacity: op});
-        // } else {
-        //     polygon.fill(gradient);
-        // }
         if (isRight) {
             if (this.config.useOpacity) {
                 // @ts-ignore
@@ -1560,106 +1929,8 @@ export class SVGDrawing {
         }
     }
 
-    private async drawLeafFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRight: boolean, gradient: string | Gradient) {
-        const moduleSize = this.config.moduleSize;
-        const r = startX + width;
-        const b = startY + height;
-        const radius = moduleSize * 2;
-
-        gradient = this.config.eyeFrameColor ? this.config.eyeFrameColor : await this.getGradientFromCanvas(canvas, startX, startY, width,height);
-
-        if (isRight) {
-            // @ts-ignore
-            canvas.path(`M0 0 
-            h${width - radius * 1.5} 
-            v${height - radius * 1.5} 
-            a${radius},${radius} 0 0 1 -${radius},${radius} 
-            h-${width - radius * 1.5} 
-            v-${height - radius * 1.5} 
-            a${radius},${radius} 0 0 1 ${radius},-${radius}`)
-                .fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize });
-        } else {
-            // @ts-ignore
-            canvas.path(`M0 0 
-            h${width - radius * 1.5} 
-            a${radius},${radius} 0 0 1 ${radius},${radius} 
-            v${height - radius * 1.5} 
-            h-${width - radius * 1.5} 
-            a${radius},${radius} 0 0 1 -${radius},-${radius} 
-            v-${height - radius * 1.5} z`)
-                .fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize });
-        }
-
-    }
-
-    private async drawCircularFrame(startX: number, startY: number, canvas: object, width: number, height: number, isLarge: boolean, gradient: string | Gradient) {
-        const moduleSize = this.config.moduleSize;
-
-        gradient = this.config.eyeFrameColor ? this.config.eyeFrameColor : await this.getGradientFromCanvas(canvas, startX, startY, width,height);
-
-
-        // @ts-ignore
-        canvas.path(`M 0, 0
-        a ${width/2 - moduleSize},${width/2 - moduleSize} 0 1,1 ${width - moduleSize},0
-        a ${width/2 - moduleSize},${width/2 - moduleSize} 0 1,1 -${width - moduleSize},0`)
-            .fill('none')
-            .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-            .stroke({ color: gradient, width: this.config.moduleSize });
-        // // @ts-ignore
-        // canvas.circle().radius(width / 2).fill(gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
-        // // @ts-ignore
-        // canvas.circle().radius(width / 2 - moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#ffffff').move(startX + this.config.margin + moduleSize + this.shiftX, startY + this.config.margin + moduleSize + this.shiftY);
-    }
-
-    private async getGradientFromCanvas(canvas: object, startX: number, startY: number, width: number, height: number) {
-        let gradient = this.config.colorDark ? this.config.colorDark : '#000';
-        return gradient;
-    }
-
-    private async drawSquareEyeFrame(startX: number, startY: number, canvas: object, width: number, height: number, isRound: boolean, gradient: string | Gradient) {
-        const moduleSize = this.config.moduleSize;
-        const radius = height / 4;
-
-        gradient = this.config.eyeFrameColor ? this.config.eyeFrameColor : await this.getGradientFromCanvas(canvas, startX, startY, width,height);
-
-        if (isRound) {
-            // @ts-ignore
-            canvas.path(`M0 0
-            h${width - radius * 2.5}
-            a${radius},${radius} 0 0 1 ${radius},${radius}
-            v${height - radius * 2.5}
-            a${radius},${radius} 0 0 1 -${radius},${radius}
-            h-${width - radius * 2.5}
-            a${radius},${radius} 0 0 1 -${radius},-${radius}
-            v-${height - radius * 2.5}
-            a${radius},${radius} 0 0 1 ${radius},-${radius}`)
-                .fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize });
-            // canvas.rect(height, width).radius(radius).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
-            // // @ts-ignore
-            // canvas.rect(height - 1.5 * moduleSize, width - 1.5 * moduleSize).radius(radius).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize * 0.75 + this.config.margin + this.shiftX, startY + moduleSize * 0.75 + this.config.margin + this.shiftY);
-        } else {
-            // TODO: move back to path based implementation
-            // @ts-ignore
-            canvas.path(`M0 0
-            h${width - moduleSize}
-            v${height - moduleSize}
-            h-${width - moduleSize}
-            v-${height - moduleSize} z`)
-                .fill('none')
-                .move(startX + this.config.margin + this.shiftX + moduleSize / 2, startY + this.config.margin + this.shiftY + moduleSize / 2)
-                .stroke({ color: gradient, width: this.config.moduleSize });
-            // // @ts-ignore
-            // canvas.rect(height, width).fill(this.config.eyeFrameColor ? this.config.eyeFrameColor : gradient).move(startX + this.config.margin + this.shiftX, startY + this.config.margin + this.shiftY);
-            // // @ts-ignore
-            // canvas.rect(height - 2 * moduleSize, width - 2 * moduleSize).fill(this.config.backgroundColor ? this.config.backgroundColor : '#fff').move(startX + moduleSize + this.config.margin + this.shiftX, startY + moduleSize + this.config.margin + this.shiftY);
-        }
-
+    drawThinSquare(startX: number, startY: number, canvas: object, gradient: string, width: number, height: number, isRound?: boolean, isMask?: boolean){
+        this.drawSquare(startX, startY, canvas, width, height, true, gradient , isMask )
     }
 
     private async drawFocus(startX: number, startY: number, canvas: object, gradient: string | undefined, width: number, height: number) {
@@ -1714,7 +1985,7 @@ export class SVGDrawing {
                         });
         
 
-        //BOTTOM RIGHT FOCUS 
+        //BOTTOM LEFT FOCUS 
         // @ts-ignore
         canvas.polyline([   startX + frameWidth / 2  , startY  + frameWidth / 2 + height * 2 / 3  ,
                             startX + frameWidth / 2  , startY + height - frameWidth / 2,
@@ -1978,7 +2249,12 @@ export class SVGDrawing {
 
     isDataDotBehindLogo( dataDotLeftPosition : number, dataDotTopPosition :number ) {
 
-        const dotLength = this.config.moduleSize ;        
+        let dotLength ;
+        
+        if(this.config.dotScale > 0 && this.config.dotScale <= 1)
+            dotLength = this.config.moduleSize * this.config.dotScale ;
+        else   
+            dotLength = this.config.moduleSize ;      
 
         const logoXPosition = this.logoAreaCordinateX - this.config.margin ;
         const logoYPosition = this.logoAreaCordinateY - this.config.margin ;
@@ -2085,6 +2361,31 @@ export class SVGDrawing {
         this.logoAreaCordinateY = this.shiftY + 0.5 * ( this.config.size - logoAreaHeight );
     }
 
+
+    create2DArrayOfDots(moduleCount: number, xyOffset:number) {
+        let TwoDArrayOfDataDots: Array<Array<boolean>> = []
+            for (let row = 0; row < moduleCount; row++) {
+                TwoDArrayOfDataDots[row] = []
+                for (let col = 0; col < moduleCount; col++) { 
+                    const drawDataDot = this.isDark.bind(this)(row, col) || false;
+
+                    const isBlkPosCtr = (col < 8 && (row < 8 || row >= moduleCount - 8)) || (col >= moduleCount - 8 && row < 8);
+                    let bProtected = isBlkPosCtr || !drawDataDot;
+
+                    const nLeft = col * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
+                    const nTop = row * this.config.nSize + (bProtected ? 0 : xyOffset * this.config.nSize);
+
+                    let _isDataDotBehindLogo = false;
+                    if( this.config.logoBackground && this.config.logoImage ){
+                        _isDataDotBehindLogo = this.isDataDotBehindLogo(nLeft , nTop );
+                    }
+                    bProtected = bProtected || _isDataDotBehindLogo;
+                    TwoDArrayOfDataDots[row][col] = !bProtected;
+                }
+            }
+        this.TwoDArray = TwoDArrayOfDataDots;
+    }
+      
 }
 
 
