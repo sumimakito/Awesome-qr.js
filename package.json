@@ -27,19 +27,19 @@
   "dependencies": {
     "buffer": "^6.0.3",
     "js-binary-schema-parser": "^2.0.0",
-    "skia-canvas": "^0.9.27"
+    "jszip": "^3.10.1",
+    "skia-canvas": "^3.0.8"
   },
   "devDependencies": {
     "@types/mocha": "^8.2.3",
-    "@types/node": "^14.0.14",
-    "@types/skia-canvas": "^0.9.2",
+    "@types/node": "^26.2.0",
     "jimp": "^0.16.1",
     "jsqr": "^1.4.0",
     "mocha": "^8.3.0",
     "tmp": "^0.2.1",
     "ts-loader": "^8.0.18",
     "ts-node": "^10.1.0",
-    "typescript": "^3.9.6",
+    "typescript": "^6.0.3",
     "webpack": "^5.27.2",
     "webpack-cli": "^4.5.0"
   }
