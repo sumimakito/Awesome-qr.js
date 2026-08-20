@@ -1,5 +1,9 @@
 # Changelog
 
+## Ver 2.1.6
+
+- Update skia-canvas to 3.0.8 and typescript to 6.0.3.
+
 ## Ver 2.1.5
 
 - Fixed prebuilt libraries.

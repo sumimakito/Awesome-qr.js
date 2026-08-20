@@ -95,32 +95,34 @@ class QR8bitByte {
       const byteArray: number[] = [];
       const code = this.data.charCodeAt(i);
 
-      if (code > 0x10000) {
-        byteArray[0] = 0xf0 | ((code & 0x1c0000) >>> 18);
-        byteArray[1] = 0x80 | ((code & 0x3f000) >>> 12);
-        byteArray[2] = 0x80 | ((code & 0xfc0) >>> 6);
-        byteArray[3] = 0x80 | (code & 0x3f);
-      } else if (code > 0x800) {
-        byteArray[0] = 0xe0 | ((code & 0xf000) >>> 12);
-        byteArray[1] = 0x80 | ((code & 0xfc0) >>> 6);
-        byteArray[2] = 0x80 | (code & 0x3f);
-      } else if (code > 0x80) {
-        byteArray[0] = 0xc0 | ((code & 0x7c0) >>> 6);
-        byteArray[1] = 0x80 | (code & 0x3f);
-      } else {
-        byteArray[0] = code;
+      if (code < 0x80) byteArray.push(code);
+      else if (code < 0x800) {
+        byteArray.push(0xc0 | (code >> 6),
+          0x80 | (code & 0x3f));
+      }
+      else if (code < 0xd800 || code >= 0xe000) {
+        byteArray.push(0xe0 | (code >> 12),
+          0x80 | ((code >> 6) & 0x3f),
+          0x80 | (code & 0x3f));
+      }
+      // surrogate pair
+      else {
+        i++;
+        // UTF-16 encodes 0x10000-0x10FFFF by
+        // subtracting 0x10000 and splitting the
+        // 20 bits of 0x0-0xFFFFF into two halves
+        const codePoint = 0x10000 + (((code & 0x3ff) << 10)
+          | (this.data.charCodeAt(i) & 0x3ff));
+        byteArray.push(0xf0 | (codePoint >> 18),
+          0x80 | ((codePoint >> 12) & 0x3f),
+          0x80 | ((codePoint >> 6) & 0x3f),
+          0x80 | (codePoint & 0x3f));
       }
 
       byteArrays.push(byteArray);
     }
 
     this.parsedData = Array.prototype.concat.apply([], byteArrays);
-
-    if (this.parsedData.length != this.data.length) {
-      this.parsedData.unshift(191);
-      this.parsedData.unshift(187);
-      this.parsedData.unshift(239);
-    }
   }
 
   getLength() {

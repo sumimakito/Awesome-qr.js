@@ -1,4 +1,4 @@
-import { Canvas, CanvasRenderingContext2D, Image, loadImage } from "skia-canvas";
+import { Canvas, CanvasRenderingContext2D, Image, loadImage, ExportFormat } from "skia-canvas";
 import { decompressFrames, parseGIF } from "./gifuct-js";
 import { QRCodeModel, QRErrorCorrectLevel, QRUtil } from "./qrcode";
 import GIFEncoder from "./gif.js/GIFEncoder";
@@ -334,8 +334,9 @@ export class AwesomeQR {
     this.qrCode.make();
   }
 
-  draw(): Promise<Buffer | ArrayBuffer | string | undefined> {
-    return new Promise((resolve) => this._draw().then(resolve));
+  async draw(): Promise<Buffer | Uint8Array  | string | undefined> {
+    const result = await this._draw();
+    return result;
   }
 
   private _clear() {
@@ -851,7 +852,7 @@ export class AwesomeQR {
       outCanvasContext.drawImage(mainCanvas.getContext('2d').canvas, 0, 0, rawSize, rawSize);
       this.canvas = outCanvas;
 
-      const format = this.options.gifBackground ? "gif" : "png";
+      const format = (this.options.gifBackground ? "gif" : "png") as ExportFormat;
 
       if (isElement(this.canvas)) {
         return Promise.resolve(this.canvas.toDataURL(format));

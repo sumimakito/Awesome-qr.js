@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "target": "ES5",
     "module": "CommonJS",
     "outDir": "./lib",
     "declaration": true,
     "strict": true,
     "esModuleInterop": true,
+    "types": ["node", "mocha"],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true
@@ -13,6 +15,9 @@
   "typeAcquisition": {
     "enable": true
   },
-  "include": ["./src/**/*"],
+  "ts-node": {
+    "files": true
+  },
+  "include": ["./src/**/*", "./test/**/*"],
   "exclude": ["node_modules", "lib"]
 }
