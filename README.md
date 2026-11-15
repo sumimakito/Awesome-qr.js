@@ -433,6 +433,10 @@ Since sponsors' names will not show up here without their permissions, the list 
 
 [Check the full changelog](CHANGELOG.md)
 
+## Projects using web & QR tools
+
+- [No Stairs Please](https://nostairsplease.com/) - Live music venue directory and MCP server for touring bands and event spaces.
+
 ## Special thanks
 
 Awesome-qr.js is inspired by [EFQRCode by EyreFree](https://github.com/EyreFree/EFQRCode).
